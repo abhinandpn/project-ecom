@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	domain "github.com/thnkrn/go-gin-clean-arch/pkg/domain"
+	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 )
 
 type UserUseCase interface {

@@ -4,13 +4,13 @@
 package di
 
 import (
+	http "github.com/abhinandpn/project-ecom/pkg/api"
+	handler "github.com/abhinandpn/project-ecom/pkg/api/handler"
+	config "github.com/abhinandpn/project-ecom/pkg/config"
+	db "github.com/abhinandpn/project-ecom/pkg/db"
+	repository "github.com/abhinandpn/project-ecom/pkg/repository"
+	usecase "github.com/abhinandpn/project-ecom/pkg/usecase"
 	"github.com/google/wire"
-	http "github.com/thnkrn/go-gin-clean-arch/pkg/api"
-	handler "github.com/thnkrn/go-gin-clean-arch/pkg/api/handler"
-	config "github.com/thnkrn/go-gin-clean-arch/pkg/config"
-	db "github.com/thnkrn/go-gin-clean-arch/pkg/db"
-	repository "github.com/thnkrn/go-gin-clean-arch/pkg/repository"
-	usecase "github.com/thnkrn/go-gin-clean-arch/pkg/usecase"
 )
 
 func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {

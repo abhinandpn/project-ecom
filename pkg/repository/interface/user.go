@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/thnkrn/go-gin-clean-arch/pkg/domain"
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 )
 
 type UserRepository interface {

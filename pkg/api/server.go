@@ -5,9 +5,9 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "github.com/thnkrn/go-gin-clean-arch/cmd/api/docs"
-	handler "github.com/thnkrn/go-gin-clean-arch/pkg/api/handler"
-	middleware "github.com/thnkrn/go-gin-clean-arch/pkg/api/middleware"
+	_ "github.com/abhinandpn/project-ecom/cmd/api/docs"
+	handler "github.com/abhinandpn/project-ecom/pkg/api/handler"
+	middleware "github.com/abhinandpn/project-ecom/pkg/api/middleware"
 )
 
 type ServerHTTP struct {
