@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	config, configErr := config.LoadConfig()
+	config, configErr := config.LoadConfig()go mod vendor
+
 	if configErr != nil {
 		log.Fatal("cannot load config: ", configErr)
 	}
