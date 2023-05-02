@@ -1,32 +1,9 @@
-#ECOMMERSE ROJECT
+# ECOMMERSE ROJECT
+| updating...!!
 
-
-updating...!!
-
-`tables`
-> admin
-    admin
-> cart
-    cart
-    cart iteams
-> coupon
-    coupens
-> favourites
-    favourites
-> order
-    orders
-    order iteams
-    order status
-> payment
-    payment details
-    payment status
-    payment method
-> product
-    category
-    product
-    product iteam
-    images
-> user
-    user
-    address
-    user info
+### To start the server
+```
+git clone https://github.com/abhinandpn/project-ecom
+cd project-ecoms
+make run
+```
