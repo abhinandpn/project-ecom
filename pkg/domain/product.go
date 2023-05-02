@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type Catogery struct {
+type Categery struct {
 	Id           uint   `gorm:"primaryKey;unique;not null"`
 	CategoryName string `gorm:"unique;not null"`
 	Created_at   time.Time
@@ -14,7 +14,7 @@ type Product struct {
 	Description     string
 	Brand           string
 	Category_id     uint
-	Category        Catogery `gorm:"foreignKey:Category_id"`
+	Category        Categery `gorm:"foreignKey:Category_id"`
 	Price           uint
 	Size            uint
 	Colour          string
