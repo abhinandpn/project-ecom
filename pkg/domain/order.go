@@ -20,15 +20,15 @@ type Order struct {
 	DeliveryUpdatedAt time.Time      `json:"delivery_time"`
 }
 
-// type OrderLine struct {
-// 	ID            uint        `gorm:"primaryKey"`
-// 	ProductItemID uint        `json:"product_item_id"`
-// 	ProductItem   ProductItem `gorm:"foreignKey:ProductItemID" json:"-"`
-// 	OrderID       uint        `json:"order_Id"`
-// 	Order         Order       `gorm:"foreignKey:OrderID" json:"-"`
-// 	Quantity      int         `json:"quantity"`
-// 	Price         float64     `json:"price"`
-// }
+type OrderLine struct {
+	ID            uint        `gorm:"primaryKey"`
+	ProductItemID uint        `json:"product_item_id"`
+	ProductItem   ProductItem `gorm:"foreignKey:ProductItemID" json:"-"`
+	OrderID       uint        `json:"order_Id"`
+	Order         Order       `gorm:"foreignKey:OrderID" json:"-"`
+	Quantity      int         `json:"quantity"`
+	Price         float64     `json:"price"`
+}
 
 type OrderStatus struct {
 	ID          uint `gorm:"primaryKey"`
