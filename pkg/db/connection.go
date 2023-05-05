@@ -26,7 +26,7 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.Address{},
 
 		// Admin Table
-		&domain.Admins{},
+		&domain.Admin{},
 
 		// Product Table
 		&domain.Categery{},
