@@ -5,7 +5,7 @@ import (
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
-	services "github.com/abhinandpn/project-ecom/pkg/usecase/interface"
+	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 )
 
 type userUseCase struct {
