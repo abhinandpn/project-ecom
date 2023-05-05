@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/copier"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
-	services "github.com/abhinandpn/project-ecom/pkg/usecase/interface"
+	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 )
 
 type UserHandler struct {

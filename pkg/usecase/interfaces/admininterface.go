@@ -6,7 +6,7 @@ import (
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 )
 
-type adminUseCase interface {
+type AdminUseCase interface {
 	// Admin interface
 	SignUp(ctx context.Context, admin domain.Admin) error
 }

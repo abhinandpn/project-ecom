@@ -4,6 +4,6 @@ var ResponseMap map[string]string
 
 type ResAdminLogin struct {
 	ID       uint   `json:"id" `
-	UserName string `json:"user_name"`
+	UserName string `json:"username"`
 	Email    string `json:"email"`
 }
