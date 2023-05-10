@@ -19,7 +19,7 @@ func NewAdminUseCase(repo interfaces.AdminRepository) services.AdminUseCase {
 		adminRepo: repo,
 	}
 }
-func (c *adminUseCase) SignUp(ctx context.Context, admin domain.Admin) error {
+func (c *adminUseCase) Login(ctx context.Context, admin domain.Admin) error {
 
 	// find if the admin exist or not
 	if admin, err := c.adminRepo.FindAdmin(ctx, admin); err != nil {
