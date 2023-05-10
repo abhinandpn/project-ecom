@@ -1,5 +1,11 @@
 package interfaces
 
+import (
+	"context"
+
+	domain "github.com/abhinandpn/project-ecom/pkg/domain"
+)
+
 type AdminUseCase interface {
-	// CreateAdmin(req.AdminLoginStruct) error
+	Login(ctx context.Context, admin domain.Admin) (domain.Admin, error)
 }
