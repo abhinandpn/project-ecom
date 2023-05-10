@@ -12,7 +12,7 @@ ___
 1st week task 
 ```
 User sign up & login with validation.
-Admin sign in.
+Admin Log in.
 OTP login.
 Admin side user management 
 (list user, block/unblock).
