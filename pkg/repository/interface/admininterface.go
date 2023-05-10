@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
 )
 
 type AdminRepository interface {
-
-	// admin standerd for login and signup
+	CreateAdmin(req.AdminLoginStruct) error
 	FindAdmin(ctx context.Context, admin domain.Admin) (domain.Admin, error)
-	SaveAdmin(ctx context.Context, admin domain.Admin) error
 }
