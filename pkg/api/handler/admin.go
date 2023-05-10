@@ -33,5 +33,5 @@ func (adm *AdminHandler) AdminSignUp(ctx *gin.Context) {
 		return
 	}
 
-	// err:=adm.ad
+	// err:=adm
 }
