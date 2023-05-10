@@ -6,7 +6,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/abhinandpn/project-ecom/cmd/api/docs"
-	handler "github.com/abhinandpn/project-ecom/pkg/api/handler"
+	"github.com/abhinandpn/project-ecom/pkg/api/handler"
 	middleware "github.com/abhinandpn/project-ecom/pkg/api/middleware"
 )
 
