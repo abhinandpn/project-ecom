@@ -8,5 +8,5 @@ import (
 
 type AdminUseCase interface {
 	// Admin interface
-	SignUp(ctx context.Context, admin domain.Admin) error
+	Login(ctx context.Context, admin domain.Admin) error
 }
