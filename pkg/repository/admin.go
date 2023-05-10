@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
-	domain "github.com/abhinandpn/project-ecom/pkg/domain"
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +17,16 @@ type adminDatabase struct {
 func NewAdminRepository(DB *gorm.DB) interfaces.UserRepository {
 	return &userDatabase{DB}
 }
+func (adm *adminDatabase) CreateAdmin(admin req.AdminLoginStruct) error {
+	query := `Insert into admins (email,username,password)Values ($1,$2,$3)`
+	if adm.DB.Exec(query, admin.Email, admin.UserName, admin.Password).Error != nil {
+		return errors.New("faild to save admin")
+	}
+	return nil
+}
 func (adm *adminDatabase) FindAdmin(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
-	if adm.DB.Raw("SELECT * FROM admins WHERE email=? OR username=?", admin.Email, admin.Username).Scan(&admin).Error != nil {
+	query := `select * from admins where email=? or username=?`
+	if adm.DB.Exec(query, admin.Email, admin.Username).Error != nil {
 		return admin, errors.New("faild to find admin")
 	}
 	return admin, nil
