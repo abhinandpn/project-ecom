@@ -28,31 +28,31 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		// Admin Table
 		&domain.Admin{},
 
-		// Product Table
-		&domain.Categery{},
-		&domain.ProductBrand{},
-		&domain.Product{},
-		&domain.ProductItem{},
-		&domain.Coupons{},
+		// // Product Table
+		// &domain.Categery{},
+		// &domain.ProductBrand{},
+		// &domain.Product{},
+		// &domain.ProductItem{},
+		// &domain.Coupons{},
 
-		// cart Table
-		&domain.Cart{},
-		&domain.CartItems{},
+		// // cart Table
+		// &domain.Cart{},
+		// &domain.CartItems{},
 
-		// Wish List
-		&domain.Wishlist{},
-		&domain.WishlistItem{},
+		// // Wish List
+		// &domain.Wishlist{},
+		// &domain.WishlistItem{},
 
-		// order Table
-		&domain.Order{},
-		&domain.OrderLine{},
-		&domain.OrderStatus{},
-		&domain.DeliveryStatus{},
-		&domain.Return{},
+		// // order Table
+		// &domain.Order{},
+		// &domain.OrderLine{},
+		// &domain.OrderStatus{},
+		// &domain.DeliveryStatus{},
+		// &domain.Return{},
 
-		// Payment Detail
-		&domain.PaymentStatus{},
-		&domain.PaymentDetails{},
+		// // Payment Detail
+		// &domain.PaymentStatus{},
+		// &domain.PaymentDetails{},
 	)
 
 	// Error handling For Database Table creating
