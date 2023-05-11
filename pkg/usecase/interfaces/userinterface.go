@@ -9,7 +9,7 @@ import (
 type UserUseCase interface {
 
 	// Signup
-	// SignUp(ctx context.Context, user domain.Users) error
+	SignUp(ctx context.Context, user domain.Users) error
 
 	//........................................................
 	FindAll(ctx context.Context) ([]domain.Users, error)
