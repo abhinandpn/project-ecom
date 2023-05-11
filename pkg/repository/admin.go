@@ -14,8 +14,8 @@ type adminDatabase struct {
 	DB *gorm.DB
 }
 
-func NewAdminRepository(DB *gorm.DB) interfaces.UserRepository {
-	return &userDatabase{DB}
+func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
+	return &adminDatabase{DB: DB}
 }
 func (adm *adminDatabase) CreateAdmin(admin req.AdminLoginStruct) error {
 	query := `Insert into admins (email,username,password)Values ($1,$2,$3)`
