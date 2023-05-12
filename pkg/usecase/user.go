@@ -57,4 +57,29 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 
 }
 
-// ........................................
+func (usr *userUseCase) Login(ctx context.Context, user domain.Users) (domain.Users, error) {
+
+	dbUser, dbErr := usr.userRepo.FindUser(ctx, user)
+
+	if dbErr != nil {
+		return user, dbErr
+	} else if dbUser.ID == 0 {
+		return user, errors.New("user not exist with this details")
+	}
+
+	// check the block status
+
+	if dbUser.IsBlocked {
+		return user, errors.New("user blocked by admin")
+	}
+
+	// check username with password
+
+	err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
+
+	if err != nil {
+		return user, errors.New("entered password is wrong")
+	}
+
+	return dbUser, nil
+}
