@@ -2,23 +2,18 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 
-	domain "github.com/abhinandpn/project-ecom/pkg/domain"
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type UserHandler struct {
 	userUseCase services.UserUseCase
-}
-
-type Response struct {
-	ID      uint   `copier:"must"`
-	Name    string `copier:"must"`
-	Surname string `copier:"must"`
 }
 
 func NewUserHandler(usecase services.UserUseCase) *UserHandler {
@@ -27,97 +22,42 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 	}
 }
 
-// FindAll godoc
-// @summary Get all users
-// @description Get all users
-// @tags users
+// ----------------------User-----------------
+// UserSignUp godoc
+// @summary api for user to signup
 // @security ApiKeyAuth
-// @id FindAll
-// @produce json
-// @Router /api/users [get]
-// @response 200 {object} []Response "OK"
-func (cr *UserHandler) FindAll(c *gin.Context) {
-	users, err := cr.userUseCase.FindAll(c.Request.Context())
+// @id UserSignUp
+// @tags User Signup
+// @Param input body req.ReqUserDetails{} true "Input Fields"
+// @Router /signup [post]
+// @Success 200 "Successfully created account for user"
+// @Failure 400 "invalid input"
 
+func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
+
+	var body req.ReqUserDetails
+
+	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		response := []Response{}
-		copier.Copy(&response, &users)
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
 
-		c.JSON(http.StatusOK, response)
-	}
-}
-
-func (cr *UserHandler) FindByID(c *gin.Context) {
-	paramsId := c.Param("id")
-	id, err := strconv.Atoi(paramsId)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "cannot parse id",
-		})
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	user, err := cr.userUseCase.FindByID(c.Request.Context(), uint(id))
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		response := Response{}
-		copier.Copy(&response, &user)
-
-		c.JSON(http.StatusOK, response)
-	}
-}
-
-func (cr *UserHandler) Save(c *gin.Context) {
 	var user domain.Users
 
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	copier.Copy(&user, body)
+
+	err = usr.userUseCase.SignUp(ctx, user)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to signup", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	user, err := cr.userUseCase.Save(c.Request.Context(), user)
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		response := Response{}
-		copier.Copy(&response, &user)
-
-		c.JSON(http.StatusOK, response)
-	}
+	response := res.SuccessResponse(200, "Successfully Created Account", body)
+	ctx.JSON(200, response)
 }
 
-func (cr *UserHandler) Delete(c *gin.Context) {
-	paramsId := c.Param("id")
-	id, err := strconv.Atoi(paramsId)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Cannot parse id",
-		})
-		return
-	}
-
-	ctx := c.Request.Context()
-	user, err := cr.userUseCase.FindByID(ctx, uint(id))
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	}
-
-	if user == (domain.Users{}) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User is not booking yet",
-		})
-		return
-	}
-
-	cr.userUseCase.Delete(ctx, user)
-
-	c.JSON(http.StatusOK, gin.H{"message": "User is deleted successfully"})
-}
+// ----------------------User End-------------
