@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 	}
 }
 
-// ----------------------User-----------------
+// ---------------------- User Function -----------------
 // UserSignUp godoc
 // @summary api for user to signup
 // @security ApiKeyAuth
@@ -38,6 +39,7 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 	var body req.ReqUserDetails
 
 	err := ctx.ShouldBindJSON(&body)
+
 	if err != nil {
 		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
 
@@ -47,7 +49,7 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
 	var user domain.Users
 
-	copier.Copy(&user, body)
+	copier.Copy(&user, &body)
 
 	err = usr.userUseCase.SignUp(ctx, user)
 	if err != nil {
@@ -58,4 +60,36 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
 	response := res.SuccessResponse(200, "Successfully Created Account", body)
 	ctx.JSON(200, response)
+}
+func (usr *UserHandler) UserLogin(ctx *gin.Context) {
+
+	var body req.LoginStruct
+
+	err := ctx.ShouldBindJSON(&body)
+
+	if err != nil {
+
+		response := res.ErrorResponse(400, "invalid input", err.Error(), nil)
+
+		ctx.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	// Check all input filed is empty
+
+	if body.UserName == "" {
+
+		err := errors.New("enter username")
+
+		response := res.ErrorResponse(400, "invalid input", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var user domain.Users
+	copier.Copy(&user, &body)
+
+	// user, err := usr.userUseCase
+
 }
