@@ -10,6 +10,7 @@ type Users struct {
 	Email     string `gorm:"uniqueIndex" json:"email" binding:"required" validate:"required,email"`
 	Number    int    `gorm:"uniqueIndex" json:"phone" validate:"required,number"`
 	Password  string `json:"password" binding:"required" validate:"required,min=8,max=64"`
+	IsBlocked bool   `json:"isblock" gorm:"not null;default:false"`
 	CreatedAt time.Time
 }
 type UserInfo struct {
