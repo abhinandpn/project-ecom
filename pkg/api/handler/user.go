@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 
+	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -90,6 +91,24 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 	var user domain.Users
 	copier.Copy(&user, &body)
 
-	// user, err := usr.userUseCase
+	user, err = usr.userUseCase.Login(ctx, user)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to login", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
+	// generate JWT token
+
+	tokenString, err := auth.GenerateJWT(user.ID)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to create JWT token", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	ctx.SetCookie("user-auth", tokenString["JWT_CODE"], 60*60, "", "", false, true)
+
+	response := res.SuccessResponse(200, "successfully logged in", tokenString["JWT_CODE"])
+	ctx.JSON(http.StatusOK, response)
 }
