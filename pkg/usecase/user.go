@@ -21,13 +21,12 @@ func NewUserUseCase(repo interfaces.UserRepository) service.UserUseCase {
 
 // ........................................
 func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
-
 	// check alredy exist or not
 	checkUser, err := usr.userRepo.FindUser(ctx, user)
+
 	if err != nil {
 		return err
 	}
-
 	// if user not exist create user
 	if checkUser.ID == 0 {
 
