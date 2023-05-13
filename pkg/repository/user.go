@@ -22,9 +22,9 @@ func NewUserRepository(DB *gorm.DB) interfaces.UserRepository {
 // .....................................................
 // Find user by details
 func (usr *userDatabase) FindUser(ctx context.Context, user domain.Users) (domain.Users, error) {
-	query := `select * from user where id = ? or email = ? or phone = ? or username = ? `
+	query := `select * from users where id = ? or email = ? or number = ? or user_name = ? `
 
-	err := usr.DB.Raw(query, user.ID, user.Email, user.Number, user.UserName)
+	err := usr.DB.Raw(query, user.ID, user.Email, user.Number, user.UserName).Scan(&user).Error
 	if err != nil {
 		return user, errors.New("faild to get user")
 	}
@@ -68,7 +68,7 @@ func (usr *userDatabase) FindUserByNumber(ctx context.Context, number uint) (use
 // save user
 func (usr *userDatabase) SaveUser(ctx context.Context, user domain.Users) (UserId uint, err error) {
 
-	query := `insert in to users (username,f_name,l_name,email,phone,password,created_at)
+	query := `insert into users (user_name,f_name,l_name,email,number,password,created_at)
 	Values ($1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7)`
 
 	createdAt := time.Now()
