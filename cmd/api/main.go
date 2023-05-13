@@ -4,6 +4,7 @@ import (
 	"log"
 
 	config "github.com/abhinandpn/project-ecom/pkg/config"
+
 	di "github.com/abhinandpn/project-ecom/pkg/di"
 )
 
