@@ -107,8 +107,8 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("user-auth", tokenString["JWT_CODE"], 60*60, "", "", false, true)
+	ctx.SetCookie("user-auth", tokenString["jwtToken"], 60*60, "", "", false, true)
 
-	response := res.SuccessResponse(200, "successfully logged in", tokenString["JWT_CODE"])
+	response := res.SuccessResponse(200, "successfully logged in", tokenString["jwtToken"])
 	ctx.JSON(http.StatusOK, response)
 }
