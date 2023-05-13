@@ -17,10 +17,15 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 	wire.Build(
 		// Database
 		db.ConnectDatabase,
-		// repo
-		repository.NewUserRepository,
-		usecase.NewUserUseCase,
+		// handler
+		handler.NewAdminHandler,
 		handler.NewUserHandler,
+		// usecase
+		usecase.NewAdminUseCase,
+		usecase.NewUserUseCase,
+		// repo
+		repository.NewAdminRepository,
+		repository.NewUserRepository,
 		http.NewServerHTTP)
 
 	return &http.ServerHTTP{}, nil
