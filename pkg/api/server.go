@@ -2,39 +2,28 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/abhinandpn/project-ecom/cmd/api/docs"
 	"github.com/abhinandpn/project-ecom/pkg/api/handler"
-	middleware "github.com/abhinandpn/project-ecom/pkg/api/middleware"
+	"github.com/abhinandpn/project-ecom/pkg/api/routes"
 )
 
 type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(userHandler *handler.UserHandler) *ServerHTTP {
-	engine := gin.New()
+func NewServerHTTP(userHandler *handler.UserHandler,
+	adminHandler *handler.AdminHandler) *ServerHTTP {
 
-	// Use logger from Gin
-	engine.Use(gin.Logger())
+	Engine := gin.New()
+	Engine.Use(gin.Logger())
 
-	// Swagger docs
-	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// For Swagger
+	// For Routes
+	routes.UserRoutes(Engine.Group("/"), userHandler)
+	routes.AdminRoute(Engine.Group("/admin"), adminHandler)
 
-	// Request JWT
-	engine.POST("/login", middleware.LoginHandler)
-
-	// Auth middleware
-	// api := engine.Group("/api", middleware.AuthorizationMiddleware)
-
-	// api.GET("users", userHandler.FindAll)
-	// api.GET("users/:id", userHandler.FindByID)
-	// api.POST("users", userHandler.Save)
-	// api.DELETE("users/:id", userHandler.Delete)
-
-	return &ServerHTTP{engine: engine}
+	return &ServerHTTP{engine: Engine}
 }
 
 func (sh *ServerHTTP) Start() {
