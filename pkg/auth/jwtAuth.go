@@ -26,7 +26,7 @@ func GenerateJWT(id uint) (map[string]string, error) {
 		return nil, err
 	}
 	// refresh token add next time
-	return map[string]string{"accessToken": tokenString}, nil
+	return map[string]string{"jwtToken": tokenString}, nil
 }
 
 func ValidateToken(tokenString string) (jwt.StandardClaims, error) {
