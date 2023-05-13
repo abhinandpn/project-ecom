@@ -38,12 +38,15 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 
 func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
-	fmt.Println("------------------------------------")
+	fmt.Println("----------------User Signup Started---------------")
 	var body req.ReqUserDetails
 
 	err := ctx.ShouldBindJSON(&body)
 
 	if err != nil {
+
+		fmt.Println("----------------User SIgnup Should Bind Json error handling---------------")
+
 		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
 
 		ctx.JSON(http.StatusBadRequest, response)
@@ -56,6 +59,9 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
 	err = usr.userUseCase.SignUp(ctx, user)
 	if err != nil {
+
+		fmt.Println("----------------User SIgnup user err:=  detail copying from body---------------")
+
 		response := res.ErrorResponse(400, "faild to signup", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -63,17 +69,22 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
 	response := res.SuccessResponse(200, "Successfully Created Account", body)
 	ctx.JSON(200, response)
+	fmt.Println("----------------User Signup End success---------------")
 }
 
 // UserSignIn godoc
 
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
+	fmt.Println("----------------User Login Started---------------")
+
 	var body req.LoginStruct
 
 	err := ctx.ShouldBindJSON(&body)
 
 	if err != nil {
+
+		fmt.Println("----------------User Login Should Bind Json error handling---------------")
 
 		response := res.ErrorResponse(400, "invalid input", err.Error(), nil)
 
@@ -85,6 +96,8 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 	// Check all input filed is empty
 
 	if body.UserName == "" {
+
+		fmt.Println("----------------User Login check all filed is empty or not err ---------------")
 
 		err := errors.New("enter username")
 
@@ -98,6 +111,9 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
 	user, err = usr.userUseCase.Login(ctx, user)
 	if err != nil {
+
+		fmt.Println("----------------User Login User login error handling (user struct copy from body)---------------")
+
 		response := res.ErrorResponse(400, "faild to login", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -107,6 +123,9 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
 	tokenString, err := auth.GenerateJWT(user.ID)
 	if err != nil {
+
+		fmt.Println("----------------User Login Generate JWT error handling ---------------")
+
 		response := res.ErrorResponse(400, "faild to create JWT token", err.Error(), nil)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
@@ -116,4 +135,7 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
 	response := res.SuccessResponse(200, "successfully logged in", tokenString["jwtToken"])
 	ctx.JSON(http.StatusOK, response)
+
+	fmt.Println("------------------login success--------")
+
 }
