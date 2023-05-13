@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,7 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 
 func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
+	fmt.Println("------------------------------------")
 	var body req.ReqUserDetails
 
 	err := ctx.ShouldBindJSON(&body)
@@ -62,6 +64,9 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 	response := res.SuccessResponse(200, "Successfully Created Account", body)
 	ctx.JSON(200, response)
 }
+
+// UserSignIn godoc
+
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
 	var body req.LoginStruct
