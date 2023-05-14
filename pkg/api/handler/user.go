@@ -31,7 +31,7 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 // @id UserSignUp
 // @tags User Signup
 // @Param input body req.ReqUserDetails{} true "Input Fields"
-// @Router user/signup [post]
+// @Router /user/signup [post]
 // @Success 200 "Successfully created account for user"
 // @Failure 400 "invalid input"
 
@@ -65,7 +65,7 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 	ctx.JSON(200, response)
 }
 
-// UserSignIn godoc
+// UserLogin godoc
 
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
