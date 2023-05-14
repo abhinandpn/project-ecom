@@ -25,3 +25,7 @@ type PageNation struct {
 type BlockStruct struct {
 	UserId uint `json:"user_id" binding:"required,numaric"`
 }
+type ReqPagination struct {
+	Count      uint `json:"count"`
+	PageNumber uint `json:"page_number"`
+}
