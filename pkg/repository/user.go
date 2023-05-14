@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -26,7 +25,8 @@ func (usr *userDatabase) FindUser(ctx context.Context, user domain.Users) (domai
 
 	err := usr.DB.Raw(query, user.ID, user.Email, user.Number, user.UserName).Scan(&user).Error
 	if err != nil {
-		return user, errors.New("faild to get user")
+		// return user, errors.New("faild to get user")
+		return user, err
 	}
 	return user, nil
 }
