@@ -24,7 +24,8 @@ func (adm *AdminUseCase) Login(ctx context.Context, admin domain.Admin) (domain.
 	if err != nil {
 		return admin, err
 	} else if dbAdmin.ID == 0 {
-		return admin, errors.New("admin not exist")
+		// return admin, errors.New("admin not exist")
+		return admin, err
 
 	}
 	// Check the pass and username
