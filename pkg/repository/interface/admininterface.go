@@ -9,6 +9,8 @@ import (
 )
 
 type AdminRepository interface {
+	// Login Admin sudo .env
+	EnvAdminFind(ctx context.Context) (domain.Admin, error)
 	// Admin Main
 	CreateAdmin(req.AdminLoginStruct) error
 	FindAdmin(ctx context.Context, admin domain.Admin) (domain.Admin, error)

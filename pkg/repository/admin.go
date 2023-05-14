@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/abhinandpn/project-ecom/pkg/config"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -20,6 +21,22 @@ func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
 	return &adminDatabase{DB: DB}
 }
 
+// Find admin via env loading
+func (adm *adminDatabase) EnvAdminFind(ctx context.Context) (domain.Admin, error) {
+
+	enfCfg := config.GetSudoAdminDetails()
+	envAdmin := domain.Admin{
+		Email:    enfCfg.AdminMail,
+		Password: enfCfg.AdminPassword,
+		Username: enfCfg.AdminUserName,
+	}
+	fmt.Println("email", envAdmin.Email, "pass", envAdmin.Password)
+	if envAdmin.Email == "" || envAdmin.Password == "" || envAdmin.Username == "" {
+		return envAdmin, errors.New("admin not found")
+	}
+
+	return envAdmin, nil
+}
 func (adm *adminDatabase) CreateAdmin(admin req.AdminLoginStruct) error {
 	query := `Insert into admins (email,username,password)Values ($1,$2,$3)`
 	if adm.DB.Exec(query, admin.Email, admin.UserName, admin.Password).Error != nil {
