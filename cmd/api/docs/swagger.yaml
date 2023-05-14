@@ -1,32 +1,58 @@
 definitions:
-  handler.Response:
+  req.ReqUserDetails:
     properties:
-      id:
-        type: integer
-      name:
+      confirm_password:
         type: string
-      surname:
+      email:
         type: string
+      f_name:
+        maxLength: 50
+        minLength: 2
+        type: string
+      l_name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      password:
+        type: string
+      phone:
+        maxLength: 10
+        minLength: 10
+        type: string
+      username:
+        maxLength: 15
+        minLength: 3
+        type: string
+    required:
+    - confirm_password
+    - email
+    - f_name
+    - l_name
+    - password
+    - phone
+    - username
     type: object
 info:
   contact: {}
 paths:
-  /api/users:
-    get:
-      description: Get all users
-      operationId: FindAll
-      produces:
-      - application/json
+  /signup:
+    post:
+      operationId: UserSignUp
+      parameters:
+      - description: Input Fields
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/req.ReqUserDetails'
       responses:
         "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/handler.Response'
-            type: array
+          description: Successfully created account for user
+        "400":
+          description: invalid input
       security:
       - ApiKeyAuth: []
-      summary: Get all users
+      summary: api for user to signup
       tags:
-      - users
+      - User Signup
 swagger: "2.0"

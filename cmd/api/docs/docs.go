@@ -16,48 +16,81 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/users": {
-            "get": {
+        "/signup": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all users",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
-                    "users"
+                    "User Signup"
                 ],
-                "summary": "Get all users",
-                "operationId": "FindAll",
+                "summary": "api for user to signup",
+                "operationId": "UserSignUp",
+                "parameters": [
+                    {
+                        "description": "Input Fields",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.ReqUserDetails"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/handler.Response"
-                            }
-                        }
+                        "description": "Successfully created account for user"
+                    },
+                    "400": {
+                        "description": "invalid input"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "handler.Response": {
+        "req.ReqUserDetails": {
             "type": "object",
+            "required": [
+                "confirm_password",
+                "email",
+                "f_name",
+                "l_name",
+                "password",
+                "phone",
+                "username"
+            ],
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
+                "confirm_password": {
                     "type": "string"
                 },
-                "surname": {
+                "email": {
                     "type": "string"
+                },
+                "f_name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 2
+                },
+                "l_name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "minLength": 3
                 }
             }
         }
