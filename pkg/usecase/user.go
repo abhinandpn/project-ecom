@@ -34,7 +34,8 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		hashpass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 
 		if err != nil {
-			return errors.New("error to hash the password")
+			// return errors.New("error to hash the password")
+			return err
 
 		}
 
@@ -44,7 +45,8 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		// save the user
 		_, err = usr.userRepo.SaveUser(ctx, user)
 		if err != nil {
-			return errors.New("error to save user")
+			// return errors.New("error to save user")
+			return err
 
 		}
 		return nil
@@ -77,7 +79,8 @@ func (usr *userUseCase) Login(ctx context.Context, user domain.Users) (domain.Us
 	err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
 
 	if err != nil {
-		return user, errors.New("entered password is wrong")
+		// return user, errors.New("entered password is wrong")
+		return user, err
 	}
 
 	return dbUser, nil
