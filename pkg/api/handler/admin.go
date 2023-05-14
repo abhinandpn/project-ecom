@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/abhinandpn/project-ecom/pkg/auth"
@@ -21,6 +22,55 @@ type AdminHandler struct {
 func NewAdminHandler(AdminUseCase services.AdminUseCase) *AdminHandler {
 	return &AdminHandler{AdminUseCase: AdminUseCase}
 }
+
+/*
+	Admin Login with Env file reading
+	Super admin function
+*/
+//----------SUPER ADMIN STARTED----------------
+func (adm *AdminHandler) SudoAdminLogin(ctx *gin.Context) {
+
+	var body req.AdminLoginStruct
+
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input message from = env admin login", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	// check the fields
+	if body.Email == "" && body.UserName == "" {
+		err := errors.New("enter email or user_name atleast message from = env admin login")
+		response := res.ErrorResponse(400, "invalid input message from = env admin login", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var admin domain.Admin
+	copier.Copy(&admin, &body)
+	admin, err = adm.AdminUseCase.SudoLogin(ctx, admin)
+
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to login ------------", err.Error(), admin)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	tokenString, err := auth.GenerateJWT(admin.ID)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to generate jwt token", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	ctx.SetCookie("admin-auth", tokenString["accessToken"], 60*60, "", "", false, true)
+
+	response := res.SuccessResponse(200, "successfully logged in", nil)
+	ctx.JSON(http.StatusOK, response)
+
+}
+
+//----------SUPER ADMIN FINISHED---------------
 
 // AdminLogin godoc
 // @summary api for admin to login
@@ -102,6 +152,7 @@ func (a *AdminHandler) AdminHome(ctx *gin.Context) {
 // @Success 200 {object} res.Response{} "successfully got all users"
 // @Failure 500 {object} res.Response{} "faild to get all users"
 func (adm *AdminHandler) Listuser(ctx *gin.Context) {
+	fmt.Println("-------------")
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
