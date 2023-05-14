@@ -7,6 +7,9 @@ import (
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
+	"github.com/jinzhu/copier"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -34,4 +37,24 @@ func (adm *AdminUseCase) Login(ctx context.Context, admin domain.Admin) (domain.
 	}
 
 	return dbAdmin, nil
+}
+
+// Find all user
+func (adm *AdminUseCase) FindAllUser(ctx context.Context, pagination req.PageNation) (users []res.UserResStruct, err error) {
+
+	users, err = adm.adminRepo.ListAllUser(ctx, pagination)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var responce []res.UserResStruct
+	copier.Copy(&responce, &users)
+	return responce, nil
+}
+
+// Block user
+func (adm *AdminUseCase) BlockUser(ctx context.Context, UserId uint) error {
+
+	return adm.adminRepo.BlockUser(ctx, UserId)
 }
