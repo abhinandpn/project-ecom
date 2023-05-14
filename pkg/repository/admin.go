@@ -20,14 +20,14 @@ func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
 func (adm *adminDatabase) CreateAdmin(admin req.AdminLoginStruct) error {
 	query := `Insert into admins (email,username,password)Values ($1,$2,$3)`
 	if adm.DB.Exec(query, admin.Email, admin.UserName, admin.Password).Error != nil {
-		return errors.New("faild to save admin")
+		return errors.New("faild to save admin to DB")
 	}
 	return nil
 }
 func (adm *adminDatabase) FindAdmin(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
 	query := `select * from admins where email=? or username=?`
 	if adm.DB.Exec(query, admin.Email, admin.Username).Error != nil {
-		return admin, errors.New("faild to find admin")
+		return admin, errors.New("faild to find admin from DB")
 	}
 	return admin, nil
 }
