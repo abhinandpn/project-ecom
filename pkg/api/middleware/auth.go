@@ -1,69 +1,53 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
+	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
-func AuthorizationMiddleware(c *gin.Context) {
-	s := c.Request.Header.Get("Authorization")
+// Admin authentcation
+func AuthUser(ctx *gin.Context) {
+	authHelper(ctx, "user")
+}
 
-	token := strings.TrimPrefix(s, "Bearer ")
+// User authentication
+func AuthAdmin(ctx *gin.Context) {
+	authHelper(ctx, "admin")
+}
 
-	if err := validateToken(token); err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+// helper to get cookie and validate the token and expire time
+func authHelper(ctx *gin.Context, user string) {
+
+	tokenString, err := ctx.Cookie(user + "-auth") // get cookie for user or admin with name
+	if err != nil || tokenString == "" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"StatusCode": 401,
+			"msg":        "Unauthorized User Please Login",
+		})
 		return
 	}
-}
 
-func validateToken(token string) error {
-	_, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-
-		return []byte("secret"), nil
-	})
-
-	return err
-}
-
-func LoginHandler(c *gin.Context) {
-	// implement login logic here
-	// user := c.PostForm("user")
-	// pass := c.PostForm("pass")
-
-	// // Throws Unauthorized error
-	// if user != "john" || pass != "lark" {
-	// 	return c.AbortWithStatus(http.StatusUnauthorized)
-	// }
-
-	// Create the Claims
-	// claims := jwt.MapClaims{
-	// 	"name":  "John Lark",
-	// 	"admin": true,
-	// 	"exp":   time.Now().Add(time.Hour * 72).Unix(),
-	// }
-
-	// Create token
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-	})
-
-	ss, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+	claims, err := auth.ValidateToken(tokenString) // auth function validate the token and return claims with error
+	if err != nil || tokenString == "" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"StatusCode": 401,
+			"msg":        "Unauthorized User Please Login",
 		})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"token": ss,
-	})
+	// check the cliams expire time
+	if time.Now().Unix() > claims.ExpiresAt {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"StatusCode": 401,
+			"msg":        "User Need Re-Login time expired",
+		})
+		return
+	}
+
+	// claim the userId and set it on context
+	ctx.Set("userId", claims.Id)
 }
