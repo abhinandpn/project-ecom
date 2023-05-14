@@ -10,16 +10,20 @@ func AdminRoute(api *gin.RouterGroup,
 	AdminHandler *handler.AdminHandler,
 ) {
 	// Login
-	login := api.Group("/admin")
+	login := api.Group("/login")
 	{
 		login.POST("/", AdminHandler.AdminLogin)
+		login.POST("/sudo", AdminHandler.SudoAdminLogin)
 	}
 	api.Use(middleware.AuthAdmin)
 	{
 		api.GET("/", AdminHandler.AdminHome)
 		// user Side
 		user := api.Group("/users")
-		user.GET("/", AdminHandler.Listuser)
-		user.PATCH("/block", AdminHandler.BlockUser)
+		{
+			user.GET("/", AdminHandler.Listuser)
+			user.PATCH("/block", AdminHandler.BlockUser)
+		}
+
 	}
 }
