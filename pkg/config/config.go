@@ -13,13 +13,21 @@ type Config struct {
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	JWT        string `mapstructure:"JWT_CODE"`
 }
+type SudoAdmin struct {
+	AdminUserName string `mapstructure:"AdminUsername"`
+	AdminMail     string `mapstructure:"AdminEMail"`
+	AdminPassword string `mapstructure:"AdminPass"`
+}
 
 var envs = []string{
 	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", //database
-	"JWT_CODE", // Jwt
+	"JWT_CODE",                                 // Jwt
+	"AdminEMail", "AdminUsername", "AdminPass", // Sudo admin
 	// twilio
 	// etc...
 }
+
+var sudoAdmin SudoAdmin
 
 var config Config // create instence of config
 
@@ -45,6 +53,10 @@ func LoadConfig() (Config, error) {
 		return config, err
 	}
 
+	if err := viper.Unmarshal(&sudoAdmin); err != nil {
+		return config, err
+	}
+
 	// atlast validate the config file using validator pakage
 	// create instance and direct validte
 	if err := validator.New().Struct(&config); err != nil {
@@ -65,4 +77,8 @@ func GetCofig() Config {
 
 	return config
 
+}
+
+func GetSudoAdminDetails() SudoAdmin {
+	return sudoAdmin
 }
