@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -21,6 +22,25 @@ func NewAdminUseCase(repo interfaces.AdminRepository) services.AdminUseCase {
 
 	return &AdminUseCase{adminRepo: repo}
 }
+
+// Sudo admin login .env file loading
+func (adm *AdminUseCase) SudoLogin(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
+
+	envAdmin, err := adm.adminRepo.EnvAdminFind(ctx)
+	fmt.Println(envAdmin.Email, admin.Email)
+	if err != nil {
+		return domain.Admin{}, err
+	}
+
+	if envAdmin.Email == admin.Email && envAdmin.Password == admin.Password {
+		return envAdmin, nil
+	} else if envAdmin.Username == admin.Username && envAdmin.Password == admin.Password {
+		return envAdmin, nil
+	} else {
+		return admin, errors.New("invalid admin")
+	}
+}
+
 func (adm *AdminUseCase) Login(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
 	// Get the admin from DB
 	dbAdmin, err := adm.adminRepo.FindAdmin(ctx, admin)

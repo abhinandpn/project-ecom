@@ -9,6 +9,8 @@ import (
 )
 
 type AdminUseCase interface {
+	// Sudo admin .env file loading
+	SudoLogin(ctx context.Context, admin domain.Admin) (domain.Admin, error)
 	// Admin side
 	Login(ctx context.Context, admin domain.Admin) (domain.Admin, error)
 	// User side
