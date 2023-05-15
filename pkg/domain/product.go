@@ -23,6 +23,11 @@ type ProductInfo struct {
 	Size      uint   `json:"size" binding:"required,numeric"`
 	Brand     uint   `json:"brand"`
 }
+
+/*
+in Category : Id means the main ctegoy id
+in category : CategoryId means subcategory
+*/
 type Category struct {
 	Id           uint      `json:"-" gorm:"primaryKey;not null"`
 	CategoryID   uint      `json:"catrgory_id"`
