@@ -63,7 +63,7 @@ func (adm *AdminHandler) SudoAdminLogin(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("admin-auth", tokenString["accessToken"], 60*60, "", "", false, true)
+	ctx.SetCookie("admin-auth", tokenString["jwtToken"], 60*60, "", "", false, true)
 
 	response := res.SuccessResponse(200, "successfully logged in", nil)
 	ctx.JSON(http.StatusOK, response)
@@ -118,7 +118,7 @@ func (adm *AdminHandler) AdminLogin(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("admin-auth", tokenString["accessToken"], 60*60, "", "", false, true)
+	ctx.SetCookie("admin-auth", tokenString["jwtToken"], 60*60, "", "", false, true)
 
 	response := res.SuccessResponse(200, "successfully logged in", nil)
 	ctx.JSON(http.StatusOK, response)
