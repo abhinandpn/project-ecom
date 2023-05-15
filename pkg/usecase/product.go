@@ -36,3 +36,11 @@ func (pr *productUseCase) AddProduct(ctx context.Context, product domain.Product
 
 	return pr.productRepo.SaveProduct(ctx, product)
 }
+func (pr *productUseCase) GetProductInfo(ctx context.Context, ProductId uint) (ProductInfo domain.Product, err error) {
+	return ProductInfo, nil
+}
+
+// Category
+func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) error {
+	return nil
+}

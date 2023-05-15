@@ -36,8 +36,7 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 	// aliase :: p := product; c := category
 	querry := `SELECT pi.id,p.product_name,p.discription,c.category_name,p.price,
 	p.discount_price,p.image,pi.colour,pi.size,
-	pi.brand FROM product_infos pi JOIN products p ON pi.product_id = p.id JOIN categories c ON 
-	p.category_id = c.id ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
+	pi.brand FROM product_infos pi JOIN products p ON pi.product_id = p.id JOIN categories c ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
 
 	if pr.DB.Raw(querry, limit, offset).Scan(&products).Error != nil {
 		return products, errors.New("faild to get products from database")
@@ -50,13 +49,23 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 // Save Product
 func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Product) error {
 
-	querry := `INSERT INTO products (product_name, description, category_id, price, image, created_at) 
+	querry := `INSERT INTO products (product_name, description, price, image, created_at) 
 	VALUES($1, $2, $3, $4, $5, $6)`
 
 	createdAt := time.Now()
-	if pr.DB.Exec(querry, product.ProductName, product.Discription, product.CategoryId,
+	if pr.DB.Exec(querry, product.ProductName, product.Discription,
 		product.Price, product.Image, createdAt).Error != nil {
 		return errors.New("faild to insert product on database")
 	}
+	return nil
+}
+
+func (pr *productDatabase) UpdateProduct(ctx context.Context, product domain.Product) error {
+	return nil
+}
+
+// Categories
+func (pr *productDatabase) SaveCategory(ctx context.Context, category domain.Category) error {
+	// query := `insert into categories(category_id,)`
 	return nil
 }

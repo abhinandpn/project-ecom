@@ -15,4 +15,7 @@ type ProductRepository interface {
 	FindAllProduct(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error)
 	// product Managment
 	SaveProduct(ctx context.Context, product domain.Product) error
+	UpdateProduct(ctx context.Context, product domain.Product) error
+	// Category managment
+	SaveCategory(ctx context.Context, category domain.Category) error
 }
