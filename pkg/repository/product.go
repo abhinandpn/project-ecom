@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -34,4 +36,18 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 
 	return products, nil
 
+}
+
+// Save Product
+func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Product) error {
+
+	querry := `INSERT INTO products (product_name, description, category_id, price, image, created_at) 
+	VALUES($1, $2, $3, $4, $5, $6)`
+
+	createdAt := time.Now()
+	if pr.DB.Exec(querry, product.ProductName, product.Discription, product.CategoryId,
+		product.Price, product.Image, createdAt).Error != nil {
+		return errors.New("faild to insert product on database")
+	}
+	return nil
 }
