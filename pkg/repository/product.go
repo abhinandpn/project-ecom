@@ -19,6 +19,15 @@ type productDatabase struct {
 func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
 	return &productDatabase{DB: db}
 }
+
+// Find Product
+func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
+
+	if pr.DB.Raw("SELECT * FROM products WHERE id = ? OR product_name=?", product.Id, product.ProductName).Scan(&product).Error != nil {
+		return product, errors.New("faild to get product")
+	}
+	return product, nil
+}
 func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error) {
 
 	limit := pagination.Count

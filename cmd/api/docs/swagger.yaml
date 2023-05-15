@@ -1,4 +1,51 @@
 definitions:
+  req.BlockStruct:
+    properties:
+      user_id:
+        type: integer
+    required:
+    - user_id
+    type: object
+  req.LoginStruct:
+    properties:
+      password:
+        maxLength: 25
+        minLength: 6
+        type: string
+      username:
+        maxLength: 15
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  req.ReqProduct:
+    properties:
+      category_id:
+        type: integer
+      description:
+        maxLength: 100
+        minLength: 10
+        type: string
+      image:
+        type: string
+      price:
+        type: integer
+      product_name:
+        maxLength: 50
+        minLength: 3
+        type: string
+      size:
+        type: integer
+    required:
+    - category_id
+    - description
+    - image
+    - price
+    - product_name
+    - size
+    type: object
   req.ReqUserDetails:
     properties:
       confirm_password:
@@ -32,9 +79,149 @@ definitions:
     - phone
     - username
     type: object
+  res.Response:
+    properties:
+      data: {}
+      errors: {}
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
+  /admin:
+    get:
+      operationId: AdminHome
+      responses:
+        "200":
+          description: successfully logged in
+          schema:
+            $ref: '#/definitions/res.Response'
+      summary: api admin home
+      tags:
+      - Admin Home
+  /admin/login:
+    post:
+      operationId: AdminLogin
+      parameters:
+      - description: inputs
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/req.LoginStruct'
+      responses:
+        "200":
+          description: successfully logged in
+          schema:
+            $ref: '#/definitions/res.Response'
+        "400":
+          description: invalid input
+          schema:
+            $ref: '#/definitions/res.Response'
+        "500":
+          description: faild to generate jwt token
+          schema:
+            $ref: '#/definitions/res.Response'
+      summary: api for admin to login
+      tags:
+      - Admin Login
+  /admin/products:
+    post:
+      operationId: AddProducts
+      parameters:
+      - description: inputs
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/req.ReqProduct'
+      responses:
+        "200":
+          description: successfully product added
+          schema:
+            $ref: '#/definitions/res.Response'
+        "400":
+          description: invalid input
+          schema:
+            $ref: '#/definitions/res.Response'
+      summary: api for admin to update a product
+      tags:
+      - Admin Products
+  /admin/users:
+    get:
+      operationId: ListUsers
+      parameters:
+      - description: Page Number
+        in: query
+        name: page_number
+        type: integer
+      - description: Count Of Order
+        in: query
+        name: count
+        type: integer
+      responses:
+        "200":
+          description: successfully got all users
+          schema:
+            $ref: '#/definitions/res.Response'
+        "500":
+          description: faild to get all users
+          schema:
+            $ref: '#/definitions/res.Response'
+      summary: api for admin to list users
+      tags:
+      - Admin User
+  /admin/users/block:
+    patch:
+      operationId: BlockUser
+      parameters:
+      - description: inputs
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/req.BlockStruct'
+      responses:
+        "200":
+          description: Successfully changed user block_status
+          schema:
+            $ref: '#/definitions/res.Response'
+        "400":
+          description: invalid input
+          schema:
+            $ref: '#/definitions/res.Response'
+      summary: api for admin to block or unblock user
+      tags:
+      - Admin User
+  /products:
+    get:
+      operationId: ListProducts-User
+      parameters:
+      - description: Page Number
+        in: query
+        name: page_number
+        type: integer
+      - description: Count Of Order
+        in: query
+        name: count
+        type: integer
+      responses:
+        "200":
+          description: successfully got all products
+          schema:
+            $ref: '#/definitions/res.Response'
+        "500":
+          description: faild to get all products
+          schema:
+            $ref: '#/definitions/res.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: api for user to show products
+      tags:
+      - User Products
   /signup:
     post:
       operationId: UserSignUp
