@@ -34,7 +34,7 @@ func authHelper(ctx *gin.Context, user string) {
 	if err != nil || tokenString == "" {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"StatusCode": 401,
-			"msg":        "Unauthorized User Please Login",
+			"msg":        "Unauthorized admin Please Login",
 		})
 		return
 	}
