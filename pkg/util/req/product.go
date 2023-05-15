@@ -8,3 +8,16 @@ type ReqProduct struct {
 	Price       uint   `json:"price" gorm:"not null" binding:"required,numeric"`
 	Image       string `json:"image" gorm:"not null" binding:"required"`
 }
+type CategoryReq struct {
+	Id           uint   `json:"id"`
+	CategoryName string `json:"category_name"`
+}
+type SubCategoryReq struct {
+	Id              uint   `json:"id"`
+	SubcategoryName string `json:"sub_category_name"`
+	CategoryId      uint   `json:"category_id"`
+}
+type BrandReq struct {
+	Id        uint   `json:"id"`
+	BrandName string `json:"brand_name"`
+}
