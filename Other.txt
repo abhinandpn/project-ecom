@@ -128,3 +128,24 @@
 
 			return err
 		}
+
+query:= for product info
+SELECT
+  p.id,
+  p.product_name,
+  P.discription,
+  c.category_name,
+  p.price,
+  p.discount_price,
+  pm.product_images,
+  pi.colour,
+  pi.size,
+  pi.brand
+FROM
+  products p
+INNER JOIN
+  product_infos pi ON p.id = pi.product_id
+  INNER JOIN
+  product_images pm ON p.id = pm.product_id
+INNER JOIN
+  categories c ON p.category_id = c.id;

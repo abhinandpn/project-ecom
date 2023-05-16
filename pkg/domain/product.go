@@ -6,7 +6,7 @@ type Product struct {
 	Id            uint        `json:"id" gorm:"primaryKey;not null"`
 	ProductName   string      `json:"product_name" gorm:"not null" binding:"required,min=3,max=50"`
 	Discription   string      `json:"description" gorm:"not null" binding:"required,min=10,max=100"`
-	CategoryId    uint        `json:"category_id" binding:"omitempty,numeric"`
+	CategoryID    uint        `json:"category_id" binding:"required omitempty,numeric" `
 	Category      Category    `json:"-"`
 	Brand         Brand       `json:"-"`
 	Price         uint        `json:"price" gorm:"not null" binding:"required,numeric"`
@@ -21,7 +21,7 @@ type ProductInfo struct {
 	ProductId uint   `json:"product_id" binding:"omitempty,numeric"`
 	Colour    string `json:"colour"`
 	Size      uint   `json:"size" binding:"required,numeric"`
-	Brand     uint   `json:"brand"`
+	Brand     string `json:"brand"`
 }
 
 /*

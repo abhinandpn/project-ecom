@@ -3,8 +3,8 @@ package req
 // request for New User
 type ReqUserDetails struct {
 	UserName        string `json:"username"  binding:"required,min=3,max=15"`
-	FirstName       string `json:"f_name"  binding:"required,min=2,max=50"`
-	LastName        string `json:"l_name"  binding:"required,min=1,max=50"`
+	FName           string `json:"f_name"  binding:"required,min=2,max=50"`
+	LName           string `json:"l_name"  binding:"required,min=1,max=50"`
 	Email           string `json:"email" binding:"required,email"`
 	Number          string `json:"phone" binding:"required,min=10,max=10"`
 	Password        string `json:"password"  binding:"required,eqfield=ConfirmPassword"`

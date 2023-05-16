@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
@@ -10,7 +11,6 @@ import (
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 type ProductHandler struct {
@@ -98,17 +98,31 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 	var body req.ReqProduct
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
+		fmt.Println("------------------------1 ")
 		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, respones)
 		return
 	}
 
-	var product domain.Product
-	copier.Copy(&product, &body)
+	product := domain.Product{
+		ProductName: body.ProductName,
+		CategoryID:  body.CategoryID,
+		Discription: body.Discription,
+		Price:       body.Price,
+		Info: domain.ProductInfo{
+			Colour: body.Color,
+			Brand:  body.Brand,
+			Size:   body.Size,
+		},
+	}
+
+	fmt.Println("productdetails : ", body)
 
 	err := pr.ProductuseCase.AddProduct(ctx, product)
 
 	if err != nil {
+		fmt.Println("------------------------2 ")
+
 		response := res.ErrorResponse(400, "faild to add product", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
