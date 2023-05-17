@@ -11,6 +11,7 @@ import (
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 )
 
 type ProductHandler struct {
@@ -132,3 +133,80 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 
 }
+
+// todo category
+// add
+// edit
+// delete
+// update
+
+func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
+
+	var body req.CategoryReq
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		fmt.Println("------------------------1 ")
+		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+
+	err := pr.ProductuseCase.AddCategory(ctx, body)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := res.SuccessResponse(200, "successfully added a new category", body)
+	ctx.JSON(http.StatusOK, response)
+
+}
+
+func (pr *ProductHandler) EditCategory(ctx *gin.Context) {
+
+	var body req.CategoryReq
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var category domain.Category
+	copier.Copy(&category, &body)
+
+	err := pr.ProductuseCase.Editcategory(ctx, category)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
+		ctx.JSON(400, response)
+		return
+	}
+
+	response := res.SuccessResponse(200, "successfully product updated", body)
+	ctx.JSON(200, response)
+}
+
+func (pr *ProductHandler) DeleteCategory(ctx *gin.Context) {
+
+	var body req.CategoryReq
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var category domain.Category
+	copier.Copy(&category, &body)
+
+	err := pr.ProductuseCase.DeleteCategory(ctx, category.CategoryID)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully product updated", body)
+	ctx.JSON(200, response)
+
+}
+
+// todo Subcategory -- its updating
