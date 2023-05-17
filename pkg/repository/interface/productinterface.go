@@ -21,5 +21,9 @@ type ProductRepository interface {
 	UpdateProduct(ctx context.Context, product domain.Product) error
 
 	// Category managment
+	FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error)
+	FindAllCategory(ctx context.Context, pagination req.PageNation) (category []res.CategoryRes, err error)
 	SaveCategory(ctx context.Context, category domain.Category) error
+	UpdateCatrgoryName(ctx context.Context, category domain.Category) error
+	DeletCategory(ctx context.Context, category domain.Category) error
 }

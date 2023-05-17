@@ -100,6 +100,7 @@ func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Produ
 		// fmt.Errorf(context.Canceled.Error())
 		return errors.New("faild to insert product on database")
 	}
+
 	query2 := `insert into product_infos(product_id,colour,size,brand)values($1,$2,$3,$4)`
 
 	if pr.DB.Exec(query2, product.Id, product.Info.Colour,
@@ -130,5 +131,61 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, product domain.Pro
 // Categories
 func (pr *productDatabase) SaveCategory(ctx context.Context, category domain.Category) error {
 	// query := `insert into categories(category_id,)`
+	return nil
+}
+
+func (pr *productDatabase) FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error) {
+
+	query := `select * from categories where id = $1;`
+	err = pr.DB.Raw(query, CategoryId).Scan(&Category).Error
+
+	if err != nil {
+		return Category, fmt.Errorf("faild find product with prduct_id %v", CategoryId)
+
+	}
+
+	return Category, nil
+}
+
+func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) (category []res.CategoryRes, err error) {
+
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `footex=# select * from categories order by category_id asc limit $1 offset $2;`
+
+	err = pr.DB.Raw(query, limit, offset).Error
+
+	if err != nil {
+		return category, fmt.Errorf("failed to get categories from database")
+	}
+
+	return category, nil
+}
+
+func (pr *productDatabase) UpdateCatrgoryName(ctx context.Context, category domain.Category) error {
+
+	query := `update categories set category_name = $1 ,updated_at = $2 where category_id = $3`
+	updatedTime := time.Now()
+
+	err := pr.DB.Raw(query, category.CategoryName, updatedTime, category.CategoryID).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *productDatabase) DeletCategory(ctx context.Context, category domain.Category) error {
+
+	query := `delete from categories where category_id = $1;`
+
+	err := pr.DB.Raw(query, category.CategoryID).Error
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
