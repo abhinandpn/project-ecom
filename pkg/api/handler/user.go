@@ -2,11 +2,13 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 
+	twillio "github.com/abhinandpn/project-ecom/pkg/Twillio"
 	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
@@ -118,4 +120,87 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 	response := res.SuccessResponse(200, "successfully logged in", tokenString["jwtToken"])
 	ctx.JSON(http.StatusOK, response)
 
+}
+
+// Otp login
+func (usr *UserHandler) UserOtpLogin(ctx *gin.Context) {
+	fmt.Println(".......................")
+	var body req.OTPLoginStruct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	//check all input field is empty
+	if body.Email == "" && body.Phone == "" && body.UserName == "" {
+		err := errors.New("enter atleast user_name or email or phone")
+		response := res.ErrorResponse(400, "invalid input", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var user domain.Users
+	copier.Copy(&user, body)
+
+	user, err := usr.userUseCase.OtpLogin(ctx, user)
+
+	if err != nil {
+		resopnse := res.ErrorResponse(400, "can't login", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, resopnse)
+		return
+	}
+
+	// If we get noe error then sent the OTP
+	_, err = twillio.TwillioOtpSent("+91" + user.Number)
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to send otp", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully otp send to registered number", user.ID)
+	ctx.JSON(http.StatusOK, response)
+}
+func (usr *UserHandler) UserLoginOtpVerify(ctx *gin.Context) {
+
+	var body req.OTPVerifyStruct
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid login_otp", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var user = domain.Users{
+		ID: body.UserID,
+	}
+
+	// get the user using loginOtp useCase
+
+	user, err := usr.userUseCase.OtpLogin(ctx, user)
+
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to login", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	// then varify the otp
+	err = twillio.TwilioVerifyOTP("+91"+user.Number, body.OTP)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to login", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	// if everyting ok then generate token
+	tokenString, err := auth.GenerateJWT(user.ID)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to login", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	ctx.SetCookie("user-auth", tokenString["accessToken"], 50*60, "", "", false, true)
+	response := res.SuccessResponse(200, "successfully logged in uing otp", tokenString["accessToken"])
+	ctx.JSON(http.StatusOK, response)
 }
