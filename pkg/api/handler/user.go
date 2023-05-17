@@ -70,6 +70,8 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
+	fmt.Println("-------login function started")
+
 	var body req.LoginStruct
 
 	err := ctx.ShouldBindJSON(&body)
@@ -162,6 +164,7 @@ func (usr *UserHandler) UserOtpLogin(ctx *gin.Context) {
 	response := res.SuccessResponse(200, "successfully otp send to registered number", user.ID)
 	ctx.JSON(http.StatusOK, response)
 }
+
 func (usr *UserHandler) UserLoginOtpVerify(ctx *gin.Context) {
 
 	var body req.OTPVerifyStruct
@@ -203,4 +206,12 @@ func (usr *UserHandler) UserLoginOtpVerify(ctx *gin.Context) {
 	ctx.SetCookie("user-auth", tokenString["accessToken"], 50*60, "", "", false, true)
 	response := res.SuccessResponse(200, "successfully logged in uing otp", tokenString["accessToken"])
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (a *UserHandler) UserHome(ctx *gin.Context) {
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"StatusCode": 200,
+		"message":    "Welcome to User Home",
+	})
 }
