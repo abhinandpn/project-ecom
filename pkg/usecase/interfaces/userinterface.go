@@ -11,5 +11,6 @@ type UserUseCase interface {
 	// Signup
 	SignUp(ctx context.Context, user domain.Users) error
 	Login(ctx context.Context, user domain.Users) (domain.Users, error)
+	OtpLogin(ctx context.Context, user domain.Users) (domain.Users, error)
 	//........................................................
 }
