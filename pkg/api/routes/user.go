@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/abhinandpn/project-ecom/pkg/api/handler"
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +11,10 @@ func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productH
 	// login
 	login := api.Group("/login")
 	{
+		fmt.Println("--------------- route------")
 		login.POST("/", userHandler.UserLogin)
+		login.POST("/otp-send", userHandler.UserOtpLogin)
+		login.POST("/otp-verify", userHandler.UserLoginOtpVerify)
 	}
 	// Signup
 	signup := api.Group("/signup")
