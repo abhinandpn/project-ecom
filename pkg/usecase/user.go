@@ -58,6 +58,29 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 
 }
 
+// Login wiht OTP
+func (usr *userUseCase) OtpLogin(ctx context.Context, user domain.Users) (domain.Users, error) {
+
+	user, err := usr.userRepo.FindUser(ctx, user) // Find User from database
+
+	if err != nil {
+		return user, errors.New("can't find the user")
+	} else if user.ID == 0 {
+		return user, errors.New("user not exist with this details")
+	}
+
+	// Chech the user Block Status
+
+	if user.IsBlocked {
+		return user, errors.New("user blocked by admin")
+	}
+
+	return user, nil
+
+}
+
+//
+
 func (usr *userUseCase) Login(ctx context.Context, user domain.Users) (domain.Users, error) {
 
 	dbUser, dbErr := usr.userRepo.FindUser(ctx, user)
