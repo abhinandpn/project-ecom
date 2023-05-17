@@ -58,3 +58,15 @@ type ReqEditPassword struct {
 	NewPassword     string `json:"password"  binding:"required,eqfield=ConfirmPassword min=6,max=25"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 }
+
+// login with OTP
+type OTPLoginStruct struct {
+	Email    string `json:"email" binding:"omitempty,email"`
+	UserName string `json:"user_name" binding:"omitempty,min=3,max=16"`
+	Phone    string `json:"phone" binding:"omitempty,min=10,max=10"`
+}
+
+type OTPVerifyStruct struct {
+	OTP    string `json:"otp" binding:"required,min=4,max=8"`
+	UserID uint   `json:"user_id" binding:"required,numeric"`
+}
