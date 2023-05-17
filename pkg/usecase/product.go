@@ -8,6 +8,7 @@ import (
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/jinzhu/copier"
 
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -21,9 +22,11 @@ type productUseCase struct {
 func NewProductUseCase(ProductRepo interfaces.ProductRepository) service.ProductuseCase {
 	return &productUseCase{productRepo: ProductRepo}
 }
+
 func (pr *productUseCase) GetProducts(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error) {
 	return pr.productRepo.FindAllProduct(ctx, pagination)
 }
+
 func (pr *productUseCase) AddProduct(ctx context.Context, product domain.Product) error {
 
 	// check Given product is exist or not
@@ -36,11 +39,88 @@ func (pr *productUseCase) AddProduct(ctx context.Context, product domain.Product
 
 	return pr.productRepo.SaveProduct(ctx, product)
 }
+
 func (pr *productUseCase) GetProductInfo(ctx context.Context, ProductId uint) (ProductInfo domain.Product, err error) {
 	return ProductInfo, nil
 }
 
+// todo CATEGORY
+
 // Category
 func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) error {
+
+	// Chech if the category exist or not
+	var checkCategory = domain.Category{
+		CategoryID: category.Id}
+
+	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
+		return err
+	} else if checkCategory.Id == 0 {
+		return fmt.Errorf("category already exit with %s name", category.CategoryName)
+	}
+
+	var newCate domain.Category
+	copier.Copy(&newCate, &category)
+
+	err := pr.productRepo.SaveCategory(ctx, newCate)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+func (pr *productUseCase) Editcategory(ctx context.Context, category domain.Category) error {
+
+	// check if the category exist or not
+
+	var checkCategory = domain.Category{
+		CategoryID: category.Id}
+
+	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
+		return err
+	} else if checkCategory.Id == 0 {
+		return err
+	}
+
+	// if we get then update
+	var newCate domain.Category
+	copier.Copy(&newCate, &category)
+
+	err := pr.productRepo.UpdateCatrgoryName(ctx, newCate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *productUseCase) DeleteCategory(ctx context.Context, categoryId uint) error {
+
+	// check if the category exist or not
+
+	var checkCategory = domain.Category{
+		CategoryID: categoryId}
+
+	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
+		return err
+	} else if checkCategory.Id == 0 {
+		return err
+	}
+
+	var body domain.Category
+	copier.Copy(&body, &categoryId)
+
+	err := pr.productRepo.DeletCategory(ctx, body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *productUseCase) ViewFullCategory(ctx context.Context, pgenation req.CategoryReq) (category []res.CategoryRes, err error) {
+
+	return pr.productRepo.FindAllCategory(ctx, req.PageNation{})
+
 }

@@ -14,6 +14,10 @@ type ProductuseCase interface {
 	GetProducts(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error)
 	// Product Managment
 	AddProduct(ctx context.Context, product domain.Product) error
+
 	// Category
 	AddCategory(ctx context.Context, category req.CategoryReq) error
+	Editcategory(ctx context.Context, category domain.Category) error
+	DeleteCategory(ctx context.Context, categoryId uint) error
+	ViewFullCategory(ctx context.Context, pagenation req.CategoryReq) (category []res.CategoryRes, err error)
 }
