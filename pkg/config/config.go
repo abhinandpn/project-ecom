@@ -12,6 +12,11 @@ type Config struct {
 	DBPort     string `mapstructure:"DB_PORT"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	JWT        string `mapstructure:"JWT_CODE"`
+
+	// TWILLIO ACCOUNT
+	AUTHTOKEN  string `mapstructure:"AUTH_TOKEN"`
+	ACCOUNTSID string `mapstructure:"ACCOUNT_SID"`
+	SERVICEID  string `mapstructures:"SERVICE_SID"`
 }
 type SudoAdmin struct {
 	AdminUserName string `mapstructure:"AdminUsername"`
@@ -23,7 +28,7 @@ var envs = []string{
 	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", //database
 	"JWT_CODE",                                 // Jwt
 	"AdminEMail", "AdminUsername", "AdminPass", // Sudo admin
-	// twilio
+	"AUTH_TOKEN", "ACCOUNT_SID", "SERVICE_SID", // twilio
 	// etc...
 }
 
@@ -74,7 +79,6 @@ func GetJWTCofig() string {
 }
 
 func GetCofig() Config {
-
 	return config
 
 }
