@@ -44,31 +44,28 @@ func (pr *productUseCase) GetProductInfo(ctx context.Context, ProductId uint) (P
 	return ProductInfo, nil
 }
 
-// todo CATEGORY
-
 // Category
-func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) error {
+func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (cat res.CategoryRes, err error) {
 
 	// Chech if the category exist or not
-	var checkCategory = domain.Category{
-		CategoryID: category.Id}
+	var checkCategory res.CategoryRes
 
-	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
-		return err
+	if checkCategory, _ := pr.productRepo.FindCategoryById(ctx, checkCategory.Id); err != nil {
+		return
 	} else if checkCategory.Id == 0 {
-		return fmt.Errorf("category already exit with %s name", category.CategoryName)
+		return
 	}
 
-	var newCate domain.Category
+	var newCate req.CategoryReq
 	copier.Copy(&newCate, &category)
 
-	err := pr.productRepo.SaveCategory(ctx, newCate)
+	err = pr.productRepo.SaveCategory(ctx, newCate)
 
 	if err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return cat, nil
 }
 func (pr *productUseCase) Editcategory(ctx context.Context, category domain.Category) error {
 
@@ -119,8 +116,8 @@ func (pr *productUseCase) DeleteCategory(ctx context.Context, categoryId uint) e
 	return nil
 }
 
-func (pr *productUseCase) ViewFullCategory(ctx context.Context, pgenation req.CategoryReq) (category []res.CategoryRes, err error) {
+func (pr *productUseCase) ViewFullCategory(ctx context.Context, pagination req.PageNation) (category []res.CategoryRes, err error) {
 
-	return pr.productRepo.FindAllCategory(ctx, req.PageNation{})
+	return pr.productRepo.FindAllCategory(ctx, pagination)
 
 }
