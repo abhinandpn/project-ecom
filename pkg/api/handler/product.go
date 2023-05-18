@@ -150,7 +150,7 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	_, err := pr.ProductuseCase.AddCategory(ctx, body)
+	resp, err := pr.ProductuseCase.AddCategory(ctx, body)
 
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
@@ -158,7 +158,7 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully added a new category", body)
+	response := res.SuccessResponse(200, "successfully added a new category", resp)
 	ctx.JSON(http.StatusOK, response)
 
 }

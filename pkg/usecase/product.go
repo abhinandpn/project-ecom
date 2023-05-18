@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -45,28 +46,17 @@ func (pr *productUseCase) GetProductInfo(ctx context.Context, ProductId uint) (P
 }
 
 // Category
-func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (cat res.CategoryRes, err error) {
+func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (res.CategoryRes, error) {
 
-	// Chech if the category exist or not
-	var checkCategory res.CategoryRes
-
-	if checkCategory, _ := pr.productRepo.FindCategoryById(ctx, checkCategory.Id); err != nil {
-		return
-	} else if checkCategory.Id == 0 {
-		return
+	exitstingCategory, _ := pr.productRepo.FindCategoryById(ctx, category.Id)
+	if exitstingCategory.Id == 0 {
+		return res.CategoryRes{}, errors.New("category already exists")
 	}
 
-	var newCate req.CategoryReq
-	copier.Copy(&newCate, &category)
-
-	err = pr.productRepo.SaveCategory(ctx, newCate)
-
-	if err != nil {
-		return
-	}
-
-	return cat, nil
+	err := pr.productRepo.SaveCategory(ctx, category)
+	return res.CategoryRes(category), err
 }
+
 func (pr *productUseCase) Editcategory(ctx context.Context, category domain.Category) error {
 
 	// check if the category exist or not

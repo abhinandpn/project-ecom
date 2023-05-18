@@ -131,12 +131,14 @@ func (pr *productDatabase) SaveCategory(ctx context.Context, category req.Catego
 }
 
 func (pr *productDatabase) FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error) {
+	var category domain.Category
 
-	query := `select * from categories where id = $1;`
-	err = pr.DB.Raw(query, CategoryId).Scan(&Category).Error
-
+	fmt.Println("category id in repo", CategoryId)
+	sql := `SELECT * FROM categories WHERE category_id = $1 LIMIT 1;`
+	pr.DB.Raw(sql, CategoryId).Scan(&category)
+	fmt.Println("repo", category)
 	if err != nil {
-		return Category, fmt.Errorf("faild find product with prduct_id %v", CategoryId)
+		return category, fmt.Errorf("faild find product with prduct_id %v", err)
 
 	}
 
