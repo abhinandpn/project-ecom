@@ -18,7 +18,7 @@ func AdminRoute(api *gin.RouterGroup,
 	}
 	api.Use(middleware.AuthAdmin)
 	{
-		api.GET("/home", AdminHandler.AdminHome) // Admin Home
+		api.GET("", AdminHandler.AdminHome) // Admin Home
 		// user Side
 		user := api.Group("/users")
 		{
@@ -30,6 +30,14 @@ func AdminRoute(api *gin.RouterGroup,
 		{
 			product.GET("/all", ProductHandler.ListProducts) // list all product
 			product.POST("/add", ProductHandler.AddProduct)  // Add Product
+		}
+		// Category
+		category := api.Group("/category")
+		{
+			category.GET("", ProductHandler.Viewcategory)      // View Category
+			category.POST("", ProductHandler.Addcategory)      // Add category
+			category.PATCH("", ProductHandler.EditCategory)    // Edit category
+			category.DELETE("", ProductHandler.DeleteCategory) // Delete category
 		}
 
 	}

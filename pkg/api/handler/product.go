@@ -134,11 +134,10 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 
 }
 
-// todo category
 // add
 // edit
 // delete
-// update
+// View
 
 func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 
@@ -151,7 +150,8 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	err := pr.ProductuseCase.AddCategory(ctx, body)
+	_, err := pr.ProductuseCase.AddCategory(ctx, body)
+
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -209,4 +209,37 @@ func (pr *ProductHandler) DeleteCategory(ctx *gin.Context) {
 
 }
 
-// todo Subcategory -- its updating
+func (pr *ProductHandler) Viewcategory(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var pagination req.ReqPagination
+	pagination.Count = count
+	pagination.PageNumber = pageNumber
+
+	category, err := pr.ProductuseCase.ViewFullCategory(ctx, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all category", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if category == nil {
+		response := res.SuccessResponse(200, "there is no category to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all category", category)
+	ctx.JSON(http.StatusOK, respones)
+
+}
