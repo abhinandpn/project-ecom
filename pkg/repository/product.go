@@ -21,16 +21,6 @@ func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
 	return &productDatabase{DB: db}
 }
 
-// todo: PRODUCT FULL FUNCTIONS ( DATABASE RETALED QUER)
-/*
-* FIND PRODUCT BY ID 	-->
-* FIND PRODUCT 			-->
-* FIND ALL PRODUCT 		-->
-* SAVE PRODUCT 			-->
-* UPDATE PRODUCT 		-->
- */
-
-// TODO:
 // Find Product
 func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
 
@@ -40,7 +30,6 @@ func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Produ
 	return product, nil
 }
 
-// TODO:
 func (pr *productDatabase) FindProductById(ctx context.Context, productId uint) (product domain.Product, err error) {
 	query := `Select * from products where id = $1`
 	err = pr.DB.Raw(query, productId).Scan(&product).Error
@@ -50,7 +39,6 @@ func (pr *productDatabase) FindProductById(ctx context.Context, productId uint) 
 	return product, nil
 }
 
-// TODO:
 func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error) {
 
 	limit := pagination.Count
@@ -75,8 +63,7 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 	
   INNER JOIN
 	categories c ON p.category_id = c.id
-   ORDER BY created_at DESC LIMIT $1 OFFSET $2
-   ;`
+   ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
 
 	if pr.DB.Raw(querry, limit, offset).Scan(&products).Error != nil {
 		return products, errors.New("faild to get products from database")
@@ -86,7 +73,6 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 
 }
 
-// TODO:
 // Save Product
 func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Product) error {
 
@@ -111,7 +97,6 @@ func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Produ
 	return nil
 }
 
-// TODO:
 func (pr *productDatabase) UpdateProduct(ctx context.Context, product domain.Product) error {
 
 	query := `UPDATE products SET product_name = $1, discription = $2, category_id = $3, 
@@ -127,10 +112,21 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, product domain.Pro
 	return nil
 }
 
-// todo: CATEGORIES
 // Categories
-func (pr *productDatabase) SaveCategory(ctx context.Context, category domain.Category) error {
-	// query := `insert into categories(category_id,)`
+func (pr *productDatabase) SaveCategory(ctx context.Context, category req.CategoryReq) error {
+
+	query := `UPDATE categories
+			  SET category_name = $1,
+			  updated_at = $2,
+			  WHERE category_id = $3;`
+
+	updateTime := time.Now()
+
+	err := pr.DB.Raw(query, category.CategoryName, updateTime, category.Id).Scan(category)
+	if err != nil {
+		return errors.New("failed to save category")
+	}
+
 	return nil
 }
 
@@ -147,14 +143,15 @@ func (pr *productDatabase) FindCategoryById(ctx context.Context, CategoryId uint
 	return Category, nil
 }
 
-func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) (category []res.CategoryRes, err error) {
+func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
 
 	limit := pagination.Count
 	offset := (pagination.PageNumber - 1) * limit
 
-	query := `footex=# select * from categories order by category_id asc limit $1 offset $2;`
+	var category []res.CategoryRes
 
-	err = pr.DB.Raw(query, limit, offset).Error
+	query := `select * from categories order by category_id asc limit $1 offset $2;`
+	err := pr.DB.Raw(query, limit, offset).Scan(&category).Error
 
 	if err != nil {
 		return category, fmt.Errorf("failed to get categories from database")
