@@ -16,12 +16,16 @@ type ProductRepository interface {
 	CreateProduct(ctx context.Context, product domain.Product) error                               // Save a New product in to database
 	DeletProduct(ctx context.Context, PId uint) error                                              // Dalete product from database
 	UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error)                // Update the product info
-	// FindProduct(ctx context.Context, product domain.Product) (domain.Product, error)
 
 	// Category managment
-	FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error)
-	FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error)
-	SaveCategory(ctx context.Context, category req.CategoryReq) error
-	UpdateCatrgoryName(ctx context.Context, category domain.Category) error
-	DeletCategory(ctx context.Context, category domain.Category) error
+	FindCategoryById(ctx context.Context, CId uint) (domain.Category, error)                   // Find Category By Id
+	CreateCategory(ctx context.Context, category domain.Category) error                        // Creating new Category
+	DeleteCategory(ctx context.Context, id uint) error                                         // Delete category
+	UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error)         // Update category
+	FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // View Full category
+	//
+	//
+	//
+	//
+
 }

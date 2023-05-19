@@ -68,6 +68,12 @@ func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.P
 
 func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Product) error {
 
+	// verify the product by id
+	product, err := pr.FindProductById(ctx, product.Id)
+	if err != nil {
+		return err
+	}
+
 	querry := `INSERT INTO products (product_name, discription,category_id, price, image, created_at) 
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
 
@@ -137,46 +143,72 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Produc
 	return product, nil
 }
 
-// Find Product
-// func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
+// Categories New updated
 
-// 	if pr.DB.Raw("SELECT * FROM products WHERE id = ? OR product_name=?", product.Id, product.ProductName).Scan(&product).Error != nil {
-// 		return product, errors.New("faild to get product")
-// 	}
-// 	return product, nil
-// }
+func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (domain.Category, error) {
 
-// Categories
-func (pr *productDatabase) SaveCategory(ctx context.Context, category req.CategoryReq) error {
+	var category domain.Category
+	query := `select * from categories where id = $1;`
 
-	query := `UPDATE categories
-			  SET category_name = $1,
-			  updated_at = $2,
-			  WHERE category_id = $3;`
-
-	updateTime := time.Now()
-
-	err := pr.DB.Raw(query, category.CategoryName, updateTime, category.Id).Scan(category)
+	err := ct.DB.Raw(query, CId).Scan(&category).Error
 	if err != nil {
-		return errors.New("failed to save category")
+		return category, fmt.Errorf("faild to find to product with this category id %v", CId)
 	}
 
+	return category, nil
+}
+
+func (ct *productDatabase) CreateCategory(ctx context.Context, Category domain.Category) error {
+
+	// verify the product by id
+	Category, err := ct.FindCategoryById(ctx, Category.Id)
+	if err != nil {
+		return err
+	}
+	// if its not exist then create new one using this fileds
+	query := `insert into categories (category_name)values ($1);`
+	err = ct.DB.Raw(query, Category.CategoryName).Scan(Category).Error
+	if err != nil {
+		return err
+	}
+	// return
 	return nil
 }
 
-func (pr *productDatabase) FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error) {
-	var category domain.Category
+func (ct *productDatabase) DeleteCategory(ctx context.Context, id uint) error {
 
-	fmt.Println("category id in repo", CategoryId)
-	sql := `SELECT * FROM categories WHERE category_id = $1 LIMIT 1;`
-	pr.DB.Raw(sql, CategoryId).Scan(&category)
-	fmt.Println("repo", category)
+	// find the category
+	category, err := ct.FindCategoryById(ctx, id)
 	if err != nil {
-		return category, fmt.Errorf("faild find product with prduct_id %v", err)
-
+		return err
 	}
+	// if we get delete
+	query := `delete from categories where id = $1;`
+	err = ct.DB.Raw(query, category.Id).Error
+	if err != nil {
+		return err
+	}
+	// retun
+	return nil
+}
 
-	return Category, nil
+func (ct *productDatabase) UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error) {
+
+	var body domain.Category
+	// find the category
+	category, err := ct.FindCategoryById(ctx, info.Id)
+	if err != nil {
+		return category, err
+	}
+	// update
+	query := `update categories set category_name = $1 where id = $2;`
+	err = ct.DB.Raw(query, info.CategoryName, info.Id).Scan(&body).Error
+	if err != nil {
+		return category, err
+	}
+	// return
+	return body, nil
+
 }
 
 func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
@@ -194,31 +226,4 @@ func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.P
 	}
 
 	return category, nil
-}
-
-func (pr *productDatabase) UpdateCatrgoryName(ctx context.Context, category domain.Category) error {
-
-	query := `update categories set category_name = $1 ,updated_at = $2 where category_id = $3`
-	updatedTime := time.Now()
-
-	err := pr.DB.Raw(query, category.CategoryName, updatedTime, category.Id).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (pr *productDatabase) DeletCategory(ctx context.Context, category domain.Category) error {
-
-	query := `delete from categories where category_id = $1;`
-
-	err := pr.DB.Raw(query, category.Id).Error
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
