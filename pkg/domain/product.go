@@ -30,7 +30,6 @@ in category : CategoryId means subcategory
 */
 type Category struct {
 	Id           uint      `json:"-" gorm:"primaryKey;not null"`
-	CategoryID   uint      `json:"catrgory_id"`
 	Category     *Category `json:"-"`
 	CategoryName string    `json:"category_name" gorm:"unique;not null" binding:"required,min=3,max=30"`
 }
