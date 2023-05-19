@@ -24,14 +24,9 @@ type ProductInfo struct {
 	Brand     string `json:"brand"`
 }
 
-/*
-in Category : Id means the main ctegoy id
-in category : CategoryId means subcategory
-*/
 type Category struct {
-	Id           uint      `json:"-" gorm:"primaryKey;not null"`
-	Category     *Category `json:"-"`
-	CategoryName string    `json:"category_name" gorm:"unique;not null" binding:"required,min=3,max=30"`
+	Id           uint   `json:"-" gorm:"primaryKey;not null"`
+	CategoryName string `json:"category_name" gorm:"unique;not null" binding:"required,min=3,max=30"`
 }
 type Brand struct {
 	Id        uint   `json:"-" gorm:"primaryKey;not null"`
@@ -44,12 +39,3 @@ type ProductImage struct {
 	ProductImages string  `json:"product_images"`
 	Product       Product `json:"-"`
 }
-
-// Add On Tables
-/*
-	Brand table
-	Colour Table
-	Size table
-
-	Updation --> Sub Category Table
-*/
