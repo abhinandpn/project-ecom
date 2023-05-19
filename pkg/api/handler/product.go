@@ -54,36 +54,36 @@ Products
 // @Failure 500 {object} res.Response{}  "faild to get all products"
 func (pr *ProductHandler) ListProducts(ctx *gin.Context) {
 
-	count, err1 := helper.StringToUInt(ctx.Query("count"))
-	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	// count, err1 := helper.StringToUInt(ctx.Query("count"))
+	// pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
-	err1 = errors.Join(err1, err2)
-	if err1 != nil {
-		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-	pagination := req.ReqPagination{
-		PageNumber: pageNumber,
-		Count:      count,
-	}
+	// err1 = errors.Join(err1, err2)
+	// if err1 != nil {
+	// 	response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+	// 	ctx.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
+	// pagination := req.ReqPagination{
+	// 	PageNumber: pageNumber,
+	// 	Count:      count,
+	// }
 
-	products, err := pr.ProductuseCase.GetProducts(ctx, req.PageNation(pagination))
+	// products, err := pr.ProductuseCase.GetProducts(ctx, req.PageNation(pagination))
 
-	if err != nil {
-		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	}
+	// if err != nil {
+	// 	response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+	// 	ctx.JSON(http.StatusInternalServerError, response)
+	// 	return
+	// }
 
-	if products == nil {
-		response := res.SuccessResponse(200, "there is no products to show", nil)
-		ctx.JSON(http.StatusOK, response)
-		return
-	}
+	// if products == nil {
+	// 	response := res.SuccessResponse(200, "there is no products to show", nil)
+	// 	ctx.JSON(http.StatusOK, response)
+	// 	return
+	// }
 
-	respones := res.SuccessResponse(200, "successfully got all products", products)
-	ctx.JSON(http.StatusOK, respones)
+	// respones := res.SuccessResponse(200, "successfully got all products", products)
+	// ctx.JSON(http.StatusOK, respones)
 }
 
 // AddProducts godoc
@@ -150,16 +150,16 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := pr.ProductuseCase.AddCategory(ctx, body)
+	// resp, err := pr.ProductuseCase.AddCategory(ctx, body)
 
-	if err != nil {
-		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
+	// if err != nil {
+	// 	response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
+	// 	ctx.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
 
-	response := res.SuccessResponse(200, "successfully added a new category", resp)
-	ctx.JSON(http.StatusOK, response)
+	// response := res.SuccessResponse(200, "successfully added a new category", resp)
+	// ctx.JSON(http.StatusOK, response)
 
 }
 
@@ -175,12 +175,12 @@ func (pr *ProductHandler) EditCategory(ctx *gin.Context) {
 	var category domain.Category
 	copier.Copy(&category, &body)
 
-	err := pr.ProductuseCase.Editcategory(ctx, category)
-	if err != nil {
-		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
-		ctx.JSON(400, response)
-		return
-	}
+	// err := pr.ProductuseCase.Editcategory(ctx, category)
+	// if err != nil {
+	// 	response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
+	// 	ctx.JSON(400, response)
+	// 	return
+	// }
 
 	response := res.SuccessResponse(200, "successfully product updated", body)
 	ctx.JSON(200, response)
@@ -197,15 +197,6 @@ func (pr *ProductHandler) DeleteCategory(ctx *gin.Context) {
 
 	var category domain.Category
 	copier.Copy(&category, &body)
-
-	err := pr.ProductuseCase.DeleteCategory(ctx, category.CategoryID)
-	if err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-	response := res.SuccessResponse(200, "successfully product updated", body)
-	ctx.JSON(200, response)
 
 }
 
