@@ -9,16 +9,14 @@ import (
 )
 
 type ProductRepository interface {
+
 	// Product
-	FindProduct(ctx context.Context, product domain.Product) (domain.Product, error)
-	FindProductById(ctx context.Context, productId uint) (product domain.Product, err error)
-
-	// List all product
-	FindAllProduct(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error)
-
-	// product Managment
-	SaveProduct(ctx context.Context, product domain.Product) error
-	UpdateProduct(ctx context.Context, product domain.Product) error
+	FindProductById(ctx context.Context, PId uint) (domain.Product, error)                         // Find The product Details By an ID
+	ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View Full Product From database
+	CreateProduct(ctx context.Context, product domain.Product) error                               // Save a New product in to database
+	DeletProduct(ctx context.Context, PId uint) error                                              // Dalete product from database
+	UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error)                // Update the product info
+	// FindProduct(ctx context.Context, product domain.Product) (domain.Product, error)
 
 	// Category managment
 	FindCategoryById(ctx context.Context, CategoryId uint) (Category domain.Category, err error)

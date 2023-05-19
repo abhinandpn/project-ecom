@@ -21,29 +21,25 @@ func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
 	return &productDatabase{DB: db}
 }
 
-// Find Product
-func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
+// Product
 
-	if pr.DB.Raw("SELECT * FROM products WHERE id = ? OR product_name=?", product.Id, product.ProductName).Scan(&product).Error != nil {
-		return product, errors.New("faild to get product")
-	}
-	return product, nil
-}
+func (pr *productDatabase) FindProductById(ctx context.Context, PId uint) (domain.Product, error) {
 
-func (pr *productDatabase) FindProductById(ctx context.Context, productId uint) (product domain.Product, err error) {
+	var product domain.Product
 	query := `Select * from products where id = $1`
-	err = pr.DB.Raw(query, productId).Scan(&product).Error
+
+	err := pr.DB.Raw(query, PId).Scan(&product).Error
 	if err != nil {
-		return product, fmt.Errorf("faild find product with prduct_id %v", productId)
+		return product, fmt.Errorf("faild find To product with prduct_id : %v", PId)
 	}
 	return product, nil
 }
 
-func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error) {
+func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.PageNation) (product []res.ProductResponce, err error) {
 
 	limit := pagination.Count
 	offset := (pagination.PageNumber - 1) * limit
-
+	var ProductTable res.ProductResponce
 	// aliase :: p := product; c := category
 	querry := `SELECT
 	p.id,
@@ -52,7 +48,6 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 	c.category_name,
 	p.price,
 	p.discount_price,
-	
 	pi.colour,
 	pi.size,
 	pi.brand
@@ -60,57 +55,96 @@ func (pr *productDatabase) FindAllProduct(ctx context.Context, pagination req.Pa
 	products p
   INNER JOIN
 	product_infos pi ON p.id = pi.product_id
-	
   INNER JOIN
 	categories c ON p.category_id = c.id
    ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
 
-	if pr.DB.Raw(querry, limit, offset).Scan(&products).Error != nil {
-		return products, errors.New("faild to get products from database")
+	err = pr.DB.Raw(querry, limit, offset).Scan(&ProductTable).Error
+	if err != nil {
+		return product, errors.New("faild to get product details from database")
 	}
-
-	return products, nil
-
+	return product, nil
 }
 
-// Save Product
-func (pr *productDatabase) SaveProduct(ctx context.Context, product domain.Product) error {
+func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Product) error {
 
 	querry := `INSERT INTO products (product_name, discription,category_id, price, image, created_at) 
 	VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
 
 	createdAt := time.Now()
+	var ResProduct res.ProductResponce
 
 	if pr.DB.Raw(querry, product.ProductName, product.Discription, product.CategoryID,
-		product.Price, product.Image, createdAt).Scan(&product).Error != nil {
-		// fmt.Errorf(context.Canceled.Error())
+		product.Price, product.Image, createdAt).Scan(&ResProduct).Error != nil {
 		return errors.New("faild to insert product on database")
 	}
 
 	query2 := `insert into product_infos(product_id,colour,size,brand)values($1,$2,$3,$4)`
 
-	if pr.DB.Exec(query2, product.Id, product.Info.Colour,
-		product.Info.Size, product.Info.Brand).Error != nil {
+	if pr.DB.Raw(query2, product.Id, product.Info.Colour,
+		product.Info.Size, product.Info.Brand).Scan(ResProduct).Error != nil {
 		return errors.New("faild to insert product_info table on database----------- ")
 
 	}
 	return nil
 }
 
-func (pr *productDatabase) UpdateProduct(ctx context.Context, product domain.Product) error {
+func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
+
+	// verify the product by id
+	product, err := pr.FindProductById(ctx, PId)
+	if err != nil {
+		return err
+	}
+
+	// delete the product_info
+	query1 := `delete from product_infos where product_id = $1;`
+	err = pr.DB.Raw(query1).Error
+	if err != nil {
+		return errors.New("failed to delete from product_infos table")
+	}
+
+	// Delete from Products
+	query2 := `delete from products where id = $1;`
+	err = pr.DB.Raw(query2, product.Id).Error
+	if err != nil {
+		return errors.New("failed to delete from products table")
+	}
+
+	return nil
+}
+
+func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error) {
 
 	query := `UPDATE products SET product_name = $1, discription = $2, category_id = $3, 
 	price = $4, image = $5, updated_at = $6 WHERE id = $7`
 
 	updatedAt := time.Now()
+	var product domain.Product
 
-	if pr.DB.Exec(query, product.ProductName, product.Discription, product.CategoryID,
-		product.Price, product.Image, updatedAt, product.Id).Error != nil {
-		return errors.New("faild to update product")
+	err := pr.DB.Exec(query, info.ProductName,
+		info.Discription,
+		info.CategoryID,
+		info.Price,
+		info.Image,
+		updatedAt,
+		info.Id).Scan(product).Error
+
+	if err != nil {
+		return info, nil
 	}
 
-	return nil
+	return product, nil
 }
+
+// Find Product
+// func (pr *productDatabase) FindProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
+
+// 	if pr.DB.Raw("SELECT * FROM products WHERE id = ? OR product_name=?", product.Id, product.ProductName).Scan(&product).Error != nil {
+// 		return product, errors.New("faild to get product")
+// 	}
+// 	return product, nil
+// }
 
 // Categories
 func (pr *productDatabase) SaveCategory(ctx context.Context, category req.CategoryReq) error {
@@ -167,7 +201,7 @@ func (pr *productDatabase) UpdateCatrgoryName(ctx context.Context, category doma
 	query := `update categories set category_name = $1 ,updated_at = $2 where category_id = $3`
 	updatedTime := time.Now()
 
-	err := pr.DB.Raw(query, category.CategoryName, updatedTime, category.CategoryID).Error
+	err := pr.DB.Raw(query, category.CategoryName, updatedTime, category.Id).Error
 
 	if err != nil {
 		return err
@@ -180,7 +214,7 @@ func (pr *productDatabase) DeletCategory(ctx context.Context, category domain.Ca
 
 	query := `delete from categories where category_id = $1;`
 
-	err := pr.DB.Raw(query, category.CategoryID).Error
+	err := pr.DB.Raw(query, category.Id).Error
 
 	if err != nil {
 		return err
