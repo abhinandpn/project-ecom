@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 
@@ -109,74 +108,76 @@ func (pr *productUseCase) ViewFullProduct(ctx context.Context, pagination req.Pa
 	return body, nil
 }
 
-//
-//
-//
-//
-
 // Category
-func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (res.CategoryRes, error) {
+func (ct *productUseCase) FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error) {
 
-	exitstingCategory, _ := pr.productRepo.FindCategoryById(ctx, category.Id)
-
-	if exitstingCategory.Id == 0 {
-		return res.CategoryRes{}, errors.New("category already exists")
+	var category res.CategoryRes
+	body, err := ct.productRepo.FindCategoryById(ctx, id)
+	if err != nil {
+		return category, err
 	}
 
-	err := pr.productRepo.SaveCategory(ctx, category)
-	return res.CategoryRes(category), err
+	err = copier.Copy(&category, &body)
+	if err != nil {
+		return category, err
+	}
+	return category, nil
 }
 
-func (pr *productUseCase) Editcategory(ctx context.Context, category domain.Category) error {
+func (ct *productUseCase) AddCategory(ctx context.Context, category domain.Category) (domain.Category, error) {
 
-	// check if the category exist or not
-
-	var checkCategory = domain.Category{
-		CategoryID: category.Id}
-
-	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
-		return err
-	} else if checkCategory.Id == 0 {
-		return err
+	// find if exist or not
+	body, err := ct.productRepo.FindCategoryById(ctx, category.Id)
+	if err != nil {
+		return category, err
+	} else if body.Id == 0 {
+		return category, fmt.Errorf("invalid category_id %v", body.Id)
 	}
+	// add category
+	err = ct.productRepo.CreateCategory(ctx, body)
+	if err != nil {
+		return body, err
+	}
+	// responce
+	log.Printf("successfully product saved\n\n")
+	return body, nil
+}
 
-	// if we get then update
-	var newCate domain.Category
-	copier.Copy(&newCate, &category)
+func (ct *productUseCase) UpdateCategory(ctx context.Context, category domain.Category) error {
 
-	err := pr.productRepo.UpdateCatrgoryName(ctx, newCate)
+	// chek the category
+	body, err := ct.productRepo.FindCategoryById(ctx, category.Id)
+	if err != nil {
+		return err
+	} else if body.Id == 0 {
+		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+	// update
+	_, err = ct.productRepo.UpdateCategory(ctx, category)
 	if err != nil {
 		return err
 	}
-
+	//responce
 	return nil
 }
 
-func (pr *productUseCase) DeleteCategory(ctx context.Context, categoryId uint) error {
+func (ct *productUseCase) DeleteCategory(ctx context.Context, id uint) error {
 
-	// check if the category exist or not
-
-	var checkCategory = domain.Category{
-		CategoryID: categoryId}
-
-	if checkCategory, err := pr.productRepo.FindCategoryById(ctx, checkCategory.CategoryID); err != nil {
-		return err
-	} else if checkCategory.Id == 0 {
-		return err
-	}
-
-	var body domain.Category
-	copier.Copy(&body, &categoryId)
-
-	err := pr.productRepo.DeletCategory(ctx, body)
+	// check if exist or not
+	body, err := ct.productRepo.FindCategoryById(ctx, id)
 	if err != nil {
 		return err
 	}
-
+	// delete
+	err = ct.DeleteCategory(ctx, body.Id)
+	if err != nil {
+		return nil
+	}
+	// response
 	return nil
 }
 
-func (pr *productUseCase) ViewFullCategory(ctx context.Context, pagination req.PageNation) (category []res.CategoryRes, err error) {
+func (pr *productUseCase) ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
 
 	return pr.productRepo.FindAllCategory(ctx, pagination)
 
