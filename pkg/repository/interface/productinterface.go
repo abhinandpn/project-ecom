@@ -23,9 +23,5 @@ type ProductRepository interface {
 	DeleteCategory(ctx context.Context, id uint) error                                         // Delete category
 	UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error)         // Update category
 	FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // View Full category
-	//
-	//
-	//
-	//
 
 }
