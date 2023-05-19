@@ -9,11 +9,13 @@ import (
 )
 
 type ProductuseCase interface {
-	// Products View
-	GetProductInfo(ctx context.Context, ProductId uint) (ProductInfo domain.Product, err error)
-	GetProducts(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error)
-	// Product Managment
-	AddProduct(ctx context.Context, product domain.Product) error
+
+	// Product
+	AddProduct(ctx context.Context, product domain.Product) error                                // Add New Product
+	UpdateProduct(ctx context.Context, product domain.Product) error                             // Update Product Info
+	DeleteProduct(ctx context.Context, id uint) error                                            // Delete the product
+	FindProductById(ctx context.Context, id uint) (res.ProductResponce, error)                   // Find a product by a ID
+	ViewFullProduct(ctx context.Context, pagination req.PageNation) (res.ProductResponce, error) // View full Products
 
 	// Category
 	AddCategory(ctx context.Context, category req.CategoryReq) (cat res.CategoryRes, err error)

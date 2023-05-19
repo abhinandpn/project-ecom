@@ -24,31 +24,101 @@ func NewProductUseCase(ProductRepo interfaces.ProductRepository) service.Product
 	return &productUseCase{productRepo: ProductRepo}
 }
 
-func (pr *productUseCase) GetProducts(ctx context.Context, pagination req.PageNation) (products []res.ProductResponce, err error) {
-	return pr.productRepo.FindAllProduct(ctx, pagination)
-}
-
+// Product
 func (pr *productUseCase) AddProduct(ctx context.Context, product domain.Product) error {
 
 	// check Given product is exist or not
-	if product, err := pr.productRepo.FindProduct(ctx, product); err != nil {
+	Pid := product.Id
+	body, err := pr.productRepo.FindProductById(ctx, Pid)
+	if err != nil {
 		return err
-	} else if product.Id != 0 {
-		return fmt.Errorf("product already exist with %s product name", product.ProductName)
+	} else if body.Id == 0 {
+		return fmt.Errorf("invalid product_id %v", body.Id)
 	}
+
+	// if its found then create a new product with new data
+	err = pr.productRepo.CreateProduct(ctx, body)
+	if err != nil {
+		return err
+	}
+
 	log.Printf("successfully product saved\n\n")
-
-	return pr.productRepo.SaveProduct(ctx, product)
+	return nil
 }
 
-func (pr *productUseCase) GetProductInfo(ctx context.Context, ProductId uint) (ProductInfo domain.Product, err error) {
-	return ProductInfo, nil
+func (pr *productUseCase) UpdateProduct(ctx context.Context, product domain.Product) error {
+
+	// check the product exist or not
+	Pid := product.Id
+	body, err := pr.productRepo.FindProductById(ctx, Pid)
+	if err != nil {
+		return err
+	} else if body.Id == 0 {
+		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+
+	// if exist update
+	_, err = pr.productRepo.UpdateProduct(ctx, body)
+	if err != nil {
+		return err
+	}
+
+	// responce
+	return nil
 }
+
+func (pr *productUseCase) DeleteProduct(ctx context.Context, id uint) error {
+
+	// check the product exist or not
+	body, err := pr.productRepo.FindProductById(ctx, id)
+	if err != nil {
+		return err
+	} else if body.Id == 0 {
+		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+
+	// if exist then delete
+	err = pr.productRepo.DeletProduct(ctx, body.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pr *productUseCase) FindProductById(ctx context.Context, id uint) (res.ProductResponce, error) {
+
+	var Product res.ProductResponce
+	body, err := pr.productRepo.FindProductById(ctx, id)
+	if err != nil {
+		return Product, err
+	}
+
+	err = copier.Copy(&Product, &body)
+	if err != nil {
+		return Product, err
+	}
+	return Product, nil
+}
+
+func (pr *productUseCase) ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	body, err := pr.productRepo.ViewFullProduct(ctx, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+//
+//
+//
+//
 
 // Category
 func (pr *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (res.CategoryRes, error) {
 
 	exitstingCategory, _ := pr.productRepo.FindCategoryById(ctx, category.Id)
+
 	if exitstingCategory.Id == 0 {
 		return res.CategoryRes{}, errors.New("category already exists")
 	}
