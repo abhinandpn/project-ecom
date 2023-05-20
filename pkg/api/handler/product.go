@@ -24,11 +24,6 @@ func NewProductHandler(productUsecase service.ProductuseCase) *ProductHandler {
 
 //
 // Product
-//
-//
-//
-//
-//
 
 // ListProducts-Admin godoc
 // @summary api for admin to show products
@@ -98,7 +93,6 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 	var body req.ReqProduct
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		fmt.Println("------------------------1 ")
 		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, respones)
 		return
@@ -133,17 +127,104 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 
 }
 
-// add
-// edit
-// delete
-// View
+func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
+
+	var body req.ReqProduct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var product domain.Product
+	copier.Copy(&product, &body)
+
+	err := pr.ProductuseCase.UpdateProduct(ctx, product)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
+		ctx.JSON(400, response)
+		return
+	}
+
+	response := res.SuccessResponse(200, "successfully product updated", body)
+	ctx.JSON(200, response)
+}
+
+func (pr *ProductHandler) DeleteProduct(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	id, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	err = pr.ProductuseCase.DeleteProduct(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't delete product",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, res.Response{
+		StatusCode: 200,
+		Message:    "product deleted",
+		Data:       nil,
+		Errors:     nil,
+	})
+}
+
+func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	id, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	data, err := pr.ProductuseCase.FindProductById(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't Find product",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, res.Response{
+		StatusCode: 200,
+		Message:    "product Found",
+		Data:       data,
+		Errors:     nil,
+	})
+}
+
+//
+//
+//
+//
+//
 
 func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 
 	var body domain.Category
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		fmt.Println("------------------------1 ")
 		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, respones)
 		return
