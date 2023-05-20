@@ -37,7 +37,8 @@ func AdminRoute(api *gin.RouterGroup,
 		// Category
 		category := api.Group("/category")
 		{
-			category.GET("", ProductHandler.Viewcategory)      // View Category
+			category.GET("", ProductHandler.ViewFullcategory)  // View Categories
+			category.GET("/:id", ProductHandler.Viewcategory)  // view Single Category
 			category.POST("", ProductHandler.Addcategory)      // Add category
 			category.PATCH("", ProductHandler.EditCategory)    // Edit category
 			category.DELETE("", ProductHandler.DeleteCategory) // Delete category

@@ -214,13 +214,9 @@ func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
 	})
 }
 
-//
-//
-//
-//
-//
+// Category Handler
 
-func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
+func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 
 	var body domain.Category
 
@@ -230,7 +226,7 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := pr.ProductuseCase.AddCategory(ctx, body)
+	resp, err := ct.ProductuseCase.AddCategory(ctx, body)
 
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
@@ -243,7 +239,7 @@ func (pr *ProductHandler) Addcategory(ctx *gin.Context) {
 
 }
 
-func (pr *ProductHandler) EditCategory(ctx *gin.Context) {
+func (ct *ProductHandler) EditCategory(ctx *gin.Context) {
 
 	var body req.CategoryReq
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -255,7 +251,7 @@ func (pr *ProductHandler) EditCategory(ctx *gin.Context) {
 	var category domain.Category
 	copier.Copy(&category, &body)
 
-	err := pr.ProductuseCase.UpdateCategory(ctx, category)
+	err := ct.ProductuseCase.UpdateCategory(ctx, category)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
 		ctx.JSON(400, response)
@@ -266,7 +262,7 @@ func (pr *ProductHandler) EditCategory(ctx *gin.Context) {
 	ctx.JSON(200, response)
 }
 
-func (pr *ProductHandler) DeleteCategory(ctx *gin.Context) {
+func (ct *ProductHandler) DeleteCategory(ctx *gin.Context) {
 
 	var body req.CategoryReq
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -280,7 +276,39 @@ func (pr *ProductHandler) DeleteCategory(ctx *gin.Context) {
 
 }
 
-func (pr *ProductHandler) Viewcategory(ctx *gin.Context) {
+func (ct *ProductHandler) Viewcategory(ctx *gin.Context) {
+
+	Paramid := ctx.Param("id")
+
+	id, err := helper.StringToUInt(Paramid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find CategoryId",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	data, err := ct.ProductuseCase.FindCategoryById(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't Find Category",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, res.Response{
+		StatusCode: 200,
+		Message:    "Category Found",
+		Data:       data,
+		Errors:     nil,
+	})
+}
+
+func (ct *ProductHandler) ViewFullcategory(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
@@ -296,7 +324,7 @@ func (pr *ProductHandler) Viewcategory(ctx *gin.Context) {
 	pagination.Count = count
 	pagination.PageNumber = pageNumber
 
-	category, err := pr.ProductuseCase.ViewFullCategory(ctx, req.PageNation(pagination))
+	category, err := ct.ProductuseCase.ViewFullCategory(ctx, req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all category", err.Error(), nil)
