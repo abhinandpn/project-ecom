@@ -33,3 +33,27 @@ type Address struct {
 	Pincode     string `json:"pincode"`
 	Landmark    string `json:"landmark"`
 }
+
+type Cart struct {
+	CartID          uint `json:"cart_id" gorm:"primaryKey;not null"`
+	UserID          uint `json:"user_id" gorm:"not null"`
+	TotalPrice      uint `json:"total_price" gorm:"not null"`
+	AppliedCouponID uint `json:"applied_coupon_id"`
+	DiscountAmount  uint `json:"discount_amount"`
+}
+
+type CartIteams struct {
+	CartItemId uint `json:"cart_item_id" gorm:"not null"`
+	CartId     uint `json:"cart_id" gorm:"not null"`
+	Cart       Cart
+	ProductId  uint `json:"product_id" gorm:"not null"`
+	Product    Product
+	Quantity   uint `json:"qty" gorm:"not null"`
+}
+
+type WishList struct {
+	ID        uint `json:"id" gorm:"primaryKey;not null"`
+	UserID    uint `json:"user_id" gorm:"not null"`
+	User      Users
+	ProductId uint `json:"product_id" gorm:"not null"`
+}
