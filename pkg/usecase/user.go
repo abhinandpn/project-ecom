@@ -108,3 +108,14 @@ func (usr *userUseCase) Login(ctx context.Context, user domain.Users) (domain.Us
 
 	return dbUser, nil
 }
+
+// User account Info
+func (usr *userUseCase) UserAccount(ctx context.Context, UserId uint) (domain.Users, error) {
+
+	var user domain.Users
+	user, err := usr.userRepo.FindUserById(ctx, UserId)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
