@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
+	"github.com/gin-gonic/gin"
 )
 
 func UserCheck(user, curUser domain.Users) (err error) {
@@ -22,4 +23,15 @@ func UserCheck(user, curUser domain.Users) (err error) {
 func StringToUInt(str string) (uint, error) {
 	val, err := strconv.Atoi(str)
 	return uint(val), err
+}
+
+func GetUserId(ctx *gin.Context) uint {
+
+	UserId := ctx.GetString("userId") // string Type
+	Id, err := strconv.Atoi(UserId)   // Int type
+	if err != nil {
+		return 0
+	}
+	return uint(Id) // current User Id
+
 }
