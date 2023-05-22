@@ -74,21 +74,36 @@ func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Pro
 		return err
 	}
 
-	querry := `INSERT INTO products (product_name, discription,category_id, price, image, created_at) 
-	VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
+	querry := `INSERT INTO products (product_name, 
+					discription,
+					category_id, 
+					price, image, 
+					created_at) 
+				VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
 
 	createdAt := time.Now()
 	var ResProduct res.ProductResponce
 
-	if pr.DB.Raw(querry, product.ProductName, product.Discription, product.CategoryID,
-		product.Price, product.Image, createdAt).Scan(&ResProduct).Error != nil {
+	if pr.DB.Raw(querry,
+		product.ProductName,
+		product.Discription,
+		product.CategoryID,
+		product.Price,
+		product.Image,
+		createdAt).Scan(&ResProduct).Error != nil {
 		return errors.New("faild to insert product on database")
 	}
 
-	query2 := `insert into product_infos(product_id,colour,size,brand)values($1,$2,$3,$4)`
+	query2 := `insert into product_infos(product_id,
+		colour,
+		size,
+		brand)values($1,$2,$3,$4)`
 
-	if pr.DB.Raw(query2, product.Id, product.Info.Colour,
-		product.Info.Size, product.Info.Brand).Scan(ResProduct).Error != nil {
+	if pr.DB.Raw(query2,
+		product.Id,
+		product.Info.Colour,
+		product.Info.Size,
+		product.Info.Brand).Scan(ResProduct).Error != nil {
 		return errors.New("faild to insert product_info table on database----------- ")
 
 	}
@@ -122,8 +137,14 @@ func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
 func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error) {
 
-	query := `UPDATE products SET product_name = $1, discription = $2, category_id = $3, 
-	price = $4, image = $5, updated_at = $6 WHERE id = $7`
+	query := `UPDATE products SET 
+					product_name = $1, 
+					discription = $2, 
+					category_id = $3, 
+					price = $4, 
+					image = $5, 
+					updated_at = $6 
+				WHERE id = $7`
 
 	updatedAt := time.Now()
 	var product domain.Product
