@@ -11,6 +11,7 @@ import (
 	twillio "github.com/abhinandpn/project-ecom/pkg/Twillio"
 	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
+	"github.com/abhinandpn/project-ecom/pkg/helper"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -27,6 +28,7 @@ func NewUserHandler(usecase services.UserUseCase) *UserHandler {
 }
 
 // ---------------------- User Function -----------------
+
 // UserSignUp godoc
 // @summary api for user to signup
 // @security ApiKeyAuth
@@ -126,7 +128,7 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 
 // Otp login
 func (usr *UserHandler) UserOtpLogin(ctx *gin.Context) {
-	fmt.Println(".......................")
+
 	var body req.OTPLoginStruct
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
@@ -165,6 +167,7 @@ func (usr *UserHandler) UserOtpLogin(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+// user Login Otp verify
 func (usr *UserHandler) UserLoginOtpVerify(ctx *gin.Context) {
 
 	var body req.OTPVerifyStruct
@@ -208,10 +211,41 @@ func (usr *UserHandler) UserLoginOtpVerify(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (a *UserHandler) UserHome(ctx *gin.Context) {
+// home
+func (usr *UserHandler) UserHome(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"StatusCode": 200,
 		"message":    "Welcome to User Home",
 	})
+}
+
+// User Information
+
+func (usr *UserHandler) UserInfo(ctx *gin.Context) {
+
+	// collect the user id
+	userId := helper.GetUserId(ctx)
+	// find the user with this id
+	CurUser, err := usr.userUseCase.UserAccount(ctx, userId)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to show user details", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// responce
+	var data res.UserResStruct
+	copier.Copy(&data, &CurUser)
+
+	response := res.SuccessResponse(200, "Successfully user account details found", data)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// user logout
+func (usr *UserHandler) UserLogout(ctx *gin.Context) {
+
+	ctx.SetCookie("user-auth", "", -1, "", "", false, true)
+	response := res.SuccessResponse(200, "successfully logged out", nil)
+	ctx.JSON(http.StatusOK, response)
+
 }
