@@ -37,15 +37,21 @@ func (adm *adminDatabase) EnvAdminFind(ctx context.Context) (domain.Admin, error
 
 	return envAdmin, nil
 }
+
 func (adm *adminDatabase) CreateAdmin(admin req.AdminLoginStruct) error {
+
 	query := `Insert into admins (email,username,password)Values ($1,$2,$3)`
+
 	if adm.DB.Exec(query, admin.Email, admin.UserName, admin.Password).Error != nil {
 		return errors.New("faild to save admin to DB")
 	}
 	return nil
 }
+
 func (adm *adminDatabase) FindAdmin(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
+
 	query := `select * from admins where email=? or username=?`
+
 	if adm.DB.Exec(query, admin.Email, admin.Username).Error != nil {
 		return admin, errors.New("faild to find admin from DB")
 	}
@@ -53,17 +59,22 @@ func (adm *adminDatabase) FindAdmin(ctx context.Context, admin domain.Admin) (do
 }
 
 // List all users from database via pagenation
-func (adm *adminDatabase) ListAllUser(ctx context.Context, PageNation req.PageNation) (user []res.UserResStruct, err error) {
+func (adm *adminDatabase) ListAllUser(ctx context.Context, PageNation req.PageNation) ([]res.UserResStruct, error) {
+
+	var user []res.UserResStruct
 
 	limit := PageNation.Count
-
 	offset := (PageNation.PageNumber - 1) * limit
 
-	query := `SELECT * FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2`
+	query := `select * FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2`
 
-	err = adm.DB.Raw(query, limit, offset).Scan(&user).Error
+	err := adm.DB.Raw(query, limit, offset).Scan(&user).Error
+	// fmt.Println("user data -------------->>> ", user)
+	if err != nil {
+		return user, err
+	}
 
-	return user, err
+	return user, nil
 }
 
 // block user

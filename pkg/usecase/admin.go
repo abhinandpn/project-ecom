@@ -67,13 +67,14 @@ func (adm *AdminUseCase) Login(ctx context.Context, admin domain.Admin) (domain.
 func (adm *AdminUseCase) FindAllUser(ctx context.Context, pagination req.PageNation) (users []res.UserResStruct, err error) {
 
 	users, err = adm.adminRepo.ListAllUser(ctx, pagination)
-
+	// fmt.Println("1 st get date --------------->>>>>>", users)
 	if err != nil {
 		return nil, err
 	}
 
 	var responce []res.UserResStruct
 	copier.Copy(&responce, &users)
+	// fmt.Println("2 nd get date --------------->>>>>>", responce)
 	return responce, nil
 }
 
