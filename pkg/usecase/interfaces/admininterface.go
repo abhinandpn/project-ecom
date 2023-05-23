@@ -16,7 +16,16 @@ type AdminUseCase interface {
 	// Admin side
 	Login(ctx context.Context, admin domain.Admin) (domain.Admin, error)
 
-	// User side
+	// -------------User side----------------
+
+	// List All Users
 	FindAllUser(ctx context.Context, pagination req.PageNation) (users []res.UserResStruct, err error)
 	BlockUser(ctx context.Context, UserId uint) error
+
+	// Find user By
+	FindUserByUserName(ctx context.Context, name string) (domain.Users, error)
+	FindUserByNumber(ctx context.Context, number uint) (domain.Users, error)
+	FindUserByEmail(ctx context.Context, email string) (domain.Users, error)
+	FindUserInfo(ctx context.Context, user domain.Users) (domain.Users, error)
+	FindUserById(ctx context.Context, id uint) (domain.Users, error)
 }

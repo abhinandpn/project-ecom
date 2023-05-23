@@ -16,11 +16,15 @@ import (
 
 type AdminUseCase struct {
 	adminRepo interfaces.AdminRepository
+	userRepo  interfaces.UserRepository
 }
 
-func NewAdminUseCase(repo interfaces.AdminRepository) services.AdminUseCase {
+func NewAdminUseCase(Adminrepo interfaces.AdminRepository, UserRepo interfaces.UserRepository) services.AdminUseCase {
 
-	return &AdminUseCase{adminRepo: repo}
+	return &AdminUseCase{
+		adminRepo: Adminrepo,
+		userRepo:  UserRepo,
+	}
 }
 
 // Sudo admin login .env file loading
@@ -77,4 +81,63 @@ func (adm *AdminUseCase) FindAllUser(ctx context.Context, pagination req.PageNat
 func (adm *AdminUseCase) BlockUser(ctx context.Context, UserId uint) error {
 
 	return adm.adminRepo.BlockUser(ctx, UserId)
+}
+
+// Find User By user Name
+func (adm *AdminUseCase) FindUserByUserName(ctx context.Context, name string) (domain.Users, error) {
+
+	body, err := adm.userRepo.FindUserByUserName(ctx, name)
+
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
+// Find User By Email
+func (adm *AdminUseCase) FindUserByEmail(ctx context.Context, email string) (domain.Users, error) {
+
+	body, err := adm.userRepo.FindUserByEmail(ctx, email)
+
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// Find User By Number
+func (adm *AdminUseCase) FindUserByNumber(ctx context.Context, number uint) (domain.Users, error) {
+
+	body, err := adm.userRepo.FindUserByNumber(ctx, number)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// Find User By Any Information
+
+func (adm *AdminUseCase) FindUserInfo(ctx context.Context, user domain.Users) (domain.Users, error) {
+
+	body, err := adm.userRepo.FindUser(ctx, user)
+
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+
+}
+
+// Find User By Id
+func (adm *AdminUseCase) FindUserById(ctx context.Context, id uint) (domain.Users, error) {
+
+	body, err := adm.userRepo.FindUserById(ctx, id)
+
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
 }

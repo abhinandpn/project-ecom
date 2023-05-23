@@ -15,4 +15,12 @@ type UserUseCase interface {
 
 	UserAccount(ctx context.Context, UserId uint) (domain.Users, error)
 	//........................................................
+	/*
+		Add Address
+		Uodate Addres
+		List All Address
+		Delete Drress
+		View profile
+		Edit Profile
+	*/
 }
