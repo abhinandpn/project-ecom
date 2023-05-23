@@ -218,3 +218,81 @@ func (adm *AdminHandler) BlockUser(ctx *gin.Context) {
 	// if successfully blocked or unblock user then response 200
 	ctx.JSON(http.StatusOK, response)
 }
+
+// Find User By UserName
+func (adm *AdminHandler) FindUserByUserName(ctx *gin.Context) {
+
+	Param := ctx.Param("username")
+
+	user, err := adm.AdminUseCase.FindUserByUserName(ctx, Param)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := res.SuccessResponse(200, "successfully got  users", user)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// find User By Email
+
+func (adm *AdminHandler) FindUserWithEmail(ctx *gin.Context) {
+
+	param := ctx.Param("email")
+
+	user, err := adm.AdminUseCase.FindUserByEmail(ctx, param)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := res.SuccessResponse(200, "successfully got  users", user)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// Find user By number
+func (adm *AdminHandler) FindUserWithNumber(ctx *gin.Context) {
+
+	param := ctx.Param("number")
+
+	number, err := helper.StringToUInt(param)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	user, err := adm.AdminUseCase.FindUserByNumber(ctx, number)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully got  users", user)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// Find User by Id
+
+func (adm *AdminHandler) FindUserWithId(ctx *gin.Context) {
+
+	param := ctx.Param("id")
+
+	id, err := helper.StringToUInt(param)
+
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	user, err := adm.AdminUseCase.FindUserById(ctx, id)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully got  users", user)
+	ctx.JSON(http.StatusOK, response)
+}

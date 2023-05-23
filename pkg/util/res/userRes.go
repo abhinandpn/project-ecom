@@ -14,3 +14,6 @@ type UserResStruct struct {
 	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+type UserFindWithUserName struct {
+	UserName string `json:"user_name" gorm:"not null"`
+}

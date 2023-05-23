@@ -22,8 +22,15 @@ func AdminRoute(api *gin.RouterGroup,
 		// user Side
 		user := api.Group("/users")
 		{
-			user.GET("", AdminHandler.Listuser)          // List all user
+			// user managment
 			user.PATCH("/block", AdminHandler.BlockUser) // Block User
+
+			// Finding And Listing
+			user.GET("", AdminHandler.Listuser)                     // List all user
+			user.GET("/:id", AdminHandler.FindUserWithId)           // find User With Id
+			user.GET("/:number", AdminHandler.FindUserWithNumber)   // Find user with number
+			user.GET("/:email", AdminHandler.FindUserWithEmail)     // Find User With email
+			user.GET("/:username", AdminHandler.FindUserByUserName) // Find User With User name
 		}
 		// Product
 		product := api.Group("/product")
