@@ -9,6 +9,7 @@ import (
 )
 
 func UserCheck(user, curUser domain.Users) (err error) {
+
 	if curUser.Email == user.Email {
 		err = errors.Join(err, errors.New("user alredy exist with this email"))
 	}
@@ -22,6 +23,7 @@ func UserCheck(user, curUser domain.Users) (err error) {
 }
 func StringToUInt(str string) (uint, error) {
 	val, err := strconv.Atoi(str)
+	// fmt.Println("new ne w enenenenen--------------->", (str))
 	return uint(val), err
 }
 

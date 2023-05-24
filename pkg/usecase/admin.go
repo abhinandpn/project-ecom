@@ -108,7 +108,7 @@ func (adm *AdminUseCase) FindUserByEmail(ctx context.Context, email string) (dom
 }
 
 // Find User By Number
-func (adm *AdminUseCase) FindUserByNumber(ctx context.Context, number uint) (domain.Users, error) {
+func (adm *AdminUseCase) FindUserByNumber(ctx context.Context, number string) (domain.Users, error) {
 
 	body, err := adm.userRepo.FindUserByNumber(ctx, number)
 	if err != nil {

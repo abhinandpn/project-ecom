@@ -51,11 +51,11 @@ func (usr *userDatabase) FindUserByEmail(ctx context.Context, email string) (dom
 	return user, nil
 }
 
-func (usr *userDatabase) FindUserByNumber(ctx context.Context, number uint) (domain.Users, error) {
+func (usr *userDatabase) FindUserByNumber(ctx context.Context, number string) (domain.Users, error) {
 
 	var user domain.Users
 
-	query := `select * from users where phone = $1`
+	query := `select * from users where number = $1`
 
 	err := usr.DB.Raw(query, number).Scan(&user).Error
 
@@ -85,9 +85,10 @@ func (usr *userDatabase) FindUserByUserName(ctx context.Context, username string
 
 	var user domain.Users
 
-	query := `select * from users where user_name = ?;`
-
-	err := usr.DB.Raw(query, username).Scan(user).Error
+	query := `select * from users where user_name = $1;`
+	// fmt.Println("--xxxxxx----- > ", username)
+	err := usr.DB.Raw(query, username).Scan(&user).Error
+	// fmt.Println("--------------------------- >", usr.DB.Raw(query, username))
 	if err != nil {
 		return user, err
 	}

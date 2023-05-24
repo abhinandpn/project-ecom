@@ -13,7 +13,7 @@ type UserRepository interface {
 	// Finding
 	FindUser(ctx context.Context, user domain.Users) (domain.Users, error)                 // Find By Any filed
 	FindUserByEmail(ctx context.Context, email string) (domain.Users, error)               // Find By Email
-	FindUserByNumber(ctx context.Context, number uint) (domain.Users, error)               // Find By Number
+	FindUserByNumber(ctx context.Context, number string) (domain.Users, error)             // Find By Number
 	FindUserById(ctx context.Context, id uint) (domain.Users, error)                       // Find By User Id
 	FindUserByUserName(ctx context.Context, username string) (domain.Users, error)         // Find By UserName
 	ListUsers(ctx context.Context, pagination req.PageNation) (res.ProductResponce, error) // List Full Users

@@ -24,7 +24,7 @@ type AdminUseCase interface {
 
 	// Find user By
 	FindUserByUserName(ctx context.Context, name string) (domain.Users, error)
-	FindUserByNumber(ctx context.Context, number uint) (domain.Users, error)
+	FindUserByNumber(ctx context.Context, number string) (domain.Users, error)
 	FindUserByEmail(ctx context.Context, email string) (domain.Users, error)
 	FindUserInfo(ctx context.Context, user domain.Users) (domain.Users, error)
 	FindUserById(ctx context.Context, id uint) (domain.Users, error)

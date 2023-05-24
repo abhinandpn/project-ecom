@@ -129,6 +129,7 @@ func (ct *productUseCase) AddCategory(ctx context.Context, category domain.Categ
 	// find if exist or not
 	body, err := ct.productRepo.FindCategoryById(ctx, category.Id)
 	if err != nil {
+		fmt.Println("xtxtxtxtxtxtxtxtxt")
 		return category, err
 	} else if body.Id == 0 {
 		return category, fmt.Errorf("invalid category_id %v", body.Id)

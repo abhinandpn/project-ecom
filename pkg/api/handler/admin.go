@@ -152,7 +152,7 @@ func (a *AdminHandler) AdminHome(ctx *gin.Context) {
 // @Success 200 {object} res.Response{} "successfully got all users"
 // @Failure 500 {object} res.Response{} "faild to get all users"
 func (adm *AdminHandler) Listuser(ctx *gin.Context) {
-	fmt.Println("-------------")
+	// fmt.Println("-------------")
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
@@ -255,14 +255,13 @@ func (adm *AdminHandler) FindUserWithEmail(ctx *gin.Context) {
 // Find user By number
 func (adm *AdminHandler) FindUserWithNumber(ctx *gin.Context) {
 
-	param := ctx.Param("number")
-
-	number, err := helper.StringToUInt(param)
-	if err != nil {
-		response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
+	number := ctx.Param("number")
+	// number, err := helper.StringToUInt(param)
+	// if err != nil {
+	// 	response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
+	// 	ctx.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
 	user, err := adm.AdminUseCase.FindUserByNumber(ctx, number)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
@@ -276,11 +275,11 @@ func (adm *AdminHandler) FindUserWithNumber(ctx *gin.Context) {
 // Find User by Id
 
 func (adm *AdminHandler) FindUserWithId(ctx *gin.Context) {
-
+	fmt.Println("----------------------------------------")
 	param := ctx.Param("id")
 
 	id, err := helper.StringToUInt(param)
-
+	fmt.Println("id is -------------->> ", id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)

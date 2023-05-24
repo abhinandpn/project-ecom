@@ -226,15 +226,16 @@ func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := ct.ProductuseCase.AddCategory(ctx, body)
+	body, err := ct.ProductuseCase.AddCategory(ctx, body)
 
+	// fmt.Println("xxxxxx-x-x-x-x-x-xx-", body.Id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully added a new category", resp)
+	response := res.SuccessResponse(200, "successfully added a new category", body)
 	ctx.JSON(http.StatusOK, response)
 
 }

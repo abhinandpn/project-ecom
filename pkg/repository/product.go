@@ -182,13 +182,19 @@ func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (doma
 func (ct *productDatabase) CreateCategory(ctx context.Context, Category domain.Category) error {
 
 	// verify the product by id
-	Category, err := ct.FindCategoryById(ctx, Category.Id)
+	body, err := ct.FindCategoryById(ctx, Category.Id)
 	if err != nil {
 		return err
 	}
+	fmt.Println("body body body ------ ??? > ", body)
+	// var body domain.Category
 	// if its not exist then create new one using this fileds
-	query := `insert into categories (category_name)values ($1);`
-	err = ct.DB.Raw(query, Category.CategoryName).Scan(Category).Error
+	query := `insert into categories (id,category_name)values ($1,$2);`
+	fmt.Println("xxxxxxxxxxx-------- > id ----- >", Category.Id)
+
+	fmt.Println("xxxxxxxxxxx-------- > name ------- >", Category.CategoryName)
+
+	err = ct.DB.Raw(query, body.Id, body.CategoryName).Scan(body).Error
 	if err != nil {
 		return err
 	}
@@ -239,7 +245,7 @@ func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.P
 
 	var category []res.CategoryRes
 
-	query := `select * from categories order by category_id asc limit $1 offset $2;`
+	query := `select * from categories order by id asc limit $1 offset $2;`
 	err := pr.DB.Raw(query, limit, offset).Scan(&category).Error
 
 	if err != nil {
