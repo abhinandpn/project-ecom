@@ -35,8 +35,9 @@ func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productH
 		// Address
 		address := api.Group("address")
 		{
-			address.POST("/add", userHandler.AddAddress)    // Add Address
-			address.GET("/all", userHandler.ListAllAddress) // List all Address
+			address.POST("/add", userHandler.AddAddress)        // Add Address
+			address.GET("/all", userHandler.ListAllAddress)     // List all Address
+			address.PATCH("/update", userHandler.UpdateAddress) // Update Address
 		}
 		// Product
 		product := api.Group("/product")

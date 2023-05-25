@@ -306,6 +306,35 @@ func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 	}
 
 	// response
-	response := res.SuccessResponse(200, "Successfully Add user Address", address)
+	response := res.SuccessResponse(200, "Successfully list user all Address", address)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// -----------------UpdateAllAddress-----------------
+
+func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
+
+	// get id
+	UserId := helper.GetUserId(ctx)
+
+	// create variable and bind
+	var body req.ReqAddress
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to bind address", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// call func
+	err = usr.userUseCase.UpdateAddress(ctx, UserId, body)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to update address", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// responce
+	response := res.SuccessResponse(200, "Successfully update user Address", body)
 	ctx.JSON(http.StatusOK, response)
 }
