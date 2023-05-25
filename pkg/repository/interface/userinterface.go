@@ -22,4 +22,9 @@ type UserRepository interface {
 	SaveUser(ctx context.Context, user domain.Users) (UserId uint, err error) // Create new User
 	DeleteUser(ctx context.Context, id uint) error                            // Delete User
 	UpdateUser(ctx context.Context, info domain.Users) (domain.Users, error)  // Update User Info
+
+	// Address
+	AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error     // Add Address
+	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error // Update Address
+	ListAllAddress(ctx context.Context, Uid uint) error                        // Delete Address
 }

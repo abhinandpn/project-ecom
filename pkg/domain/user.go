@@ -26,12 +26,14 @@ type Address struct {
 	ID          uint   `json:"id"`
 	UserID      uint   `json:"user_id"`
 	Users       Users  `gorm:"foreignKey:UserID" json:"-"`
-	HouseNumber string `json:"house_number"`
+	House       string `json:"house8"`
+	PhoneNumber string `json:"phone_number"`
 	Street      string `json:"street"`
 	City        string `json:"city"`
 	District    string `json:"district"`
 	Pincode     string `json:"pincode"`
 	Landmark    string `json:"landmark"`
+	Default     *bool  `json:"is_default"`
 }
 
 type Cart struct {

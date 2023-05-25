@@ -218,7 +218,7 @@ func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
 
 func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 
-	var body domain.Category
+	var body req.CategoryReq
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
@@ -226,16 +226,22 @@ func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 		return
 	}
 
-	body, err := ct.ProductuseCase.AddCategory(ctx, body)
+	SavCat, err := ct.ProductuseCase.AddCategory(ctx, body)
+	fmt.Println("function started body is  :", SavCat.Id)
 
-	// fmt.Println("xxxxxx-x-x-x-x-x-xx-", body.Id)
+	if err != nil {
+		response := res.ErrorResponse(400, "failed to add", "", SavCat)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully added a new category", body)
+	response := res.SuccessResponse(200, "successfully added a new category", SavCat)
 	ctx.JSON(http.StatusOK, response)
 
 }
@@ -259,7 +265,7 @@ func (ct *ProductHandler) EditCategory(ctx *gin.Context) {
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully product updated", body)
+	response := res.SuccessResponse(200, "successfully category updated", body)
 	ctx.JSON(200, response)
 }
 

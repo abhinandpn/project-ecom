@@ -19,6 +19,7 @@ type ProductRepository interface {
 
 	// Category managment
 	FindCategoryById(ctx context.Context, CId uint) (domain.Category, error)                   // Find Category By Id
+	FindCategoryByname(ctx context.Context, name string) (domain.Category, error)              // Find cTegory by name
 	CreateCategory(ctx context.Context, category domain.Category) error                        // Creating new Category
 	DeleteCategory(ctx context.Context, id uint) error                                         // Delete category
 	UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error)         // Update category

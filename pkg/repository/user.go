@@ -170,3 +170,75 @@ func (usr *userDatabase) UpdateUser(ctx context.Context, info domain.Users) (dom
 	}
 	return user, nil
 }
+
+// -----------------AddAddress-----------------
+
+func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error {
+
+	var body domain.Address
+
+	query := `insert into addresses (user_id,
+					house,
+					phone_number,
+					street,
+					city,
+					district,
+					pincode,
+					is_default,
+		landmark)values ($1,$2,$3,$4,$5,$6,$7,$8);`
+
+	err := usr.DB.Raw(query,
+		Uid,
+		addres.House,
+		addres.PhoneNumber,
+		addres.Street,
+		addres.City,
+		addres.District,
+		addres.Pincode,
+		addres.IsDefault).Scan(&body).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// -----------------DeletAddress-----------------
+
+func (usr *userDatabase) UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error {
+	var body req.ReqAddress
+	query := `update addresses set house = ,
+				phone_number= $1,
+				street = $2,
+				city = $3,
+				district = $4,
+				pincode = $5,
+				landmark = $6 where id = $7;`
+	err := usr.DB.Raw(query,
+		body.House,
+		body.PhoneNumber,
+		body.Street,
+		body.City,
+		body.District,
+		body.Pincode,
+		body.Landmark, Uid).Scan(&body).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// -----------------ListAllAddress-----------------
+
+func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) error {
+
+	query := `select * from addresses where user_id = ?;`
+
+	err := usr.DB.Raw(query, Uid).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

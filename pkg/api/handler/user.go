@@ -249,3 +249,29 @@ func (usr *UserHandler) UserLogout(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 
 }
+
+// -----------------AddAddress-----------------
+func (usr *UserHandler) AddAddress(ctx *gin.Context) {
+
+	// collect user Id
+	UserId := helper.GetUserId(ctx)
+	var body req.ReqAddress
+
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to Add user detail", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// Add Address
+	err = usr.userUseCase.AddAddres(ctx, UserId, body)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to Add user detail", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// response
+	response := res.SuccessResponse(200, "Successfully Add user Address", body)
+	ctx.JSON(http.StatusOK, response)
+
+}

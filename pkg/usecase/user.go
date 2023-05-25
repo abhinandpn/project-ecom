@@ -8,6 +8,7 @@ import (
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -118,4 +119,29 @@ func (usr *userUseCase) UserAccount(ctx context.Context, UserId uint) (domain.Us
 		return user, err
 	}
 	return user, nil
+}
+
+func (usr *userUseCase) FindUserById(ctx context.Context, Uid uint) (domain.Users, error) {
+	var user domain.Users
+	user, err := usr.userRepo.FindUserById(ctx, Uid)
+	return user, err
+}
+
+// -----------------AddAddress-----------------
+
+func (usr *userUseCase) AddAddres(ctx context.Context, Uid uint, Address req.ReqAddress) error {
+
+	err := usr.userRepo.AddAddress(ctx, Uid, Address)
+
+	return err
+
+}
+
+func (usr *userUseCase) UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error {
+
+	var body req.ReqAddress
+
+	err := usr.userRepo.UpdateAddress(ctx, Uid, body)
+
+	return err
 }

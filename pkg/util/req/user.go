@@ -24,14 +24,16 @@ type ReqEditUser struct {
 
 // request for Address
 type ReqAddress struct {
+	UserId      uint   `json:"user_id" binding:"required"`
 	Name        string `json:"name" binding:"required,min=2,max=50"`
+	House       string `json:"house_number" binding:"required,min=3,max=10"`
 	PhoneNumber string `json:"phone_number" binding:"required,min=10,max=10"`
-	House       string `json:"house" binding:"required"`
-	Area        string `json:"area"`
-	LandMark    string `json:"land_mark" binding:"required"`
-	City        string `json:"city" binding:"required"`
-	Pincode     uint   `json:"pincode" binding:"required,max=6"`
-	CountryID   uint   `json:"country_id" binding:"required"`
+	Street      string `json:"street" binding:"required,min=3,max=10"`
+	City        string `json:"city" binding:"required,min=3,max=10"`
+	District    string `json:"district" binding:"required,min=3,max=10"`
+	Pincode     string `json:"pincode" binding:"required,min=6,max=6"`
+	Landmark    string `json:"landmark" binding:"required,min=3,max=10"`
+	// CountryID   uint   `json:"country_id" binding:"required"`
 
 	IsDefault *bool `json:"is_default"`
 }
@@ -39,14 +41,15 @@ type ReqAddress struct {
 // request Edit address
 type ReqEditAddress struct {
 	ID          uint   `json:"address_id" binding:"required"`
+	UserId      uint   `json:"user_id" binding:"required"`
 	Name        string `json:"name" binding:"required,min=2,max=50"`
-	PhoneNumber string `json:"phone_number" binding:"required,min=10,max=10"`
 	House       string `json:"house" binding:"required"`
+	PhoneNumber string `json:"phone_number" binding:"required,min=10,max=10"`
 	Area        string `json:"area"`
 	LandMark    string `json:"land_mark" binding:"required"`
 	City        string `json:"city" binding:"required"`
 	Pincode     uint   `json:"pincode" binding:"required,max=6"`
-	CountryID   uint   `json:"country_id" binding:"required"`
+	// CountryID   uint   `json:"country_id" binding:"required"`
 
 	IsDefault *bool `json:"is_default"`
 }

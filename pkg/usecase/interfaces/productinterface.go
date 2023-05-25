@@ -19,7 +19,8 @@ type ProductuseCase interface {
 
 	// Category
 	FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error)                     // Find category By an ID
-	AddCategory(ctx context.Context, category domain.Category) (domain.Category, error)         // Add Cateory
+	FindCategoryByname(ctx context.Context, name string) (domain.Category, error)               // Find category by name
+	AddCategory(ctx context.Context, category req.CategoryReq) (domain.Category, error)         // Add Cateory
 	UpdateCategory(ctx context.Context, category domain.Category) error                         // update category
 	DeleteCategory(ctx context.Context, Id uint) error                                          // Delete category
 	ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // view full category

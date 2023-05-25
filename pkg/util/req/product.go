@@ -23,3 +23,6 @@ type BrandReq struct {
 	Id        uint   `json:"id"`
 	BrandName string `json:"brand_name"`
 }
+type AddCategoryReq struct {
+	CategoryName string `json:"category_name" gorm:"not null"`
+}

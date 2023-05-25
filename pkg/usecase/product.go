@@ -124,15 +124,21 @@ func (ct *productUseCase) FindCategoryById(ctx context.Context, id uint) (res.Ca
 	return category, nil
 }
 
-func (ct *productUseCase) AddCategory(ctx context.Context, category domain.Category) (domain.Category, error) {
+func (ct *productUseCase) FindCategoryByname(ctx context.Context, name string) (domain.Category, error) {
+
+	body, err := ct.productRepo.FindCategoryByname(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+func (ct *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (domain.Category, error) {
 
 	// find if exist or not
-	body, err := ct.productRepo.FindCategoryById(ctx, category.Id)
+	body, err := ct.productRepo.FindCategoryByname(ctx, category.CategoryName)
 	if err != nil {
-		fmt.Println("xtxtxtxtxtxtxtxtxt")
-		return category, err
-	} else if body.Id == 0 {
-		return category, fmt.Errorf("invalid category_id %v", body.Id)
+		return body, err
 	}
 	// add category
 	err = ct.productRepo.CreateCategory(ctx, body)
@@ -170,7 +176,7 @@ func (ct *productUseCase) DeleteCategory(ctx context.Context, id uint) error {
 		return err
 	}
 	// delete
-	err = ct.DeleteCategory(ctx, body.Id)
+	err = ct.productRepo.DeleteCategory(ctx, body.Id)
 	if err != nil {
 		return nil
 	}

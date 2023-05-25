@@ -42,22 +42,22 @@ func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.P
 	var ProductTable res.ProductResponce
 	// aliase :: p := product; c := category
 	querry := `SELECT
-	p.id,
-	p.product_name,
-	P.discription,
-	c.category_name,
-	p.price,
-	p.discount_price,
-	pi.colour,
-	pi.size,
-	pi.brand
-  FROM
-	products p
-  INNER JOIN
-	product_infos pi ON p.id = pi.product_id
-  INNER JOIN
-	categories c ON p.category_id = c.id
-   ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
+			p.id,
+			p.product_name,
+			P.discription,
+			c.category_name,
+			p.price,
+			p.discount_price,
+			pi.colour,
+			pi.size,
+			pi.brand
+		  FROM
+			products p
+		  INNER JOIN
+			product_infos pi ON p.id = pi.product_id
+		  INNER JOIN
+			categories c ON p.category_id = c.id
+		   ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
 
 	err = pr.DB.Raw(querry, limit, offset).Scan(&ProductTable).Error
 	if err != nil {
@@ -179,22 +179,35 @@ func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (doma
 	return category, nil
 }
 
+func (ct *productDatabase) FindCategoryByname(ctx context.Context, name string) (domain.Category, error) {
+
+	var category domain.Category
+
+	query := `select * from categories where category_name = ?`
+
+	err := ct.DB.Raw(query, name).Scan(&category).Error
+	if err != nil {
+		return category, err
+	}
+	return category, nil
+
+}
+
 func (ct *productDatabase) CreateCategory(ctx context.Context, Category domain.Category) error {
 
-	// verify the product by id
-	body, err := ct.FindCategoryById(ctx, Category.Id)
+	// verify the category by name
+	body, err := ct.FindCategoryByname(ctx, Category.CategoryName)
 	if err != nil {
 		return err
 	}
 	fmt.Println("body body body ------ ??? > ", body)
-	// var body domain.Category
+
 	// if its not exist then create new one using this fileds
-	query := `insert into categories (id,category_name)values ($1,$2);`
-	fmt.Println("xxxxxxxxxxx-------- > id ----- >", Category.Id)
+	query := `insert into categories (category_name)values ($1);`
 
 	fmt.Println("xxxxxxxxxxx-------- > name ------- >", Category.CategoryName)
 
-	err = ct.DB.Raw(query, body.Id, body.CategoryName).Scan(body).Error
+	err = ct.DB.Raw(query, body.Id, body.CategoryName).Scan(&body).Error
 	if err != nil {
 		return err
 	}

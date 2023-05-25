@@ -32,12 +32,17 @@ func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productH
 			user.GET("/info", userHandler.UserHome)      // user Information
 			user.POST("/logout", userHandler.UserLogout) // User Logout
 		}
-
+		// Address
+		address := api.Group("address")
+		{
+			address.POST("/add", userHandler.AddAddress) // Add Address
+		}
 		// Product
 		product := api.Group("/product")
 		{
 			product.GET("/all", productHandler.ListProducts) // List all product
 		}
+
 	}
 
 }
