@@ -26,5 +26,5 @@ type UserRepository interface {
 	// Address
 	AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error     // Add Address
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error // Update Address
-	ListAllAddress(ctx context.Context, Uid uint) error                        // Delete Address
+	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)    // Delete Address
 }

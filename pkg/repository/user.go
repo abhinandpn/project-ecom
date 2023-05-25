@@ -232,13 +232,16 @@ func (usr *userDatabase) UpdateAddress(ctx context.Context, Uid uint, address re
 
 // -----------------ListAllAddress-----------------
 
-func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) error {
+func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error) {
+
+	var body []res.ResAddress
 
 	query := `select * from addresses where user_id = ?;`
 
-	err := usr.DB.Raw(query, Uid).Error
+	err := usr.DB.Raw(query, Uid).Scan(&body).Error
+
 	if err != nil {
-		return err
+		return body, err
 	}
-	return nil
+	return body, nil
 }

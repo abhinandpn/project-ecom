@@ -9,6 +9,7 @@ import (
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -144,4 +145,12 @@ func (usr *userUseCase) UpdateAddress(ctx context.Context, Uid uint, address req
 	err := usr.userRepo.UpdateAddress(ctx, Uid, body)
 
 	return err
+}
+func (usr *userUseCase) ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error) {
+
+	var body []res.ResAddress
+
+	body, err := usr.userRepo.ListAllAddress(ctx, Uid)
+
+	return body, err
 }

@@ -5,6 +5,7 @@ import (
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type UserUseCase interface {
@@ -20,6 +21,7 @@ type UserUseCase interface {
 	// Address
 	AddAddres(ctx context.Context, Uid uint, Address req.ReqAddress) error
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error
+	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)
 
 	/*
 		Add Address

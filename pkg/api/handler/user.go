@@ -251,6 +251,7 @@ func (usr *UserHandler) UserLogout(ctx *gin.Context) {
 }
 
 // -----------------AddAddress-----------------
+
 func (usr *UserHandler) AddAddress(ctx *gin.Context) {
 
 	// collect user Id
@@ -274,4 +275,37 @@ func (usr *UserHandler) AddAddress(ctx *gin.Context) {
 	response := res.SuccessResponse(200, "Successfully Add user Address", body)
 	ctx.JSON(http.StatusOK, response)
 
+}
+
+// -----------------ListAllAddress-----------------
+
+func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
+
+	// collect the user id
+	UserId := helper.GetUserId(ctx)
+	var body res.ResAddress
+
+	// Bind json
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to bind address", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// List func calling
+	address, err := usr.userUseCase.ListAllAddress(ctx, UserId)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to list all address", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	if address == nil {
+		response := res.ErrorResponse(500, "there no address found", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// response
+	response := res.SuccessResponse(200, "Successfully Add user Address", address)
+	ctx.JSON(http.StatusOK, response)
 }
