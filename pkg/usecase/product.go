@@ -217,7 +217,8 @@ func (ct *productUseCase) DeleteCategory(ctx context.Context, name string) error
 
 // -------------------ViewFullcategory-------------------
 
-func (pr *productUseCase) ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
+func (pr *productUseCase) ViewFullCategory(ctx context.Context,
+	pagination req.PageNation) ([]res.CategoryRes, error) {
 
 	return pr.productRepo.FindAllCategory(ctx, pagination)
 
