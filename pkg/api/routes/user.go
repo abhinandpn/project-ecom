@@ -44,7 +44,11 @@ func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productH
 		{
 			product.GET("/all", productHandler.ListProducts) // List all product
 		}
-
+		// Category
+		category := api.Group("/category")
+		{
+			category.GET("/all", productHandler.ViewFullcategory) // View full category
+		}
 	}
 
 }
