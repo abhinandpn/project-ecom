@@ -22,8 +22,8 @@ type ProductRepository interface {
 	FindCategoryByname(ctx context.Context, name string) (domain.Category, error) // Find cTegory by name
 	// CURD
 	CreateCategory(ctx context.Context, name string) (domain.Category, error)                  // Creating new Category
-	DeleteCategory(ctx context.Context, id uint) error                                         // Delete category
-	UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error)         // Update category
 	FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // View Full category
+	UpdateCategory(ctx context.Context, body req.UpdateCategoryReq) (domain.Category, error)   // Update category
+	DeleteCategory(ctx context.Context, name string) (domain.Category, error)                  // Delete category
 
 }

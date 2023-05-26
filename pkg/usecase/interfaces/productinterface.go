@@ -22,8 +22,8 @@ type ProductuseCase interface {
 	FindCategoryByname(ctx context.Context, name string) (domain.Category, error) // Find category by name
 	// CURD
 	AddCategory(ctx context.Context, name string) (domain.Category, error)                      // Add Cateory
-	UpdateCategory(ctx context.Context, category domain.Category) error                         // update category
-	DeleteCategory(ctx context.Context, Id uint) error                                          // Delete category
+	UpdateCategory(ctx context.Context, category req.UpdateCategoryReq) error                   // update category
 	ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // view full category
+	DeleteCategory(ctx context.Context, name string) error                                      // Delete category
 
 }

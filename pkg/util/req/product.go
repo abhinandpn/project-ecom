@@ -25,3 +25,7 @@ type BrandReq struct {
 type AddCategoryReq struct {
 	CategoryName string `json:"category_name" gorm:"not null"`
 }
+type UpdateCategoryReq struct {
+	OldCategory string `json:"old_category" gorm:"not null"`
+	Newcategory string `json:"new_category" gorm:""`
+}

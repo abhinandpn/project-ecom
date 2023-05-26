@@ -244,23 +244,22 @@ func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 // ----------------EditCategory----------------
 func (ct *ProductHandler) EditCategory(ctx *gin.Context) {
 
-	var body req.CategoryReq
+	// check the category and find the json binding
+	var body req.UpdateCategoryReq
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	var category domain.Category
-	copier.Copy(&category, &body)
-
-	err := ct.ProductuseCase.UpdateCategory(ctx, category)
+	// update category
+	err := ct.ProductuseCase.UpdateCategory(ctx, body)
 	if err != nil {
-		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
-		ctx.JSON(400, response)
+		response := res.ErrorResponse(400, "unable to update category", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-
+	// response
 	response := res.SuccessResponse(200, "successfully category updated", body)
 	ctx.JSON(200, response)
 }
@@ -276,9 +275,16 @@ func (ct *ProductHandler) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	var category domain.Category
-	copier.Copy(&category, &body)
+	err := ct.ProductuseCase.DeleteCategory(ctx, body.CategoryName)
+	if err != nil {
+		response := res.ErrorResponse(400, "unable to delete category", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
+	// response
+	response := res.SuccessResponse(200, "successfully category deleted", body)
+	ctx.JSON(200, response)
 }
 
 // ----------------ViewCategory----------------

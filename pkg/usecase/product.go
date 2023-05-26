@@ -170,35 +170,44 @@ func (ct *productUseCase) AddCategory(ctx context.Context, name string) (domain.
 
 // -------------------Updatecategory-------------------
 
-func (ct *productUseCase) UpdateCategory(ctx context.Context, category domain.Category) error {
+func (ct *productUseCase) UpdateCategory(ctx context.Context, category req.UpdateCategoryReq) error {
 
-	// chek the category
-	body, err := ct.productRepo.FindCategoryById(ctx, category.Id)
+	// check if the category exist or not
+	body, err := ct.productRepo.FindCategoryByname(ctx, category.OldCategory)
 	if err != nil {
 		return err
-	} else if body.Id == 0 {
-		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+	// fmt.Println("body----- >", body)
+	if body.Id == 0 {
+		res := fmt.Errorf("category not found with this name :  %v", category.OldCategory)
+		return res
 	}
 	// update
-	_, err = ct.productRepo.UpdateCategory(ctx, category)
-	if err != nil {
+	body, err = ct.productRepo.UpdateCategory(ctx, category)
+	if err == nil {
 		return err
 	}
-	//responce
+
+	// response
 	return nil
 }
 
 // -------------------Deletecategory-------------------
 
-func (ct *productUseCase) DeleteCategory(ctx context.Context, id uint) error {
+func (ct *productUseCase) DeleteCategory(ctx context.Context, name string) error {
 
 	// check if exist or not
-	body, err := ct.productRepo.FindCategoryById(ctx, id)
+	body, err := ct.productRepo.FindCategoryByname(ctx, name)
 	if err != nil {
 		return err
 	}
+	// check
+	if body.Id == 0 {
+		res := fmt.Errorf("category not found with this name :  %v", name)
+		return res
+	}
 	// delete
-	err = ct.productRepo.DeleteCategory(ctx, body.Id)
+	_, err = ct.productRepo.DeleteCategory(ctx, name)
 	if err != nil {
 		return nil
 	}

@@ -212,46 +212,6 @@ func (ct *productDatabase) CreateCategory(ctx context.Context, name string) (dom
 	return body, nil
 }
 
-// -------------------DeleteCategory-------------------
-
-func (ct *productDatabase) DeleteCategory(ctx context.Context, id uint) error {
-
-	// find the category
-	category, err := ct.FindCategoryById(ctx, id)
-	if err != nil {
-		return err
-	}
-	// if we get delete
-	query := `delete from categories where id = $1;`
-	err = ct.DB.Raw(query, category.Id).Error
-	if err != nil {
-		return err
-	}
-	// retun
-	return nil
-}
-
-// -------------------UpdateCategory-------------------
-
-func (ct *productDatabase) UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error) {
-
-	var body domain.Category
-	// find the category
-	category, err := ct.FindCategoryById(ctx, info.Id)
-	if err != nil {
-		return category, err
-	}
-	// update
-	query := `update categories set category_name = $1 where id = $2;`
-	err = ct.DB.Raw(query, info.CategoryName, info.Id).Scan(&body).Error
-	if err != nil {
-		return category, err
-	}
-	// return
-	return body, nil
-
-}
-
 // -------------------FindFullCategory-------------------
 
 func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
@@ -269,4 +229,37 @@ func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.P
 	}
 
 	return category, nil
+}
+
+// -------------------UpdateCategory-------------------
+
+func (ct *productDatabase) UpdateCategory(ctx context.Context, body req.UpdateCategoryReq) (domain.Category, error) {
+
+	var category domain.Category
+
+	query := `update categories set category_name = $1 where category_name = $2;`
+
+	err := ct.DB.Raw(query, body.Newcategory, body.OldCategory).Scan(&category).Error
+	if err != nil {
+		return category, err
+	}
+	return category, nil
+}
+
+// -------------------DeleteCategory-------------------
+
+func (ct *productDatabase) DeleteCategory(ctx context.Context, name string) (domain.Category, error) {
+
+	var body domain.Category
+	// if we get delete
+	query := `delete from categories where category_name = $1;`
+
+	err := ct.DB.Raw(query, name).Scan(&body).Error
+
+	if err != nil {
+		return body, err
+	}
+
+	// retun
+	return body, nil
 }
