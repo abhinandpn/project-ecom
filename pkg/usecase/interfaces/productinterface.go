@@ -18,9 +18,10 @@ type ProductuseCase interface {
 	ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View full Products
 
 	// Category
-	FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error)                     // Find category By an ID
-	FindCategoryByname(ctx context.Context, name string) (domain.Category, error)               // Find category by name
-	AddCategory(ctx context.Context, category req.CategoryReq) (domain.Category, error)         // Add Cateory
+	FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error)       // Find category By an ID
+	FindCategoryByname(ctx context.Context, name string) (domain.Category, error) // Find category by name
+	// CURD
+	AddCategory(ctx context.Context, name string) (domain.Category, error)                      // Add Cateory
 	UpdateCategory(ctx context.Context, category domain.Category) error                         // update category
 	DeleteCategory(ctx context.Context, Id uint) error                                          // Delete category
 	ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // view full category

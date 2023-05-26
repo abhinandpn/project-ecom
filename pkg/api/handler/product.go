@@ -110,8 +110,6 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 		},
 	}
 
-	fmt.Println("productdetails : ", body)
-
 	err := pr.ProductuseCase.AddProduct(ctx, product)
 
 	if err != nil {
@@ -216,36 +214,34 @@ func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
 
 // Category Handler
 
+// ----------------AddCategory----------------
+
 func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 
-	var body req.CategoryReq
+	var body res.CategoryRes
 
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, respones)
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
+	name := body.CategoryName
 
-	SavCat, err := ct.ProductuseCase.AddCategory(ctx, body)
-	fmt.Println("function started body is  :", SavCat.Id)
+	category, err := ct.ProductuseCase.AddCategory(ctx, name)
 
 	if err != nil {
-		response := res.ErrorResponse(400, "failed to add", "", SavCat)
+		response := res.ErrorResponse(400, "failed to add category", err.Error(), category)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	if err != nil {
-		response := res.ErrorResponse(400, "faild to add cateogy", err.Error(), nil)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	response := res.SuccessResponse(200, "successfully added a new category", SavCat)
-	ctx.JSON(http.StatusOK, response)
+	response := res.SuccessResponse(200, "successfully category added", body)
+	ctx.JSON(200, response)
 
 }
 
+// ----------------EditCategory----------------
 func (ct *ProductHandler) EditCategory(ctx *gin.Context) {
 
 	var body req.CategoryReq
@@ -269,6 +265,8 @@ func (ct *ProductHandler) EditCategory(ctx *gin.Context) {
 	ctx.JSON(200, response)
 }
 
+// ----------------DeleteCategory----------------
+
 func (ct *ProductHandler) DeleteCategory(ctx *gin.Context) {
 
 	var body req.CategoryReq
@@ -282,6 +280,8 @@ func (ct *ProductHandler) DeleteCategory(ctx *gin.Context) {
 	copier.Copy(&category, &body)
 
 }
+
+// ----------------ViewCategory----------------
 
 func (ct *ProductHandler) Viewcategory(ctx *gin.Context) {
 
@@ -314,6 +314,8 @@ func (ct *ProductHandler) Viewcategory(ctx *gin.Context) {
 		Errors:     nil,
 	})
 }
+
+// ----------------ViewFullCategory----------------
 
 func (ct *ProductHandler) ViewFullcategory(ctx *gin.Context) {
 

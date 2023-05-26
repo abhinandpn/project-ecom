@@ -16,7 +16,7 @@ type ProductResponce struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 type CategoryRes struct {
-	Id           uint   `json:"id"`
+	// Id           uint   `json:"id"`
 	CategoryName string `json:"category_name"`
 }
 type SubCategoryRes struct {

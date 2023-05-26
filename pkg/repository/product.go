@@ -166,6 +166,8 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Produc
 
 // Categories New updated
 
+// -------------------FindcategoryById-------------------
+
 func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (domain.Category, error) {
 
 	var category domain.Category
@@ -178,6 +180,8 @@ func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (doma
 
 	return category, nil
 }
+
+// -------------------FindcategoryByName-------------------
 
 func (ct *productDatabase) FindCategoryByname(ctx context.Context, name string) (domain.Category, error) {
 
@@ -193,27 +197,22 @@ func (ct *productDatabase) FindCategoryByname(ctx context.Context, name string) 
 
 }
 
-func (ct *productDatabase) CreateCategory(ctx context.Context, Category domain.Category) error {
+// -------------------CreateCategory-------------------
 
-	// verify the category by name
-	body, err := ct.FindCategoryByname(ctx, Category.CategoryName)
-	if err != nil {
-		return err
-	}
-	fmt.Println("body body body ------ ??? > ", body)
+func (ct *productDatabase) CreateCategory(ctx context.Context, name string) (domain.Category, error) {
 
-	// if its not exist then create new one using this fileds
+	var body domain.Category
+
 	query := `insert into categories (category_name)values ($1);`
 
-	fmt.Println("xxxxxxxxxxx-------- > name ------- >", Category.CategoryName)
-
-	err = ct.DB.Raw(query, body.Id, body.CategoryName).Scan(&body).Error
+	err := ct.DB.Raw(query, name).Scan(&body).Error
 	if err != nil {
-		return err
+		return body, err
 	}
-	// return
-	return nil
+	return body, nil
 }
+
+// -------------------DeleteCategory-------------------
 
 func (ct *productDatabase) DeleteCategory(ctx context.Context, id uint) error {
 
@@ -231,6 +230,8 @@ func (ct *productDatabase) DeleteCategory(ctx context.Context, id uint) error {
 	// retun
 	return nil
 }
+
+// -------------------UpdateCategory-------------------
 
 func (ct *productDatabase) UpdateCategory(ctx context.Context, info domain.Category) (domain.Category, error) {
 
@@ -250,6 +251,8 @@ func (ct *productDatabase) UpdateCategory(ctx context.Context, info domain.Categ
 	return body, nil
 
 }
+
+// -------------------FindFullCategory-------------------
 
 func (pr *productDatabase) FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
 

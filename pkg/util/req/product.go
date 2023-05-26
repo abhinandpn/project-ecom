@@ -11,7 +11,6 @@ type ReqProduct struct {
 	Image       string `json:"image" gorm:"not null" binding:"required"`
 }
 type CategoryReq struct {
-	Id           uint   `json:"id"`
 	CategoryName string `json:"category_name"`
 }
 type SubCategoryReq struct {

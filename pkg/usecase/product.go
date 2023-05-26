@@ -108,7 +108,10 @@ func (pr *productUseCase) ViewFullProduct(ctx context.Context, pagination req.Pa
 	return body, nil
 }
 
-// Category
+// CATEGORY USECASE
+
+// -------------------FindCategoryById-------------------
+
 func (ct *productUseCase) FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error) {
 
 	var category res.CategoryRes
@@ -124,6 +127,8 @@ func (ct *productUseCase) FindCategoryById(ctx context.Context, id uint) (res.Ca
 	return category, nil
 }
 
+// -------------------FindCategoryByName-------------------
+
 func (ct *productUseCase) FindCategoryByname(ctx context.Context, name string) (domain.Category, error) {
 
 	body, err := ct.productRepo.FindCategoryByname(ctx, name)
@@ -133,22 +138,37 @@ func (ct *productUseCase) FindCategoryByname(ctx context.Context, name string) (
 	return body, nil
 
 }
-func (ct *productUseCase) AddCategory(ctx context.Context, category req.CategoryReq) (domain.Category, error) {
 
-	// find if exist or not
-	body, err := ct.productRepo.FindCategoryByname(ctx, category.CategoryName)
+// -------------------AddCategory-------------------
+
+func (ct *productUseCase) AddCategory(ctx context.Context, name string) (domain.Category, error) {
+
+	// create response
+	var body domain.Category
+
+	// find with name if exist
+	exist, err := ct.FindCategoryByname(ctx, name)
+	if err != nil {
+		return exist, err
+	}
+
+	// if exist return
+	if exist.Id != 0 {
+		res := fmt.Errorf("category alredy exist with this name :%v ", name)
+		return exist, res
+	}
+	// or create
+	body, err = ct.productRepo.CreateCategory(ctx, name)
 	if err != nil {
 		return body, err
 	}
-	// add category
-	err = ct.productRepo.CreateCategory(ctx, body)
-	if err != nil {
-		return body, err
-	}
-	// responce
-	log.Printf("successfully product saved\n\n")
+
+	// return
 	return body, nil
+
 }
+
+// -------------------Updatecategory-------------------
 
 func (ct *productUseCase) UpdateCategory(ctx context.Context, category domain.Category) error {
 
@@ -168,6 +188,8 @@ func (ct *productUseCase) UpdateCategory(ctx context.Context, category domain.Ca
 	return nil
 }
 
+// -------------------Deletecategory-------------------
+
 func (ct *productUseCase) DeleteCategory(ctx context.Context, id uint) error {
 
 	// check if exist or not
@@ -183,6 +205,8 @@ func (ct *productUseCase) DeleteCategory(ctx context.Context, id uint) error {
 	// response
 	return nil
 }
+
+// -------------------ViewFullcategory-------------------
 
 func (pr *productUseCase) ViewFullCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) {
 
