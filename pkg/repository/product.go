@@ -162,33 +162,44 @@ func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
 // -------------------UpdateProduct-------------------
 
-func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error) {
+func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduct, id uint) error {
 
-	query := `UPDATE products SET 
+	query1 := `UPDATE products SET 
 					product_name = $1, 
 					discription = $2, 
 					category_id = $3, 
 					price = $4, 
-					image = $5, 
+					image = $5,
 					updated_at = $6 
 				WHERE id = $7`
 
 	updatedAt := time.Now()
-	var product domain.Product
 
-	err := pr.DB.Exec(query, info.ProductName,
+	var product domain.Product
+	var prinfo domain.ProductInfo
+
+	err := pr.DB.Raw(query1, info.ProductName,
 		info.Discription,
 		info.CategoryID,
 		info.Price,
 		info.Image,
-		updatedAt,
-		info.Id).Scan(product).Error
+		updatedAt, id).Scan(product).Error
 
 	if err != nil {
-		return info, nil
+		return err
 	}
 
-	return product, nil
+	query2 := `update product_infos set colour = $1,
+					size = $2,
+					brand = $3;
+					where product_id = $4,`
+
+	err = pr.DB.Raw(query2, info.Color, info.Size, info.Brand, id).Scan(&prinfo).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Categories New updated

@@ -76,23 +76,32 @@ func (pr *productUseCase) AddProduct(ctx context.Context, product req.ReqProduct
 	return nil
 }
 
-func (pr *productUseCase) UpdateProduct(ctx context.Context, product domain.Product) error {
+func (pr *productUseCase) UpdateProduct(ctx context.Context, product req.ReqProduct, id uint) error {
 
-	// check the product exist or not
-	Pid := product.Id
-	body, err := pr.productRepo.FindProductById(ctx, Pid)
-	if err != nil {
-		return err
-	} else if body.Id == 0 {
-		return fmt.Errorf("invalid product_id %v", body.Id)
-	}
-
-	// if exist update
-	_, err = pr.productRepo.UpdateProduct(ctx, body)
+	// check if the product exist or not
+	body, err := pr.productRepo.FindProductById(ctx, id)
 	if err != nil {
 		return err
 	}
+	if body.Id != 0 {
+		err = fmt.Errorf("unabel to find product by Id %v", id)
+		return err
+	}
 
+	// check if exist in category
+	category, err := pr.productRepo.FindCategoryById(ctx, product.CategoryID)
+	if err != nil {
+		return err
+	}
+	if category.Id != 0 {
+		err = fmt.Errorf("unabel to find category by Id %v", id)
+		return err
+	}
+	// if exist update product table
+	err = pr.productRepo.UpdateProduct(ctx, product, id)
+	if err != nil {
+		return err
+	}
 	// responce
 	return nil
 }

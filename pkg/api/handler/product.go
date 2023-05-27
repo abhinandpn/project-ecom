@@ -4,13 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 type ProductHandler struct {
@@ -131,17 +129,22 @@ func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
 		return
 	}
 
-	var product domain.Product
-	copier.Copy(&product, &body)
+	ParamId := ctx.Param("id")
+	id, err := helper.StringToUInt(ParamId)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), id)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	err := pr.ProductuseCase.UpdateProduct(ctx, product)
+	err = pr.ProductuseCase.UpdateProduct(ctx, body, id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
 		ctx.JSON(400, response)
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully product updated", body)
+	response := res.SuccessResponse(200, "successfully product updated ", body)
 	ctx.JSON(200, response)
 }
 
