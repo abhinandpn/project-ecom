@@ -8,7 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productHandler *handler.ProductHandler) {
+func UserRoutes(api *gin.RouterGroup,
+	userHandler *handler.UserHandler,
+	productHandler *handler.ProductHandler) {
 	// login
 	login := api.Group("/login")
 	{
@@ -47,7 +49,7 @@ func UserRoutes(api *gin.RouterGroup, userHandler *handler.UserHandler, productH
 		// Category
 		category := api.Group("/category")
 		{
-			category.GET("/all", productHandler.ViewFullcategory) // View full category
+			category.GET("", productHandler.ViewFullcategory) // View full category
 		}
 	}
 

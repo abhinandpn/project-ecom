@@ -23,6 +23,8 @@ func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
 
 // Product
 
+// -------------------FindProductById-------------------
+
 func (pr *productDatabase) FindProductById(ctx context.Context, PId uint) (domain.Product, error) {
 
 	var product domain.Product
@@ -34,6 +36,21 @@ func (pr *productDatabase) FindProductById(ctx context.Context, PId uint) (domai
 	}
 	return product, nil
 }
+
+func (pr *productDatabase) FindProductByName(ctx context.Context, name string) (domain.Product, error) {
+
+	var body domain.Product
+
+	query := `select * from products where product_name = ?;`
+
+	err := pr.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// -------------------ViewFullProduct-------------------
 
 func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.PageNation) (product []res.ProductResponce, err error) {
 
@@ -66,23 +83,23 @@ func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.P
 	return product, nil
 }
 
-func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Product) error {
+// -------------------CreateProduct-------------------
 
-	// verify the product by id
-	product, err := pr.FindProductById(ctx, product.Id)
-	if err != nil {
-		return err
-	}
+func (pr *productDatabase) CreateProduct(ctx context.Context, product req.ReqProduct) error {
+
+	createdAt := time.Now()
+
+	var prdt domain.Product
+	var prdtinfo domain.ProductInfo
 
 	querry := `INSERT INTO products (product_name, 
 					discription,
 					category_id, 
 					price, image, 
 					created_at) 
-				VALUES($1, $2, $3, $4, $5, $6) RETURNING id`
+				VALUES($1, $2, $3, $4, $5, $6) returning id`
 
-	createdAt := time.Now()
-	var ResProduct res.ProductResponce
+	// var ResProduct res.ProductResponce
 
 	if pr.DB.Raw(querry,
 		product.ProductName,
@@ -90,7 +107,7 @@ func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Pro
 		product.CategoryID,
 		product.Price,
 		product.Image,
-		createdAt).Scan(&ResProduct).Error != nil {
+		createdAt).Scan(&prdt).Error != nil {
 		return errors.New("faild to insert product on database")
 	}
 
@@ -99,16 +116,20 @@ func (pr *productDatabase) CreateProduct(ctx context.Context, product domain.Pro
 		size,
 		brand)values($1,$2,$3,$4)`
 
+	productId := prdt.Id
+
 	if pr.DB.Raw(query2,
-		product.Id,
-		product.Info.Colour,
-		product.Info.Size,
-		product.Info.Brand).Scan(ResProduct).Error != nil {
+		productId,
+		product.Color,
+		product.Size,
+		product.Brand).Scan(&prdtinfo).Error != nil {
 		return errors.New("faild to insert product_info table on database----------- ")
 
 	}
 	return nil
 }
+
+// -------------------DeleteProduct-------------------
 
 func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
@@ -134,6 +155,8 @@ func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
 	return nil
 }
+
+// -------------------UpdateProduct-------------------
 
 func (pr *productDatabase) UpdateProduct(ctx context.Context, info domain.Product) (domain.Product, error) {
 

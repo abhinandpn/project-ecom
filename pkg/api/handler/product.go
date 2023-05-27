@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
@@ -98,29 +97,27 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 		return
 	}
 
-	product := domain.Product{
-		ProductName: body.ProductName,
-		CategoryID:  body.CategoryID,
-		Discription: body.Discription,
-		Price:       body.Price,
-		Info: domain.ProductInfo{
-			Colour: body.Color,
-			Brand:  body.Brand,
-			Size:   body.Size,
-		},
-	}
+	// product := domain.Product{
+	// 	ProductName: body.ProductName,
+	// 	CategoryID:  body.CategoryID,
+	// 	Discription: body.Discription,
+	// 	Price:       body.Price,
+	// 	Info: domain.ProductInfo{
+	// 		Colour: body.Color,
+	// 		Brand:  body.Brand,
+	// 		Size:   body.Size,
+	// 	},
+	// }
 
-	err := pr.ProductuseCase.AddProduct(ctx, product)
+	err := pr.ProductuseCase.AddProduct(ctx, body)
 
 	if err != nil {
-		fmt.Println("------------------------2 ")
-
 		response := res.ErrorResponse(400, "faild to add product", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := res.SuccessResponse(200, "successfully product added", product)
+	response := res.SuccessResponse(200, "successfully product added", body)
 	ctx.JSON(http.StatusOK, response)
 
 }

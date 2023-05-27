@@ -22,6 +22,7 @@ type ProductInfo struct {
 	Colour    string `json:"colour"`
 	Size      uint   `json:"size" binding:"required,numeric"`
 	Brand     string `json:"brand"`
+	Qty       uint   `json:"qty"` // Quentity in stock
 }
 
 type Category struct {

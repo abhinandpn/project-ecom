@@ -24,23 +24,54 @@ func NewProductUseCase(ProductRepo interfaces.ProductRepository) service.Product
 }
 
 // Product
-func (pr *productUseCase) AddProduct(ctx context.Context, product domain.Product) error {
+
+func (pr *productUseCase) FindProductByName(ctx context.Context, name string) (domain.Product, error) {
+
+	body, err := pr.productRepo.FindProductByName(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// -------------------AddProduct-------------------
+
+func (pr *productUseCase) AddProduct(ctx context.Context, product req.ReqProduct) error {
 
 	// check Given product is exist or not
-	Pid := product.Id
-	body, err := pr.productRepo.FindProductById(ctx, Pid)
+	name := product.ProductName
+	body, err := pr.FindProductByName(ctx, name)
 	if err != nil {
 		return err
-	} else if body.Id == 0 {
-		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+	// check the category if exist or not
+	ct, err := pr.FindCategoryById(ctx, product.CategoryID)
+	if err != nil {
+		return err
+	}
+	cat, err := pr.FindCategoryByname(ctx, ct.CategoryName)
+	if err != nil {
+		return err
+	}
+	// cat res
+	if cat.Id != 0 {
+		err = fmt.Errorf("category name : %v", cat.CategoryName)
+		return err
+	} else if cat.Id == 0 {
+		err = fmt.Errorf("category id does not exist create first ")
+		return err
+	}
+	// product res
+	if body.Id != 0 {
+		err = fmt.Errorf("product alredy exist with this name : %v", name)
+		return err
 	}
 
 	// if its found then create a new product with new data
-	err = pr.productRepo.CreateProduct(ctx, body)
+	err = pr.productRepo.CreateProduct(ctx, product)
 	if err != nil {
 		return err
 	}
-
 	log.Printf("successfully product saved\n\n")
 	return nil
 }
