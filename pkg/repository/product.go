@@ -52,31 +52,35 @@ func (pr *productDatabase) FindProductByName(ctx context.Context, name string) (
 
 // -------------------ViewFullProduct-------------------
 
-func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.PageNation) (product []res.ProductResponce, err error) {
+func (pr *productDatabase) ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) {
 
 	limit := pagination.Count
 	offset := (pagination.PageNumber - 1) * limit
-	var ProductTable res.ProductResponce
+	var product []res.ProductResponce
+	// var ProductTable res.ProductResponce
 	// aliase :: p := product; c := category
 	querry := `SELECT
-			p.id,
-			p.product_name,
-			P.discription,
-			c.category_name,
-			p.price,
-			p.discount_price,
-			pi.colour,
-			pi.size,
-			pi.brand
-		  FROM
-			products p
-		  INNER JOIN
-			product_infos pi ON p.id = pi.product_id
-		  INNER JOIN
-			categories c ON p.category_id = c.id
-		   ORDER BY created_at DESC LIMIT $1 OFFSET $2;`
+					p.id,
+					p.product_name,
+					p.discription,
+					c.category_name,
+					p.price,
+					p.discount_price,
+					pi.colour,
+					pi.size,
+					pi.brand
+				  FROM
+					products p
+				  INNER JOIN
+					product_infos pi ON p.id = pi.product_id
+				  INNER JOIN
+					categories c ON p.category_id = c.id
+				  ORDER BY
+					created_at DESC
+				  LIMIT
+					$1 OFFSET $2;`
 
-	err = pr.DB.Raw(querry, limit, offset).Scan(&ProductTable).Error
+	err := pr.DB.Raw(querry, limit, offset).Scan(&product).Error
 	if err != nil {
 		return product, errors.New("faild to get product details from database")
 	}
