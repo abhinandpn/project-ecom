@@ -40,27 +40,33 @@ func (pr *productUseCase) AddProduct(ctx context.Context, product req.ReqProduct
 
 	// check Given product is exist or not
 	name := product.ProductName
+
 	body, err := pr.FindProductByName(ctx, name)
 	if err != nil {
 		return err
 	}
+
+	if body.Id != 0 {
+		err = fmt.Errorf("product alredy exist name : %v", body.ProductName)
+		return err
+	}
+
 	// check the category if exist or not
 	ct, err := pr.FindCategoryById(ctx, product.CategoryID)
 	if err != nil {
 		return err
 	}
+
 	cat, err := pr.FindCategoryByname(ctx, ct.CategoryName)
 	if err != nil {
 		return err
 	}
 	// cat res
-	if cat.Id != 0 {
+	if cat.Id == 0 {
 		err = fmt.Errorf("category name : %v", cat.CategoryName)
 		return err
-	} else if cat.Id == 0 {
-		err = fmt.Errorf("category id does not exist create first ")
-		return err
 	}
+
 	// product res
 	if body.Id != 0 {
 		err = fmt.Errorf("product alredy exist with this name : %v", name)
@@ -72,6 +78,7 @@ func (pr *productUseCase) AddProduct(ctx context.Context, product req.ReqProduct
 	if err != nil {
 		return err
 	}
+
 	log.Printf("successfully product saved\n\n")
 	return nil
 }
