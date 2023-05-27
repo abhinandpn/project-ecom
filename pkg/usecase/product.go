@@ -90,7 +90,7 @@ func (pr *productUseCase) UpdateProduct(ctx context.Context, product req.ReqProd
 	if err != nil {
 		return err
 	}
-	if body.Id != 0 {
+	if body.Id == 0 {
 		err = fmt.Errorf("unabel to find product by Id %v", id)
 		return err
 	}
@@ -100,7 +100,7 @@ func (pr *productUseCase) UpdateProduct(ctx context.Context, product req.ReqProd
 	if err != nil {
 		return err
 	}
-	if category.Id != 0 {
+	if category.Id == 0 {
 		err = fmt.Errorf("unabel to find category by Id %v", id)
 		return err
 	}
@@ -119,8 +119,9 @@ func (pr *productUseCase) DeleteProduct(ctx context.Context, id uint) error {
 	body, err := pr.productRepo.FindProductById(ctx, id)
 	if err != nil {
 		return err
-	} else if body.Id == 0 {
-		return fmt.Errorf("invalid product_id %v", body.Id)
+	}
+	if body.Id == 0 {
+		return fmt.Errorf("invalid product id %v", body.Id)
 	}
 
 	// if exist then delete

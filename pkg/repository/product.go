@@ -137,22 +137,19 @@ func (pr *productDatabase) CreateProduct(ctx context.Context, product req.ReqPro
 
 func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
-	// verify the product by id
-	product, err := pr.FindProductById(ctx, PId)
-	if err != nil {
-		return err
-	}
+	var prdtinfo domain.ProductInfo
+	var prdt domain.Product
 
 	// delete the product_info
-	query1 := `delete from product_infos where product_id = $1;`
-	err = pr.DB.Raw(query1).Error
+	query1 := `delete from product_infos where product_id = $1 ;`
+	err := pr.DB.Raw(query1, PId).Scan(&prdtinfo).Error
 	if err != nil {
 		return errors.New("failed to delete from product_infos table")
 	}
 
 	// Delete from Products
 	query2 := `delete from products where id = $1;`
-	err = pr.DB.Raw(query2, product.Id).Error
+	err = pr.DB.Raw(query2, PId).Scan(&prdt).Error
 	if err != nil {
 		return errors.New("failed to delete from products table")
 	}
@@ -170,20 +167,19 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduc
 					category_id = $3, 
 					price = $4, 
 					image = $5,
-					updated_at = $6 
-				WHERE id = $7`
+					update_at = $6 
+				WHERE id = $7 returning id;`
 
 	updatedAt := time.Now()
 
 	var product domain.Product
-	var prinfo domain.ProductInfo
 
 	err := pr.DB.Raw(query1, info.ProductName,
 		info.Discription,
 		info.CategoryID,
 		info.Price,
 		info.Image,
-		updatedAt, id).Scan(product).Error
+		updatedAt, id).Scan(&product).Error
 
 	if err != nil {
 		return err
@@ -194,7 +190,7 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduc
 					brand = $3;
 					where product_id = $4,`
 
-	err = pr.DB.Raw(query2, info.Color, info.Size, info.Brand, id).Scan(&prinfo).Error
+	err = pr.DB.Raw(query2, info.Color, info.Size, info.Brand, id).Error
 
 	if err != nil {
 		return err

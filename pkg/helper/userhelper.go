@@ -21,12 +21,29 @@ func UserCheck(user, curUser domain.Users) (err error) {
 	}
 	return err
 }
+
+//	func StringToUInt(str string) (uint, error) {
+//		val, err := strconv.Atoi(str)
+//		unt := uint(val)
+//		fmt.Println("new ne w enenenenen--------------->", unt)
+//		return unt, err
+//	}
+//
+// --------------updated
 func StringToUInt(str string) (uint, error) {
+	if str == "" {
+		return 0, errors.New("empty string ")
+	}
+
 	val, err := strconv.Atoi(str)
-	// fmt.Println("new ne w enenenenen--------------->", (str))
-	return uint(val), err
+	if err != nil {
+		return 0, err
+	}
+	// fmt.Println("xxxxx", uint(val))
+	return uint(val), nil
 }
 
+// --------------
 func GetUserId(ctx *gin.Context) uint {
 
 	UserId := ctx.GetString("userId") // string Type

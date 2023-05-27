@@ -151,7 +151,9 @@ func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
 func (pr *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
 	ParmId := ctx.Param("id")
+
 	id, err := helper.StringToUInt(ParmId)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
 			StatusCode: 400,

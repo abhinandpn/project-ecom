@@ -2,13 +2,16 @@ package req
 
 type ReqProduct struct {
 	ProductName string `json:"product_name" gorm:"not null" binding:"required,min=3,max=50"`
-	Discription string `json:"description" gorm:"not null" binding:"required,min=10,max=100"`
+	Discription string `json:"description" gorm:"not null" binding:"required,min=3,max=100"`
 	CategoryID  uint   `json:"category_id" binding:"required"`
 	Price       uint   `json:"price" gorm:"not null" binding:"required,numeric"`
 	Image       string `json:"image" gorm:"not null" binding:"required"`
 	Color       string `json:"color" binding:"required"`
 	Size        uint   `json:"size" binding:"required" gorm:"not null"`
 	Brand       string `json:"brand" binding:"required"`
+}
+type PrDelReq struct {
+	ProductName string `json:"product_name" gorm:"not null"`
 }
 type CategoryReq struct {
 	CategoryName string `json:"category_name"`
