@@ -177,7 +177,7 @@ func (ct *productUseCase) UpdateCategory(ctx context.Context, category req.Updat
 	if err != nil {
 		return err
 	}
-	// fmt.Println("body----- >", body)
+
 	if body.Id == 0 {
 		res := fmt.Errorf("category not found with this name :  %v", category.OldCategory)
 		return res
