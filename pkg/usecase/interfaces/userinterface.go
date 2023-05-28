@@ -22,13 +22,4 @@ type UserUseCase interface {
 	AddAddres(ctx context.Context, Uid uint, Address req.ReqAddress) error
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error
 	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)
-
-	/*
-		Add Address
-		Uodate Addres
-		List All Address
-		Delete Drress
-		View profile
-		Edit Profile
-	*/
 }
