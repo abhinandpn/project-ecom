@@ -37,11 +37,11 @@ type Address struct {
 }
 
 type Cart struct {
-	CartID          uint `json:"cart_id" gorm:"primaryKey;not null"`
-	UserID          uint `json:"user_id" gorm:"not null"`
-	TotalPrice      uint `json:"total_price" gorm:"not null"`
-	AppliedCouponID uint `json:"applied_coupon_id"`
-	DiscountAmount  uint `json:"discount_amount"`
+	Id              uint    `json:"id" gorm:"primaryKey;not null"`
+	UserID          uint    `json:"user_id" gorm:"not null"`
+	AppliedCouponID uint    `json:"applied_coupon_id"`
+	DiscountAmount  float64 `json:"discount_amount"`
+	TotalPrice      float64 `json:"total_price" gorm:"not null"`
 }
 
 type CartIteams struct {
