@@ -40,6 +40,7 @@ type Cart struct {
 	Id              uint    `json:"id" gorm:"primaryKey;not null"`
 	UserID          uint    `json:"user_id" gorm:"not null"`
 	AppliedCouponID uint    `json:"applied_coupon_id"`
+	SubTotal        float64 `json:"sub_total" gorm:"not null"`
 	DiscountAmount  float64 `json:"discount_amount"`
 	TotalPrice      float64 `json:"total_price" gorm:"not null"`
 }
