@@ -9,7 +9,7 @@ type Product struct {
 	CategoryID    uint        `json:"category_id" binding:"required omitempty,numeric" `
 	Category      Category    `json:"-"`
 	Brand         Brand       `json:"-"`
-	Price         uint        `json:"price" gorm:"not null" binding:"required,numeric"`
+	Price         float64     `json:"price" gorm:"not null" binding:"required,numeric"`
 	DiscountPrice uint        `json:"discount_price"`
 	Info          ProductInfo `json:"-"`
 	Image         string      `json:"image" gorm:"not null"`

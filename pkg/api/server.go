@@ -15,7 +15,8 @@ type ServerHTTP struct {
 
 func NewServerHTTP(userHandler *handler.UserHandler,
 	adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler) *ServerHTTP {
+	productHandler *handler.ProductHandler,
+	cartHandler *handler.CartsHandler) *ServerHTTP {
 
 	Engine := gin.New()
 	Engine.Use(gin.Logger())
@@ -27,7 +28,7 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 	Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// For Routes
-	routes.UserRoutes(Engine.Group("/"), userHandler, productHandler)
+	routes.UserRoutes(Engine.Group("/"), userHandler, productHandler, cartHandler)
 	routes.AdminRoute(Engine.Group("/admin"), adminHandler, productHandler)
 
 	return &ServerHTTP{engine: Engine}
