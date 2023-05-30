@@ -2,10 +2,12 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type CartUseCase struct {
@@ -62,4 +64,26 @@ func (crt *CartUseCase) AddToCart(ctx context.Context, pid, uid uint) error {
 	}
 
 	return nil
+}
+
+func (crt *CartUseCase) UserCart(ctx context.Context, uid uint) (res.CartRes, error) {
+
+	var CartRes res.CartRes
+
+	// check the user have cart
+	cart, err := crt.FindCartByUserId(ctx, uid)
+	if err != nil {
+		return CartRes, err
+	}
+	if cart.Id == 0 {
+		res := fmt.Errorf("user does not have cart")
+		return CartRes, res
+	}
+	// find the cart table detail
+	CartRes, err = crt.cartRepo.UserCart(ctx, uid)
+	if err != nil {
+		return CartRes, err
+	}
+	// response
+	return CartRes, nil
 }
