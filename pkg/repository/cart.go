@@ -78,6 +78,7 @@ func (crt *cartDatabase) Addtocart(ctx context.Context, pid uint, uid uint) erro
 	}
 	// if does not exist then add product to the cart items
 	// update cart_items
+	// va test
 	query := `insert into cart_iteams (cart_id,product_id,quantity)values ($1,$2,$3);`
 	err = crt.DB.Exec(query, cart.Id, pid, 1).Error
 	if err != nil {
