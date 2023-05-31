@@ -65,25 +65,25 @@ func (crt *cartDatabase) Addtocart(ctx context.Context, pid uint, uid uint) erro
 	if err != nil {
 		return err
 	}
+	fmt.Println("--------", cart)
 	// check the product if exist in the store
 	exist, err := crt.FindProductFromCart(ctx, cart.Id, pid)
 	if err != nil {
 		return err
 	}
+	fmt.Println("_---------", exist)
 	// check the product if exist in cart
 	if exist {
 		return fmt.Errorf("product alredy exist")
 	}
 	// if does not exist then add product to the cart items
 	// update cart_items
-	query := `insert into cart_iteams (cart_id,product_id,quantity)values ($1,$2,1);`
-	err = crt.DB.Raw(query, cart.Id, pid).Error
+	query := `insert into cart_iteams (cart_id,product_id,quantity)values ($1,$2,$3);`
+	err = crt.DB.Exec(query, cart.Id, pid, 1).Error
 	if err != nil {
 		return err
 	}
 	// update carts it will be in use case
-
-	// qry := `update carts set total_price = $1 where user_id = $2;`
 
 	return nil
 }
@@ -91,7 +91,7 @@ func (crt *cartDatabase) Addtocart(ctx context.Context, pid uint, uid uint) erro
 func (crt *cartDatabase) UpdateCartHelp(ctx context.Context, uid uint, price float64) error {
 
 	var cart domain.Cart
-	query := `update carts set total_price = where user_id = ;`
+	query := `update carts set total_price =$1 where user_id = $2;`
 	err := crt.DB.Raw(query, price, uid).Scan(&cart).Error
 	if err != nil {
 		return err
@@ -105,14 +105,16 @@ func (crt *cartDatabase) FindProductFromCart(ctx context.Context, cid, pid uint)
 
 	query := `SELECT EXISTS (
 				SELECT 1
-				FROM cart_items
+				FROM cart_iteams
 				WHERE cart_id = $1
 				AND product_id = $2 );`
 
 	err := crt.DB.Raw(query, cid, pid).Scan(&exist).Error
+
 	if err != nil {
-		return exist, err
+		return false, err
 	}
+
 	return exist, nil
 }
 

@@ -18,9 +18,9 @@ type UserFindWithUserName struct {
 	UserName string `json:"user_name" gorm:"not null"`
 }
 type ResAddress struct {
-	UserId      uint   `json:"user_id" copier:"must"`
-	Name        string `json:"name" copier:"must"`
-	House       string `json:"house_number" copier:"must"`
+	UserId uint `json:"user_id" copier:"must"`
+	// Name        string `json:"name" copier:"must"`
+	House       string `json:"house" copier:"must"`
 	PhoneNumber string `json:"phone_number" copier:"must"`
 	Street      string `json:"street" copier:"must"`
 	City        string `json:"city" copier:"must"`
@@ -29,5 +29,5 @@ type ResAddress struct {
 	Landmark    string `json:"landmark" copier:"must"`
 	// CountryID   uint   `json:"country_id" binding:"required"`
 
-	IsDefault *bool `json:"is_default"`
+	// IsDefault *bool `json:"is_default"`
 }

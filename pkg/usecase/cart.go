@@ -45,7 +45,17 @@ func (crt *CartUseCase) FindCartByUserId(ctx context.Context, uid uint) (domain.
 
 func (crt *CartUseCase) AddToCart(ctx context.Context, pid, uid uint) error {
 
-	err := crt.cartRepo.Addtocart(ctx, pid, uid)
+	cat, err := crt.cartRepo.FindCartByUserId(ctx, uid)
+	if err != nil {
+		return err
+	}
+	if cat.Id == 0 {
+		err = crt.CreateCart(ctx, uid)
+		if err != nil {
+			return err
+		}
+	}
+	err = crt.cartRepo.Addtocart(ctx, pid, uid)
 	if err != nil {
 		return err
 	}

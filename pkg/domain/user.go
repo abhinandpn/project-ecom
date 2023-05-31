@@ -33,7 +33,7 @@ type Address struct {
 	District    string `json:"district"`
 	Pincode     string `json:"pincode"`
 	Landmark    string `json:"landmark"`
-	Default     *bool  `json:"is_default"`
+	// Default     *bool  `json:"is_default"`
 }
 
 type Cart struct {

@@ -267,7 +267,6 @@ func (usr *UserHandler) UserLogout(ctx *gin.Context) {
 
 func (usr *UserHandler) AddAddress(ctx *gin.Context) {
 
-	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// collect user Id
 	UserId := helper.GetUserId(ctx)
 	var body req.ReqAddress
@@ -297,7 +296,18 @@ func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 
 	// collect the user id
 	UserId := helper.GetUserId(ctx)
+
 	var body res.ResAddress
+
+	body.UserId = UserId
+	// body.City
+	// body.District
+	// body.House
+	// body.Landmark
+	// body.Name
+	// body.PhoneNumber
+	// body.Pincode
+	// body.Street
 
 	// Bind json
 	err := ctx.ShouldBindJSON(&body)
@@ -343,12 +353,24 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 	// call func
 	err = usr.userUseCase.UpdateAddress(ctx, UserId, body)
 	if err != nil {
-		response := res.ErrorResponse(500, "Failed to update address", err.Error(), body)
+		response := res.ErrorResponse(500, "failed to update address", err.Error(), body)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
 	// responce
-	response := res.SuccessResponse(200, "Successfully update user Address", body)
+	response := res.SuccessResponse(200, "successfully update user Address", body)
+	ctx.JSON(http.StatusOK, response)
+}
+func (crt *CartsHandler) CreateCart(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+	err := crt.CartUseCase.CreateCart(ctx, UserId)
+	if err != nil {
+		response := res.ErrorResponse(500, "failed to create user cart user id :", err.Error(), UserId)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response := res.SuccessResponse(200, "user cart created", UserId)
 	ctx.JSON(http.StatusOK, response)
 }

@@ -139,6 +139,7 @@ func (usr *userDatabase) ListUsers(ctx context.Context, pagination req.PageNatio
 	var res res.ProductResponce
 
 	query := `select * from users order by users.id desc limit $1 offset $2`
+
 	err := usr.DB.Raw(query, limit, offset).Scan(res).Error
 	if err != nil {
 		return res, err
@@ -236,7 +237,7 @@ func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) ([]res.Re
 
 	var body []res.ResAddress
 
-	query := `select * from addresses where user_id = ?;`
+	query := `select * from addresses where user_id = $1;`
 
 	err := usr.DB.Raw(query, Uid).Scan(&body).Error
 
