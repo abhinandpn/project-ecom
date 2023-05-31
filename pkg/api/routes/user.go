@@ -32,11 +32,11 @@ func UserRoutes(api *gin.RouterGroup,
 		user := api.Group("/user")
 		{
 			user.GET("/home", userHandler.UserHome)      // User Home
-			user.GET("/info", userHandler.UserHome)      // user Information
+			user.GET("/info", userHandler.UserInfo)      // user Information
 			user.POST("/logout", userHandler.UserLogout) // User Logout
 		}
 		// Address
-		address := api.Group("address")
+		address := api.Group("/address")
 		{
 			address.POST("/add", userHandler.AddAddress)        // Add Address
 			address.GET("/all", userHandler.ListAllAddress)     // List all Address

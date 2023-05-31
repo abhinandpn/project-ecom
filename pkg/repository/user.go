@@ -184,9 +184,7 @@ func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.Re
 					city,
 					district,
 					pincode,
-					is_default,
 		landmark)values ($1,$2,$3,$4,$5,$6,$7,$8);`
-
 	err := usr.DB.Raw(query,
 		Uid,
 		addres.House,
@@ -195,8 +193,10 @@ func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.Re
 		addres.City,
 		addres.District,
 		addres.Pincode,
-		addres.IsDefault).Scan(&body).Error
+		// addres.IsDefault,
+		addres.Landmark).Scan(&body).Error
 
+	fmt.Println("address", body)
 	if err != nil {
 		return err
 	}

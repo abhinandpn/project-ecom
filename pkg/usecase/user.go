@@ -154,3 +154,5 @@ func (usr *userUseCase) ListAllAddress(ctx context.Context, Uid uint) ([]res.Res
 
 	return body, err
 }
+
+// --------------------------------------------------------------

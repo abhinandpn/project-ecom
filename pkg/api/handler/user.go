@@ -224,8 +224,10 @@ func (usr *UserHandler) UserHome(ctx *gin.Context) {
 
 func (usr *UserHandler) UserInfo(ctx *gin.Context) {
 
+	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// collect the user id
 	userId := helper.GetUserId(ctx)
+
 	// find the user with this id
 	CurUser, err := usr.userUseCase.UserAccount(ctx, userId)
 	if err != nil {
@@ -235,7 +237,18 @@ func (usr *UserHandler) UserInfo(ctx *gin.Context) {
 	}
 	// responce
 	var data res.UserResStruct
-	copier.Copy(&data, &CurUser)
+	// copier.Copy(&CurUser, &data)
+
+	data.ID = CurUser.ID
+	data.FName = CurUser.FName
+	data.LName = CurUser.LName
+	data.UserName = CurUser.UserName
+	// data.Age =CurUser
+	data.BlockStatus = CurUser.IsBlocked
+	data.CreatedAt = CurUser.CreatedAt
+	data.Email = CurUser.Email
+	data.Number = CurUser.Number
+	// data.UpdatedAt = CurUser.CreatedAt
 
 	response := res.SuccessResponse(200, "Successfully user account details found", data)
 	ctx.JSON(http.StatusOK, response)
@@ -254,6 +267,7 @@ func (usr *UserHandler) UserLogout(ctx *gin.Context) {
 
 func (usr *UserHandler) AddAddress(ctx *gin.Context) {
 
+	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// collect user Id
 	UserId := helper.GetUserId(ctx)
 	var body req.ReqAddress
