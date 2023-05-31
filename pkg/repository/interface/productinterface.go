@@ -28,4 +28,10 @@ type ProductRepository interface {
 	UpdateCategory(ctx context.Context, body req.UpdateCategoryReq) (domain.Category, error) // Update category
 	DeleteCategory(ctx context.Context, name string) (domain.Category, error)                // Delete category
 
+	// Subcategory
+	// finding
+	// FindSubCtByName(ctx context.Context, name string) (domain.SubCategory, error)
+	// FindSubCtById(ctx context.Context, id uint) (domain.SubCategory, error)
+	// FindSubCtByCategoryName(ctx context.Context, name string) (domain.SubCategory, error)
+	// curd
 }

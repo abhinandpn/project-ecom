@@ -29,6 +29,11 @@ type Category struct {
 	Id           uint   `json:"id" gorm:"primaryKey;not null"`
 	CategoryName string `json:"category_name" gorm:"unique;not null" binding:"required,min=3,max=30"`
 }
+type SubCategory struct {
+	Id           uint   `json:"id" gorm:"primaryKey;not null"`
+	CategoryId   uint   `json:"category_id" binding:"omitempty,numeric"`
+	CategoryName string `json:"category_name"`
+}
 type Brand struct {
 	Id        uint   `json:"id" gorm:"primaryKey;not null"`
 	ProductId uint   `json:"product_id"`

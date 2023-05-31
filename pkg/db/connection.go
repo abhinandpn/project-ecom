@@ -42,6 +42,8 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 
 		// &domain.Coupons{},
 
+		// sub category updating
+
 	)
 
 	// Error handling While Database Table creating
