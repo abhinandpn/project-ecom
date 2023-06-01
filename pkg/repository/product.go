@@ -297,3 +297,163 @@ func (ct *productDatabase) DeleteCategory(ctx context.Context, name string) (dom
 	// retun
 	return body, nil
 }
+
+// -------------------------SUB-CATEGORY-------------------------
+// Find by name
+func (subct *productDatabase) FindSubCtByName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+	query := `select * from sub_categories where category_name =?;`
+
+	err := subct.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// find by id
+func (subct *productDatabase) FindSubCtById(ctx context.Context, id uint) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+	query := `select * from sub_categories where id =?`
+
+	err := subct.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// find by sub category name
+
+func (subct *productDatabase) FindSubCtByCategoryName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+
+	// find category with name
+	cat, err := subct.FindCategoryByname(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	// find with this catogery id
+	query := `select * from sub_categories where category_id =?;`
+	err = subct.DB.Raw(query, cat.Id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// find sub category by id
+func (subct *productDatabase) FindSubCtByCategoryId(ctx context.Context, id uint) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+
+	// find category with name
+	cat, err := subct.FindCategoryById(ctx, id)
+	if err != nil {
+		return body, err
+	}
+	query := `select * from sub_categories where category_id =?;`
+	err = subct.DB.Raw(query, cat.Id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// list all sub category
+func (subct *productDatabase) ListllSubCategory(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error) {
+
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+	var body []res.SubCategoryRes
+
+	query := `SELECT c.id, c.category_name, sc.category_id, sc.sub_category_name
+					FROM categories c
+				INNER JOIN sub_categories sc
+					ON c.id = sc.category_id
+				ORDER BY
+					id DESC
+				LIMIT
+					$1 OFFSET $2;`
+
+	err := subct.DB.Raw(query, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// create sub category
+
+func (subct *productDatabase) CreateSubCategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+
+	// findiing category
+	category, err := subct.FindCategoryById(ctx, cid)
+	if err != nil {
+		return body, err
+	}
+	// craeting new sub category
+	query := `insert into sub_categories (category_id,sub_category_name)values ($1,$2);`
+	err = subct.DB.Raw(query, category.Id, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// deleting sub category
+
+func (subct *productDatabase) DeleteSubCategory(ctx context.Context, name string) error {
+
+	query := `delete from sub_categories  where sub_category_name =$1`
+	err := subct.DB.Exec(query).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// changing sub cat name
+func (subct *productDatabase) ChangeSubCatName(ctx context.Context, id uint, name string) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+
+	// find the sub category details
+	subcategory, err := subct.FindSubCtById(ctx, id)
+	if err != nil {
+		return body, err
+	}
+	// find the
+	query := `UPDATE sub_categories
+			  SET sub_category_name = $1
+			  WHERE sub_category_name = $2;`
+	err = subct.DB.Raw(query, name, subcategory.SubCategoryName).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// change category for a sub category
+func (subct *productDatabase) ChangeSubCatCatogeryName(ctx context.Context, id uint, name string) (domain.SubCategory, error) {
+
+	var body domain.SubCategory
+	// find the sub category
+	subcategory, err := subct.FindSubCtByCategoryName(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	query := `UPDATE sub_categories
+				SET category_id = $1
+				WHERE sub_category_name = $2;`
+	err = subct.DB.Raw(query, id, subcategory.SubCategoryName).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}

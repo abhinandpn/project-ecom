@@ -30,14 +30,14 @@ type ProductRepository interface {
 
 	// ------------------------Subcategory------------------------
 	// finding
-	FindSubCtByName(ctx context.Context, name string) (domain.SubCategory, error)                    // Find by name
-	FindSubCtById(ctx context.Context, id uint) (domain.SubCategory, error)                          // Find By id
-	FindSubCtByCategoryName(ctx context.Context, name string) (domain.SubCategory, error)            // Find By Sub category name
-	FindSubCtByCategoryId(ctx context.Context, id uint) (domain.SubCategory, error)                  // find by sub category id
-	FindAllSubCategory(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error) // find all sub category
+	FindSubCtByName(ctx context.Context, name string) (domain.SubCategory, error)                   // Find by name
+	FindSubCtById(ctx context.Context, id uint) (domain.SubCategory, error)                         // Find By id
+	FindSubCtByCategoryName(ctx context.Context, name string) (domain.SubCategory, error)           // Find By Sub category name
+	FindSubCtByCategoryId(ctx context.Context, id uint) (domain.SubCategory, error)                 // find by sub category id
+	ListllSubCategory(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error) // find all sub category
 	// curd
-	CreateSubCategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error) // create sub category
-	DeleteSubCategory(ctx context.Context, name string) error                                 // delete sub category
-	ChangeSubCatName(ctx context.Context, name string) (domain.SubCategory, error)            // change sub category name
-	ChangeSubCatCatogeryName(ctx context.Context, name string) (domain.SubCategory, error)    // change category for sub category
+	CreateSubCategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error)       // create sub category
+	DeleteSubCategory(ctx context.Context, name string) error                                       // delete sub category
+	ChangeSubCatName(ctx context.Context, id uint, name string) (domain.SubCategory, error)         // change sub category name
+	ChangeSubCatCatogeryName(ctx context.Context, id uint, name string) (domain.SubCategory, error) // change category for sub category
 }
