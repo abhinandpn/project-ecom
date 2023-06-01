@@ -22,6 +22,7 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 		handler.NewUserHandler,
 		handler.NewProductHandler,
 		handler.NewCartHandler,
+
 		// usecase
 		usecase.NewAdminUseCase,
 		usecase.NewUserUseCase,

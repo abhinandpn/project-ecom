@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
@@ -19,7 +20,7 @@ type AdminHandler struct {
 	AdminUseCase services.AdminUseCase
 }
 
-func NewAdminHandler(AdminUseCase services.AdminUseCase) *AdminHandler {
+func NewAdminHandler(AdminUseCase services.AdminUseCase) handlerInterface.AdminHandler {
 	return &AdminHandler{AdminUseCase: AdminUseCase}
 }
 

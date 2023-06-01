@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -15,7 +16,7 @@ type ProductHandler struct {
 	ProductuseCase service.ProductuseCase
 }
 
-func NewProductHandler(productUsecase service.ProductuseCase) *ProductHandler {
+func NewProductHandler(productUsecase service.ProductuseCase) handlerInterface.ProductHandler {
 	return &ProductHandler{ProductuseCase: productUsecase}
 }
 

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -13,7 +14,7 @@ type CartsHandler struct {
 	CartUseCase service.CartUseCase
 }
 
-func NewCartHandler(cartUseCase service.CartUseCase) *CartsHandler {
+func NewCartHandler(cartUseCase service.CartUseCase) handlerInterface.CartHandler {
 
 	return &CartsHandler{CartUseCase: cartUseCase}
 }

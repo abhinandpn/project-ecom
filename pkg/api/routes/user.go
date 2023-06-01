@@ -3,15 +3,15 @@ package routes
 import (
 	"fmt"
 
-	"github.com/abhinandpn/project-ecom/pkg/api/handler"
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func UserRoutes(api *gin.RouterGroup,
-	userHandler *handler.UserHandler,
-	productHandler *handler.ProductHandler,
-	cartHandler *handler.CartsHandler) {
+	userHandler handlerInterface.UserHandler,
+	productHandler handlerInterface.ProductHandler,
+	cartHandler handlerInterface.CartHandler) {
 	// login
 	login := api.Group("/login")
 	{

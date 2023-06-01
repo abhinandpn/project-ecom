@@ -5,26 +5,29 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
-
 	twillio "github.com/abhinandpn/project-ecom/pkg/Twillio"
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/auth"
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 )
 
 type UserHandler struct {
 	userUseCase services.UserUseCase
 }
 
-func NewUserHandler(usecase services.UserUseCase) *UserHandler {
+func NewUserHandler(usecase services.UserUseCase) handlerInterface.UserHandler {
 	return &UserHandler{
 		userUseCase: usecase,
 	}
+	// return &UserHandler{
+	// 	userUseCase: usecase,
+	// }
 }
 
 // ---------------------- User Function -----------------

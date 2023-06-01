@@ -1,14 +1,14 @@
 package routes
 
 import (
-	"github.com/abhinandpn/project-ecom/pkg/api/handler"
+	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func AdminRoute(api *gin.RouterGroup,
-	AdminHandler *handler.AdminHandler,
-	ProductHandler *handler.ProductHandler,
+	AdminHandler handlerInterface.AdminHandler,
+	ProductHandler handlerInterface.ProductHandler,
 ) {
 	// Sudo Admin Login Login
 	login := api.Group("/login")
