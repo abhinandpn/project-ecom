@@ -360,3 +360,8 @@ func (ct *ProductHandler) ViewFullcategory(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, respones)
 
 }
+
+// ------------------------sub category------------------------
+func (sub *ProductHandler) AddSubCategory(ctx *gin.Context) {
+
+}
