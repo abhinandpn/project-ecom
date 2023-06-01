@@ -3,6 +3,8 @@ package interfaces
 import "github.com/gin-gonic/gin"
 
 type CartHandler interface {
-	AddToCart(ctx *gin.Context)
-	UserCart(ctx *gin.Context)
+
+	// cart managment
+	AddToCart(ctx *gin.Context) // product add to cart
+	UserCart(ctx *gin.Context)  // user cart showing
 }
