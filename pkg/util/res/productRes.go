@@ -21,8 +21,9 @@ type CategoryRes struct {
 }
 type SubCategoryRes struct {
 	Id              uint   `json:"id"`
-	SubcategoryName string `json:"sub_category_name"`
 	CategoryId      uint   `json:"category_id"`
+	CategoryName    string `json:"category_name"`
+	SubcategoryName string `json:"sub_category_name"`
 }
 type BrandRes struct {
 	Id        uint   `json:"id"`
