@@ -271,3 +271,75 @@ func (pr *productUseCase) ViewFullCategory(ctx context.Context,
 	return pr.productRepo.FindAllCategory(ctx, pagination)
 
 }
+
+// ------------------------SUB CATEGORY------------------------
+
+func (sub *productUseCase) AddSubcategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.CreateSubCategory(ctx, cid, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) SubNameUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.ChangeSubCatName(ctx, id, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) SubCatUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.ChangeSubCatCatogeryName(ctx, id, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) DeleteSubCate(ctx context.Context, name string) error {
+
+	err := sub.productRepo.DeleteSubCategory(ctx, name)
+	return err
+}
+func (sub *productUseCase) ListALlSubCate(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error) {
+
+	body, err := sub.productRepo.ListllSubCategory(ctx, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) FindSubById(ctx context.Context, id uint) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.FindSubCtById(ctx, id)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) FindSubByName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.FindSubCtByName(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) FindSubByCatId(ctx context.Context, id uint) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.FindSubCtByCategoryId(ctx, id)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+	body, err := sub.productRepo.FindSubCtByCategoryName(ctx, name)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
