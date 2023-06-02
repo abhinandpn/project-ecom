@@ -45,6 +45,7 @@ type Cart struct {
 	TotalPrice      float64 `json:"total_price" gorm:"not null"`
 }
 
+// hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 type CartIteams struct {
 	Id        uint `json:"id" gorm:"not null"`
 	CartId    uint `json:"cart_id" gorm:"not null"`
