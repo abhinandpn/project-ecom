@@ -37,7 +37,7 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 
 		// Cart Table
 		&domain.Cart{},
-		&domain.CartIteams{},
+		&domain.CartInfo{},
 		// &domain.WishList{},
 		&domain.SubCategory{},
 

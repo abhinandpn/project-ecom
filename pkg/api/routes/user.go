@@ -57,7 +57,7 @@ func UserRoutes(api *gin.RouterGroup,
 		cart := api.Group("/cart")
 		{
 			cart.POST("/:id", cartHandler.AddToCart) // Add to cart
-			cart.GET("/view", cartHandler.UserCart)  // view user cart
+			// cart.GET("/view", cartHandler.UserCart)  // view user cart
 		}
 	}
 

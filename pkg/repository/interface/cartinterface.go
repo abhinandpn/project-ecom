@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
-	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type Cartrepository interface {
@@ -13,9 +12,9 @@ type Cartrepository interface {
 	FindCartByUserId(ctx context.Context, uid uint) (domain.Cart, error)
 
 	// User
-	CreateCart(ctx context.Context, uid uint) error              // create a empty cart for user
-	Addtocart(ctx context.Context, pid uint, uid uint) error     // add product to cart
-	UserCart(ctx context.Context, uid uint) (res.CartRes, error) // list the full cart total
+	CreateCart(ctx context.Context, uid uint) error          // create a empty cart for user
+	Addtocart(ctx context.Context, pid uint, uid uint) error // add product to cart
+	// UserCart(ctx context.Context, uid uint) (res.CartRes, error) // list the full cart total
 	// RemovePrdFromCart
 
 	// managment for cart

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
-	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type CartUseCase interface {
@@ -15,5 +14,5 @@ type CartUseCase interface {
 	// create a cart for user with empty value
 	CreateCart(ctx context.Context, uid uint) error
 	AddToCart(ctx context.Context, pid, uid uint) error
-	UserCart(ctx context.Context, uid uint) (res.CartRes, error)
+	// UserCart(ctx context.Context, uid uint) (res.CartRes, error)
 }

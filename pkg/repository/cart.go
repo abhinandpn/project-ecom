@@ -6,7 +6,6 @@ import (
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
-	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"gorm.io/gorm"
 )
 
@@ -117,21 +116,4 @@ func (crt *cartDatabase) FindProductFromCart(ctx context.Context, cid, pid uint)
 	}
 
 	return exist, nil
-}
-
-func (crt *cartDatabase) UserCart(ctx context.Context, uid uint) (res.CartRes, error) {
-
-	var cart domain.Cart
-	var resCart res.CartRes
-	CartQey := `select * from carts where user_id = $1;`
-	err := crt.DB.Raw(CartQey, uid).Scan(&cart).Error
-	if err != nil {
-		return resCart, err
-	}
-
-	resCart.SubTotal = float32(cart.SubTotal)
-	resCart.UserId = cart.UserID
-	resCart.Total = float32(cart.TotalPrice)
-
-	return resCart, nil
 }

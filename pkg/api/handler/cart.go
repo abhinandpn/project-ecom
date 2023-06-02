@@ -58,26 +58,26 @@ func (cr *CartsHandler) AddToCart(ctx *gin.Context) {
 }
 
 // list Usercart
-func (cr *CartsHandler) UserCart(ctx *gin.Context) {
+// func (cr *CartsHandler) UserCart(ctx *gin.Context) {
 
-	UserId := helper.GetUserId(ctx)
+// 	UserId := helper.GetUserId(ctx)
 
-	var UserCart res.CartRes
-	// if err := ctx.ShouldBindJSON(&UserCart); err != nil {
-	// 	response := res.ErrorResponse(400, "invalid input", err.Error(), UserCart)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
+// 	var UserCart res.CartRes
+// 	// if err := ctx.ShouldBindJSON(&UserCart); err != nil {
+// 	// 	response := res.ErrorResponse(400, "invalid input", err.Error(), UserCart)
+// 	// 	ctx.JSON(http.StatusBadRequest, response)
+// 	// 	return
+// 	// }
 
-	UserCart, err := cr.CartUseCase.UserCart(ctx, UserId)
-	if err != nil {
-		response := res.ErrorResponse(400, "failed to find user cart", err.Error(), UserCart)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-	response := res.SuccessResponse(200, "successfully product updated ", UserCart)
-	ctx.JSON(200, response)
-}
+// 	UserCart, err := cr.CartUseCase.UserCart(ctx, UserId)
+// 	if err != nil {
+// 		response := res.ErrorResponse(400, "failed to find user cart", err.Error(), UserCart)
+// 		ctx.JSON(http.StatusBadRequest, response)
+// 		return
+// 	}
+// 	response := res.SuccessResponse(200, "successfully product updated ", UserCart)
+// 	ctx.JSON(200, response)
+// }
 
 // remove from cart
 // List cart items
