@@ -12,6 +12,7 @@ func UserRoutes(api *gin.RouterGroup,
 	userHandler handlerInterface.UserHandler,
 	productHandler handlerInterface.ProductHandler,
 	cartHandler handlerInterface.CartHandler) {
+
 	// login
 	login := api.Group("/login")
 	{
@@ -20,14 +21,16 @@ func UserRoutes(api *gin.RouterGroup,
 		login.POST("/otp-send", userHandler.UserOtpLogin)
 		login.POST("/otp-verify", userHandler.UserLoginOtpVerify)
 	}
-	//iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 
 	// Signup
 	signup := api.Group("/signup")
 	{
 		signup.POST("", userHandler.UserSignUp)
 	}
-
+	product := api.Group("/product")
+	{
+		product.GET("/all", productHandler.ListProducts) // List all product
+	}
 	api.Use(middleware.AuthUser)
 	{
 		user := api.Group("/user")
@@ -44,10 +47,7 @@ func UserRoutes(api *gin.RouterGroup,
 			address.PATCH("/update", userHandler.UpdateAddress) // Update Address
 		}
 		// Product
-		product := api.Group("/product")
-		{
-			product.GET("/all", productHandler.ListProducts) // List all product
-		}
+
 		// Category
 		category := api.Group("/category")
 		{
