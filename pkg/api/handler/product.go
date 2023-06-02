@@ -362,6 +362,124 @@ func (ct *ProductHandler) ViewFullcategory(ctx *gin.Context) {
 }
 
 // ------------------------sub category------------------------
+// add sub category
 func (sub *ProductHandler) AddSubCategory(ctx *gin.Context) {
 
+	Paramid := ctx.Param("id")
+
+	id, err := helper.StringToUInt(Paramid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find CategoryId",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	var body req.SubCateCurdRes
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	subcategory, err := sub.ProductuseCase.AddSubcategory(ctx, id, body.SubCategoryName)
+	if err != nil {
+		response := res.SuccessResponse(500, "failed to add subcategory", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully add sub category", subcategory)
+	ctx.JSON(http.StatusOK, respones)
+
+}
+
+// delete sub category
+func (sub *ProductHandler) DeleteSubCategory(ctx *gin.Context) {
+
+	var body req.SubCateCurdRes
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	err := sub.ProductuseCase.DeleteSubCate(ctx, body.SubCategoryName)
+	if err != nil {
+		response := res.SuccessResponse(500, "failed to delete subcategory", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully delete sub category", nil)
+	ctx.JSON(http.StatusOK, respones)
+
+}
+
+// view full sub category
+func (sub *ProductHandler) ViewFullSubCategory(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	var pagination req.PageNation
+	pagination.Count = count
+	pagination.PageNumber = pageNumber
+
+	subcategory, err := sub.ProductuseCase.ListALlSubCate(ctx, pagination)
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all sub category", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if subcategory == nil {
+		response := res.SuccessResponse(200, "there is no sub category to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get sub category", subcategory)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+// func (sub *ProductHandler) ViewSubCategory(ctx *gin.Context) {
+
+// }
+
+// update sub category
+func (sub *ProductHandler) EditSubCategory(ctx *gin.Context) {
+
+	Paramid := ctx.Param("id")
+
+	id, err := helper.StringToUInt(Paramid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find CategoryId",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	var body req.SubCateCurdRes
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	subcate, err := sub.ProductuseCase.SubCatUpdate(ctx, id, body.SubCategoryName)
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to update sub category", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get sub category", subcate)
+	ctx.JSON(http.StatusOK, respones)
 }

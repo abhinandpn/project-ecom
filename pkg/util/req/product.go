@@ -32,3 +32,7 @@ type UpdateCategoryReq struct {
 	OldCategory string `json:"old_category" gorm:"not null"`
 	Newcategory string `json:"new_category" gorm:""`
 }
+type SubCateCurdRes struct {
+	// CategoryId      uint   `josn:"category_id"`
+	SubCategoryName string `json:"sub_category_name"`
+}

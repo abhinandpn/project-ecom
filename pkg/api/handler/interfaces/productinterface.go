@@ -19,8 +19,8 @@ type ProductHandler interface {
 	ViewFullcategory(ctx *gin.Context) // list all category
 	// sub category
 	AddSubCategory(ctx *gin.Context)
-	// DeleteSubCategory(ctx *gin.Context)
-	// ViewFullSubCategory(ctx *gin.Context)
+	DeleteSubCategory(ctx *gin.Context)
+	ViewFullSubCategory(ctx *gin.Context)
 	// ViewSubCategory(ctx *gin.Context)
-	// EditSubCategory(ctx *gin.Context)
+	EditSubCategory(ctx *gin.Context)
 }
