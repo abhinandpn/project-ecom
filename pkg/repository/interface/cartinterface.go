@@ -10,10 +10,13 @@ type Cartrepository interface {
 
 	// cart
 	FindCartByUserId(ctx context.Context, uid uint) (domain.Cart, error)
+	CreateCartInfo(ctx context.Context, cid uint) (domain.CartInfo, error)
+	UpdateCartinfo(ctx context.Context, cid, qty uint, price float64) (domain.CartInfo, error)
+	FindCartInfoByCartId(ctx context.Context, cid uint) (domain.CartInfo, error)
 
 	// User
-	CreateCart(ctx context.Context, uid uint) error          // create a empty cart for user
-	Addtocart(ctx context.Context, pid uint, uid uint) error // add product to cart
+	CreateCart(ctx context.Context, uid uint) error // create a empty cart for user
+	// Addtocart(ctx context.Context, pid uint, uid uint) error // add product to cart
 	// UserCart(ctx context.Context, uid uint) (res.CartRes, error) // list the full cart total
 	// RemovePrdFromCart
 

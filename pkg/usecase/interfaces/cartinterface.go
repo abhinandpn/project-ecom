@@ -13,6 +13,5 @@ type CartUseCase interface {
 
 	// create a cart for user with empty value
 	CreateCart(ctx context.Context, uid uint) error
-	AddToCart(ctx context.Context, pid, uid uint) error
-	// UserCart(ctx context.Context, uid uint) (res.CartRes, error)
+	Addtocart(ctx context.Context, cid, uid, pid, pfid uint) error
 }

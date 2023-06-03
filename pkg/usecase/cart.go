@@ -26,7 +26,6 @@ func (crt *CartUseCase) CreateCart(ctx context.Context, uid uint) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -41,57 +40,51 @@ func (crt *CartUseCase) FindCartByUserId(ctx context.Context, uid uint) (domain.
 	return body, nil
 }
 
-func (crt *CartUseCase) AddToCart(ctx context.Context, pid, uid uint) error {
+func (crt *CartUseCase) Addtocart(ctx context.Context, cid, uid, pid, pfid uint) error {
 
-	cat, err := crt.cartRepo.FindCartByUserId(ctx, uid)
-	if err != nil {
-		return err
-	}
-	if cat.Id == 0 {
-		err = crt.CreateCart(ctx, uid)
-		if err != nil {
-			return err
-		}
-	}
-	err = crt.cartRepo.Addtocart(ctx, pid, uid)
+	// check the user have cart and
+	cart, err := crt.cartRepo.FindCartByUserId(ctx, uid)
 	if err != nil {
 		return err
 	}
 
+	// if user dosent have cart create
+	if cart.Id == 0 {
+		crt.cartRepo.CreateCart(ctx, uid)
+	}
+
+	// if have cart check user have cart info
+	cartinfo, err := crt.cartRepo.FindCartInfoByCartId(ctx, cart.Id)
+	if err != nil {
+		return err
+	}
+
+	// if doest have cart info create
+	if cartinfo.Id == 0 {
+		crt.cartRepo.CreateCartInfo(ctx, cid)
+	}
+
+	// find product
 	product, err := crt.prd.FindProductById(ctx, pid)
 	if err != nil {
 		return err
 	}
-
-	productprice := product.Price
-
-	err = crt.cartRepo.UpdateCartHelp(ctx, uid, productprice)
-
+	if product.Id == 0 {
+		return err
+	}
+	// find prouct info
+	pinfo, err := crt.prd.FindProductInfoByPid(ctx, pid)
 	if err != nil {
 		return err
 	}
+	// update quentity
+	price := product.Price * float64(pinfo.Qty)
 
+	// update cart info
+	cartinfo, err = crt.cartRepo.UpdateCartinfo(ctx, cart.Id, pinfo.Qty, price)
+	if err != nil {
+		return err
+	}
+	// return
 	return nil
 }
-
-// func (crt *CartUseCase) UserCart(ctx context.Context, uid uint) (res.CartRes, error) {
-
-// 	var CartRes res.CartRes
-
-// 	// check the user have cart
-// 	cart, err := crt.FindCartByUserId(ctx, uid)
-// 	if err != nil {
-// 		return CartRes, err
-// 	}
-// 	if cart.Id == 0 {
-// 		res := fmt.Errorf("user does not have cart")
-// 		return CartRes, res
-// 	}
-// 	// find the cart table detail
-// 	CartRes, err = crt.cartRepo.UserCart(ctx, uid)
-// 	if err != nil {
-// 		return CartRes, err
-// 	}
-// 	// response
-// 	return CartRes, nil
-// }

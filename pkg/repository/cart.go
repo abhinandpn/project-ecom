@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -54,40 +53,6 @@ func (crt *cartDatabase) FindCartIdByUserId(ctx context.Context, id uint) (uint,
 	return Cartid, nil
 }
 
-func (crt *cartDatabase) Addtocart(ctx context.Context, pid uint, uid uint) error {
-
-	// we want user id  and product id
-	// get product deail
-
-	// check the user have cart ?
-	cart, err := crt.FindCartByUserId(ctx, uid)
-	if err != nil {
-		return err
-	}
-	fmt.Println("--------", cart)
-	// check the product if exist in the store
-	exist, err := crt.FindProductFromCart(ctx, cart.Id, pid)
-	if err != nil {
-		return err
-	}
-	fmt.Println("_---------", exist)
-	// check the product if exist in cart
-	if exist {
-		return fmt.Errorf("product alredy exist")
-	}
-	// if does not exist then add product to the cart items
-	// update cart_items
-	// va test
-	query := `insert into cart_iteams (cart_id,product_id,quantity)values ($1,$2,$3);`
-	err = crt.DB.Exec(query, cart.Id, pid, 1).Error
-	if err != nil {
-		return err
-	}
-	// update carts it will be in use case
-
-	return nil
-}
-
 func (crt *cartDatabase) UpdateCartHelp(ctx context.Context, uid uint, price float64) error {
 
 	var cart domain.Cart
@@ -116,4 +81,51 @@ func (crt *cartDatabase) FindProductFromCart(ctx context.Context, cid, pid uint)
 	}
 
 	return exist, nil
+}
+
+// find cart info
+func (crt *cartDatabase) FindCartInfoByCartId(ctx context.Context, cid uint) (domain.CartInfo, error) {
+
+	var body domain.CartInfo
+
+	query := `select * from cart_infos where cart_id = $1;`
+	err := crt.DB.Raw(query, cid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (crt *cartDatabase) UpdateCartinfo(ctx context.Context, cid, qty uint, price float64) (domain.CartInfo, error) {
+
+	var body domain.CartInfo
+
+	// we need to collect the price of the product by product id
+	// collect the product price
+	// collect the quantity
+	// set sub total with quantity * product price
+
+	subtotal := qty * uint(price)
+
+	query := `UPDATE cart_items
+				SET sub_total = $1
+				WHERE cart_id = $2;`
+	err := crt.DB.Raw(query, subtotal, cid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (crt *cartDatabase) CreateCartInfo(ctx context.Context, cid uint) (domain.CartInfo, error) {
+
+	var body domain.CartInfo
+	query := `insert into cart_infos (cart_id) values ($1) returning *;`
+	err := crt.DB.Raw(query, cid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
 }
