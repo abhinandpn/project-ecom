@@ -457,3 +457,15 @@ func (subct *productDatabase) ChangeSubCatCatogeryName(ctx context.Context, id u
 	}
 	return body, nil
 }
+func (prdt *productDatabase) FindProductInfoByPid(ctx context.Context, pid uint) (domain.ProductInfo, error) {
+
+	var body domain.ProductInfo
+
+	query := `select * from product_infos where product_id =$1;`
+
+	err := prdt.DB.Raw(query, pid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
