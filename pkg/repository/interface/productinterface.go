@@ -12,6 +12,7 @@ type ProductRepository interface {
 
 	// ------------------------Product------------------------
 	FindProductById(ctx context.Context, PId uint) (domain.Product, error)                         // Find The product Details By an ID
+	FindProductInfoByPid(ctx context.Context, pid uint) (domain.ProductInfo, error)                // findfind product info
 	FindProductByName(ctx context.Context, name string) (domain.Product, error)                    // find product by name
 	ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View Full Product From database
 	//------------curd
