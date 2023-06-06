@@ -20,13 +20,13 @@ func NewCartUseCase(CartRepo interfaces.Cartrepository, p interfaces.ProductRepo
 
 // create a cart for new user with empty value
 
-func (crt *CartUseCase) CreateCart(ctx context.Context, uid uint) error {
+func (crt *CartUseCase) CreateCart(ctx context.Context, uid uint) (domain.Cart, error) {
 
-	err := crt.cartRepo.CreateCart(ctx, uid)
+	cart, err := crt.cartRepo.CreateCart(ctx, uid)
 	if err != nil {
-		return err
+		return cart, err
 	}
-	return nil
+	return cart, nil
 }
 
 // find cart by user id
@@ -42,49 +42,47 @@ func (crt *CartUseCase) FindCartByUserId(ctx context.Context, uid uint) (domain.
 
 func (crt *CartUseCase) Addtocart(ctx context.Context, cid, uid, pid, pfid uint) error {
 
-	// check the user have cart and
-	cart, err := crt.cartRepo.FindCartByUserId(ctx, uid)
+	// check the usr have cart
+	cart, err := crt.FindCartByUserId(ctx, uid)
 	if err != nil {
 		return err
 	}
 
-	// if user dosent have cart create
+	// if doest have cart then create
+	var body domain.Cart
 	if cart.Id == 0 {
-		crt.cartRepo.CreateCart(ctx, uid)
+		body, err = crt.cartRepo.CreateCart(ctx, uid)
+		if err != nil {
+			return err
+		}
 	}
 
-	// if have cart check user have cart info
-	cartinfo, err := crt.cartRepo.FindCartInfoByCartId(ctx, cart.Id)
-	if err != nil {
-		return err
-	}
-
-	// if doest have cart info create
-	if cartinfo.Id == 0 {
-		crt.cartRepo.CreateCartInfo(ctx, cid)
-	}
-
-	// find product
-	product, err := crt.prd.FindProductById(ctx, pid)
-	if err != nil {
-		return err
-	}
-	if product.Id == 0 {
-		return err
-	}
-	// find prouct info
+	// check the product exs in th store
 	pinfo, err := crt.prd.FindProductInfoByPid(ctx, pid)
 	if err != nil {
 		return err
 	}
-	// update quentity
-	price := product.Price * float64(pinfo.Qty)
 
+	// check the qty
+	if pinfo.Qty == 0 {
+		return err
+	}
+
+	// add product in to cart
+	cart, err = crt.cartRepo.Addtocart(ctx, body)
+	if err != nil {
+		return err
+	}
+
+	product, err := crt.prd.FindProductById(ctx, pid)
+	if err != nil {
+		return err
+	}
 	// update cart info
-	cartinfo, err = crt.cartRepo.UpdateCartinfo(ctx, cart.Id, pinfo.Qty, price)
+	err = crt.cartRepo.UpdateCartinfo(ctx, cid, 1, product.Price)
 	if err != nil {
 		return err
 	}
 	// return
-	return nil
+	return err
 }

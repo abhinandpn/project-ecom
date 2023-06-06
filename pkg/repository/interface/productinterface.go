@@ -15,6 +15,7 @@ type ProductRepository interface {
 	FindProductInfoByPid(ctx context.Context, pid uint) (domain.ProductInfo, error)                // findfind product info
 	FindProductByName(ctx context.Context, name string) (domain.Product, error)                    // find product by name
 	ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View Full Product From database
+	UpdateQtyPinfo(ctx context.Context, pid uint, qty uint) error
 	//------------curd
 	CreateProduct(ctx context.Context, product req.ReqProduct) error       // Save a New product in to database
 	DeletProduct(ctx context.Context, PId uint) error                      // Dalete product from database

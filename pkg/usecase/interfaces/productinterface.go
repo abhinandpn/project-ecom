@@ -30,14 +30,14 @@ type ProductuseCase interface {
 
 	// ------------------------SUB CATEGORY------------------------
 	// curd
-	AddSubcategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error)
-	SubNameUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error)
-	SubCatUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error)
-	DeleteSubCate(ctx context.Context, name string) error
-	ListALlSubCate(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error)
+	AddSubcategory(ctx context.Context, cid uint, name string) (domain.SubCategory, error)       // add sub category
+	SubNameUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error)         //sub category name update
+	SubCatUpdate(ctx context.Context, id uint, name string) (domain.SubCategory, error)          // sub category update
+	DeleteSubCate(ctx context.Context, name string) error                                        // delete sub category
+	ListALlSubCate(ctx context.Context, pagination req.PageNation) ([]res.SubCategoryRes, error) // list all sub category
 	// finding
-	FindSubById(ctx context.Context, id uint) (domain.SubCategory, error)
-	FindSubByName(ctx context.Context, name string) (domain.SubCategory, error)
-	FindSubByCatId(ctx context.Context, id uint) (domain.SubCategory, error)
-	FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error)
+	FindSubById(ctx context.Context, id uint) (domain.SubCategory, error)          // find sub categiry by id
+	FindSubByName(ctx context.Context, name string) (domain.SubCategory, error)    // find sub categiry sub category  by name
+	FindSubByCatId(ctx context.Context, id uint) (domain.SubCategory, error)       // find sub category by category id
+	FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error) // find sb category by category name
 }

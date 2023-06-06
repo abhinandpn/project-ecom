@@ -469,3 +469,12 @@ func (prdt *productDatabase) FindProductInfoByPid(ctx context.Context, pid uint)
 	}
 	return body, nil
 }
+func (prdt *productDatabase) UpdateQtyPinfo(ctx context.Context, pid uint, qty uint) error {
+
+	qry := `update product_infos set qty = $1 where product_id = $2 ;`
+	err := prdt.DB.Raw(qry, qty, pid).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

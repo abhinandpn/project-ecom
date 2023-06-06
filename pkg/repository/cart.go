@@ -19,15 +19,16 @@ func NewCartRepository(db *gorm.DB) interfaces.Cartrepository {
 
 // function for create a empty cart for user
 
-func (crt *cartDatabase) CreateCart(ctx context.Context, uid uint) error {
+func (crt *cartDatabase) CreateCart(ctx context.Context, uid uint) (domain.Cart, error) {
 
+	var body domain.Cart
 	query := `INSERT INTO carts (user_id,total_price) VALUES($1, $2) RETURNING cart_id`
 
-	err := crt.DB.Raw(query, uid, 0).Error
+	err := crt.DB.Raw(query, uid, 0).Scan(&body).Error
 	if err != nil {
-		return err
+		return body, err
 	}
-	return nil
+	return body, nil
 }
 
 func (crt *cartDatabase) FindCartByUserId(ctx context.Context, uid uint) (domain.Cart, error) {
@@ -97,7 +98,7 @@ func (crt *cartDatabase) FindCartInfoByCartId(ctx context.Context, cid uint) (do
 
 }
 
-func (crt *cartDatabase) UpdateCartinfo(ctx context.Context, cid, qty uint, price float64) (domain.CartInfo, error) {
+func (crt *cartDatabase) UpdateCartinfo(ctx context.Context, cid, qty uint, price float64) error {
 
 	var body domain.CartInfo
 
@@ -113,9 +114,9 @@ func (crt *cartDatabase) UpdateCartinfo(ctx context.Context, cid, qty uint, pric
 				WHERE cart_id = $2;`
 	err := crt.DB.Raw(query, subtotal, cid).Scan(&body).Error
 	if err != nil {
-		return body, err
+		return err
 	}
-	return body, nil
+	return nil
 
 }
 
@@ -128,4 +129,11 @@ func (crt *cartDatabase) CreateCartInfo(ctx context.Context, cid uint) (domain.C
 		return body, err
 	}
 	return body, nil
+}
+func (crt *cartDatabase) Addtocart(ctx context.Context, cart domain.Cart) (domain.Cart, error) {
+
+	var body domain.Cart
+
+	return body, nil
+
 }
