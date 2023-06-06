@@ -368,7 +368,8 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 func (crt *CartsHandler) CreateCart(ctx *gin.Context) {
 
 	UserId := helper.GetUserId(ctx)
-	err := crt.CartUseCase.CreateCart(ctx, UserId)
+	cart, err := crt.CartUseCase.CreateCart(ctx, UserId)
+	fmt.Println(cart)
 	if err != nil {
 		response := res.ErrorResponse(500, "failed to create user cart user id :", err.Error(), UserId)
 		ctx.JSON(http.StatusInternalServerError, response)
