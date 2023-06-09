@@ -365,16 +365,3 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 	response := res.SuccessResponse(200, "successfully update user Address", body)
 	ctx.JSON(http.StatusOK, response)
 }
-func (crt *CartsHandler) CreateCart(ctx *gin.Context) {
-
-	UserId := helper.GetUserId(ctx)
-	cart, err := crt.CartUseCase.CreateCart(ctx, UserId)
-	fmt.Println(cart)
-	if err != nil {
-		response := res.ErrorResponse(500, "failed to create user cart user id :", err.Error(), UserId)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	}
-	response := res.SuccessResponse(200, "user cart created", UserId)
-	ctx.JSON(http.StatusOK, response)
-}

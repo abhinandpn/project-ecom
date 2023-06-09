@@ -18,3 +18,15 @@ type CartItemsRes struct {
 	Category    string `json:"category"`
 	Price       uint   `json:"price" gorm:"not null"`
 }
+
+type ViewCart struct {
+	ProductName string  `json:"product_name" gorm:"not null"`
+	Size        uint    `json:"size" gorm:"not null"`
+	Category    string  `json:"category" gorm:"not null"`
+	Image       string  `json:"image"`
+	Colour      string  `json:"colour"`
+	Brand       string  `json:"brand"`
+	Price       float64 `json:"price" gorm:"not null"`
+	Quantity    uint    `json:"quantity" gorm:"not null"`
+	Total       float64 `json:"total" gorm:"not null"`
+}
