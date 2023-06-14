@@ -227,7 +227,6 @@ func (usr *UserHandler) UserHome(ctx *gin.Context) {
 
 func (usr *UserHandler) UserInfo(ctx *gin.Context) {
 
-	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// collect the user id
 	userId := helper.GetUserId(ctx)
 
