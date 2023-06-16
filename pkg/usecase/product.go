@@ -343,3 +343,12 @@ func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (d
 	}
 	return body, nil
 }
+
+// func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+// 	body, err := sub.productRepo.FindSubCtByCategoryName(ctx, name)
+// 	if err != nil {
+// 		return body, err
+// 	}
+// 	return body, nil
+// }
