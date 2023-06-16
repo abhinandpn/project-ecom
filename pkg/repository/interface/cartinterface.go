@@ -13,6 +13,7 @@ type Cartrepository interface {
 	FindCartInfoByCID(cid uint) (domain.CartInfo, error)
 	FindProductFromCartByCId(pid uint) (domain.Cart, error)
 	FindProductFromCartInfoByCId(pid uint) (domain.CartInfo, error)
+	FindProductByPid(uid, pid uint) (bool, error)
 
 	// create cart help
 	CreateCartByUID(uid uint) (domain.Cart, error)
@@ -20,7 +21,7 @@ type Cartrepository interface {
 
 	// add product to cart
 	AddProductToCart(uid, pid, pfid uint) error
-	AddProductToCartInfo(cid uint, pfr domain.Product) error
+	// AddProductToCartInfo(cid uint, pfr domain.Product) error
 
 	// remove product
 	RemoveProductfromCart(uid, pfid uint) error

@@ -81,7 +81,19 @@ func (adm *AdminUseCase) FindAllUser(ctx context.Context, pagination req.PageNat
 // Block user
 func (adm *AdminUseCase) BlockUser(ctx context.Context, UserId uint) error {
 
-	return adm.adminRepo.BlockUser(ctx, UserId)
+	// find the id is exit or not
+	user, err := adm.FindUserById(ctx, UserId)
+	if err != nil {
+		return err
+	}
+
+	// if exist block
+	if user.ID != 0 {
+		adm.adminRepo.BlockUser(ctx, UserId)
+	}
+
+	// return
+	return nil
 }
 
 // Find User By user Name

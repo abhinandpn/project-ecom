@@ -30,10 +30,12 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 
 		// Product Table
 		&domain.Category{},
-		&domain.Product{},
-		&domain.ProductInfo{},
-		&domain.ProductImage{},
-		// &domain.Brand{},
+		/*
+			&domain.Product{},
+			&domain.ProductInfo{},
+			&domain.ProductImage{},
+			// &domain.Brand{},
+		*/
 
 		// Cart Table
 		&domain.Cart{},

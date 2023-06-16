@@ -39,9 +39,9 @@ type Address struct {
 type Cart struct {
 	Id          uint `json:"id" gorm:"not null"`
 	UserId      uint `json:"user_id" gorm:"not null"`
-	ProductId   uint `json:"product_id" gorm:"not null"`
-	ProductInfo uint `json:"product_info" gorm:"not null"`
-	Quantity    uint `json:"quantity" gorm:"not null"`
+	ProductId   uint `json:"product_id"`
+	ProductInfo uint `json:"product_info"`
+	Quantity    uint `json:"quantity"`
 }
 
 type CartInfo struct {

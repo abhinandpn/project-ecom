@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"log"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -24,7 +23,7 @@ func NewProductUseCase(ProductRepo interfaces.ProductRepository) service.Product
 }
 
 // Product
-
+/*
 func (pr *productUseCase) FindProductByName(ctx context.Context, name string) (domain.Product, error) {
 
 	body, err := pr.productRepo.FindProductByName(ctx, name)
@@ -155,7 +154,7 @@ func (pr *productUseCase) ViewFullProduct(ctx context.Context, pagination req.Pa
 	}
 	return body, nil
 }
-
+*/
 // CATEGORY USECASE
 
 // -------------------FindCategoryById-------------------
@@ -343,3 +342,12 @@ func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (d
 	}
 	return body, nil
 }
+
+// func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error) {
+
+// 	body, err := sub.productRepo.FindSubCtByCategoryName(ctx, name)
+// 	if err != nil {
+// 		return body, err
+// 	}
+// 	return body, nil
+// }
