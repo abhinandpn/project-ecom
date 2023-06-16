@@ -8,10 +8,10 @@ import (
 type CartUseCase interface {
 
 	// Create cart
-	CreateCart(uid uint) error
+	// CreateCart(uid uint) error
 
 	// Add Product from cart
-	AddProduct(uid, pfid uint) error
+	// AddProduct(uid, pfid uint) error
 
 	// Remove product from cart
 	RemoveProductFromCart(uid, pid uint) error

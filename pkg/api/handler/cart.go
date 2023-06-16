@@ -24,30 +24,30 @@ func NewCartHandler(cartUseCase service.CartUseCase) handlerInterface.CartHandle
 
 func (c *CartsHandler) AddCart(ctx *gin.Context) {
 
-	UID := helper.GetUserId(ctx)
+	// UID := helper.GetUserId(ctx)
 
-	ParmId := ctx.Param("id")
-	pfid, err := helper.StringToUInt(ParmId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, res.Response{
-			StatusCode: 400,
-			Message:    "can't find productinfoid",
-			Errors:     err.Error(),
-			Data:       nil,
-		})
-		return
-	}
+	// ParmId := ctx.Param("id")
+	// pfid, err := helper.StringToUInt(ParmId)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, res.Response{
+	// 		StatusCode: 400,
+	// 		Message:    "can't find productinfoid",
+	// 		Errors:     err.Error(),
+	// 		Data:       nil,
+	// 	})
+	// 	return
+	// }
 
-	err = c.CartUseCase.AddProduct(UID, pfid)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, res.Response{
-			StatusCode: 400,
-			Message:    "can't add product in to cart",
-			Errors:     err.Error(),
-			Data:       nil,
-		})
-		return
-	}
+	// err = c.CartUseCase.AddProduct(UID, pfid)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, res.Response{
+	// 		StatusCode: 400,
+	// 		Message:    "can't add product in to cart",
+	// 		Errors:     err.Error(),
+	// 		Data:       nil,
+	// 	})
+	// 	return
+	// }
 
 	ctx.JSON(http.StatusOK, res.Response{
 		StatusCode: 200,

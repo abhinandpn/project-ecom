@@ -21,7 +21,7 @@ type Cartrepository interface {
 
 	// add product to cart
 	AddProductToCart(uid, pid, pfid uint) error
-	AddProductToCartInfo(cid uint, pfr domain.Product) error
+	// AddProductToCartInfo(cid uint, pfr domain.Product) error
 
 	// remove product
 	RemoveProductfromCart(uid, pfid uint) error

@@ -106,17 +106,17 @@ func (c *cartDatabase) AddProductToCart(uid, pid, pfid uint) error {
 	return nil
 }
 
-func (c *cartDatabase) AddProductToCartInfo(cid uint, pfr domain.Product) error {
+// func (c *cartDatabase) AddProductToCartInfo(cid uint, pfr domain.Product) error {
 
-	query := `insert into cart_infos (cart_id,sub_total)values ($1,$2);`
-	fmt.Println("-----------------------------", pfr)
-	err := c.DB.Exec(query, cid, pfr.Price).Error
-	if err != nil {
-		return err
-	}
+// 	query := `insert into cart_infos (cart_id,sub_total)values ($1,$2);`
+// 	fmt.Println("-----------------------------", pfr)
+// 	err := c.DB.Exec(query, cid, pfr.Price).Error
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (c *cartDatabase) RemoveProductfromCart(uid, pfid uint) error {
 

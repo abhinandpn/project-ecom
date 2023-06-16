@@ -2,9 +2,7 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"time"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -24,7 +22,7 @@ func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
 // Product
 
 // -------------------FindProductById-------------------
-
+/*
 func (pr *productDatabase) FindProductById(ctx context.Context, PId uint) (domain.Product, error) {
 
 	var product domain.Product
@@ -96,11 +94,11 @@ func (pr *productDatabase) CreateProduct(ctx context.Context, product req.ReqPro
 	var prdt domain.Product
 	var prdtinfo domain.ProductInfo
 
-	querry := `INSERT INTO products (product_name, 
+	querry := `INSERT INTO products (product_name,
 					discription,
-					category_id, 
-					price, image, 
-					created_at) 
+					category_id,
+					price, image,
+					created_at)
 				VALUES($1, $2, $3, $4, $5, $6) returning id`
 
 	// var ResProduct res.ProductResponce
@@ -161,13 +159,13 @@ func (pr *productDatabase) DeletProduct(ctx context.Context, PId uint) error {
 
 func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduct, id uint) error {
 
-	query1 := `UPDATE products SET 
-					product_name = $1, 
-					discription = $2, 
-					category_id = $3, 
-					price = $4, 
+	query1 := `UPDATE products SET
+					product_name = $1,
+					discription = $2,
+					category_id = $3,
+					price = $4,
 					image = $5,
-					update_at = $6 
+					update_at = $6
 				WHERE id = $7 returning id;`
 
 	updatedAt := time.Now()
@@ -197,7 +195,7 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduc
 	}
 	return nil
 }
-
+*/
 // Categories New updated
 
 // -------------------FindcategoryById-------------------
@@ -457,18 +455,19 @@ func (subct *productDatabase) ChangeSubCatCatogeryName(ctx context.Context, id u
 	}
 	return body, nil
 }
-func (prdt *productDatabase) FindProductInfoByPid(ctx context.Context, pid uint) (domain.ProductInfo, error) {
 
-	var body domain.ProductInfo
+// func (prdt *productDatabase) FindProductInfoByPid(ctx context.Context, pid uint) (domain.ProductInfo, error) {
 
-	query := `select * from product_infos where product_id =$1;`
+// 	var body domain.ProductInfo
 
-	err := prdt.DB.Raw(query, pid).Scan(&body).Error
-	if err != nil {
-		return body, err
-	}
-	return body, nil
-}
+// 	query := `select * from product_infos where product_id =$1;`
+
+//		err := prdt.DB.Raw(query, pid).Scan(&body).Error
+//		if err != nil {
+//			return body, err
+//		}
+//		return body, nil
+//	}
 func (prdt *productDatabase) UpdateQtyPinfo(ctx context.Context, pid uint, qty uint) error {
 
 	qry := `update product_infos set qty = $1 where product_id = $2 ;`
@@ -479,16 +478,16 @@ func (prdt *productDatabase) UpdateQtyPinfo(ctx context.Context, pid uint, qty u
 	return nil
 }
 
-func (p *productDatabase) FindProductByPrinfo(pfid uint) (uint, error) {
+// func (p *productDatabase) FindProductByPrinfo(pfid uint) (uint, error) {
 
-	var prinfo domain.ProductInfo
-	var id uint
-	qry := `select * from product_infos where id = $1;`
-	err := p.DB.Raw(qry, pfid).Scan(&prinfo).Error
-	id = prinfo.Id
-	// fmt.Println(prinfo)
-	if err != nil {
-		return id, err
-	}
-	return id, nil
-}
+// 	var prinfo domain.ProductInfo
+// 	var id uint
+// 	qry := `select * from product_infos where id = $1;`
+// 	err := p.DB.Raw(qry, pfid).Scan(&prinfo).Error
+// 	id = prinfo.Id
+// 	// fmt.Println(prinfo)
+// 	if err != nil {
+// 		return id, err
+// 	}
+// 	return id, nil
+// }
