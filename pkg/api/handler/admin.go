@@ -200,22 +200,32 @@ func (adm *AdminHandler) Listuser(ctx *gin.Context) {
 // @Failure 400 {object} res.Response{} "invalid input"
 func (adm *AdminHandler) BlockUser(ctx *gin.Context) {
 
-	var body req.BlockStruct
+	Param := ctx.Param("id")
 
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+	id, err := helper.StringToUInt(Param)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to convert user id to UINT", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err := adm.AdminUseCase.BlockUser(ctx, body.UserId)
+	user, err := adm.AdminUseCase.FindUserById(ctx, id)
+
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user  ", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	fmt.Println("binding ok")
+	err = adm.AdminUseCase.BlockUser(ctx, id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to change user block_status", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-
-	response := res.SuccessResponse(200, "Successfully changed user block_status", body)
+	fmt.Println("block func calling ok")
+	response := res.SuccessResponse(200, "Successfully changed user block_status", user)
 	// if successfully blocked or unblock user then response 200
 	ctx.JSON(http.StatusOK, response)
 }

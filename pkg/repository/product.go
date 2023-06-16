@@ -481,12 +481,14 @@ func (prdt *productDatabase) UpdateQtyPinfo(ctx context.Context, pid uint, qty u
 
 func (p *productDatabase) FindProductByPrinfo(pfid uint) (uint, error) {
 
+	var prinfo domain.ProductInfo
 	var id uint
 	qry := `select * from product_infos where id = $1;`
-	err := p.DB.Raw(qry).Scan(&id).Error
+	err := p.DB.Raw(qry, pfid).Scan(&prinfo).Error
+	id = prinfo.Id
+	// fmt.Println(prinfo)
 	if err != nil {
 		return id, err
 	}
-
 	return id, nil
 }

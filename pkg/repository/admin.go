@@ -69,7 +69,6 @@ func (adm *adminDatabase) ListAllUser(ctx context.Context, PageNation req.PageNa
 	query := `select * FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2`
 
 	err := adm.DB.Raw(query, limit, offset).Scan(&user).Error
-	// fmt.Println("user data -------------->>> ", user)
 	if err != nil {
 		return user, err
 	}
@@ -82,7 +81,7 @@ func (adm *adminDatabase) BlockUser(ctx context.Context, userId uint) error {
 
 	// check the user id
 	var user domain.Users
-	query := `select * from users where id = ?`
+	query := `select * from users where id = $1;`
 	adm.DB.Exec(query, userId).Scan(&user)
 	// validating the user
 	/*
@@ -93,10 +92,10 @@ func (adm *adminDatabase) BlockUser(ctx context.Context, userId uint) error {
 		in the time the vaidation we can validate from the user variable
 		the user is exist or not by cheking any users key like emil,number etc...!
 	*/
-	if user.Email == "" {
+	if user.ID != 0 {
 		return errors.New("invalid user id user does not exist")
 	}
-
+	fmt.Println("user details ", user)
 	// if we get the user
 	// Start the function
 

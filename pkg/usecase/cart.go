@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -29,36 +31,46 @@ func (c *CartUseCase) AddProduct(uid, pfid uint) error {
 	}
 
 	// if doesnt have crete one
+	var newcart domain.Cart
 	if cart.Id == 0 {
-		cart, err = c.cartRepo.CreateCartByUID(uid)
+		newcart, err = c.cartRepo.CreateCartByUID(uid)
+		if err != nil {
+			return err
+		}
+		cart.Id = newcart.Id
+	}
+
+	fmt.Println("cart id : ", cart.Id)
+
+	productId, err := c.prd.FindProductByPrinfo(pfid)
+	if err != nil {
+		return err
+	}
+
+	// check if porduct exist or not
+	val, err := c.cartRepo.FindProductByPid(uid, productId)
+	if err != nil {
+		return err
+	}
+	if val {
+		return errors.New("product alredt exist")
+	} else {
+		// if dosent exist add
+		err = c.cartRepo.AddProductToCart(uid, productId, pfid)
 		if err != nil {
 			return err
 		}
 	}
-
-	product, err := c.prd.FindProductByPrinfo(pfid)
-	if err != nil {
-		return err
-	}
-	// check if porduct exist or not
-	if cart.ProductId == product {
-		return errors.New("product alredy exist")
-	}
-
-	// if dosent exist add
-	err = c.cartRepo.AddProductToCart(uid, product, pfid)
-	if err != nil {
-		return err
-	}
-
+	fmt.Println(">>>>>>>>>>>>>>>>>> cart added in to cart")
 	// create cart info
-	_, err = c.cartRepo.CreateCartInfoByCid(cart.Id)
+	cartinfo, err := c.cartRepo.CreateCartInfoByCid(cart.Id)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(cartinfo)
 	var ctx context.Context
-	prdt, err := c.prd.FindProductById(ctx, product)
+	prdt, err := c.prd.FindProductById(ctx, productId)
 	if err != nil {
 		return err
 	}

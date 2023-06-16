@@ -23,7 +23,8 @@ func AdminRoute(api *gin.RouterGroup,
 		user := api.Group("/users")
 		{
 			// user managment
-			user.PATCH("/block", AdminHandler.BlockUser) // Block User
+
+			user.PATCH("/block/:id", AdminHandler.BlockUser) // Block User
 
 			// Finding And Listing
 			user.GET("", AdminHandler.Listuser)                              // List all user

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -83,8 +85,8 @@ func (c *cartDatabase) CreateCartByUID(uid uint) (domain.Cart, error) {
 func (c *cartDatabase) CreateCartInfoByCid(cid uint) (domain.CartInfo, error) {
 
 	var body domain.CartInfo
-	query := `insert into cart_infos (cart_id)values ($1);`
-	err := c.DB.Raw(query, cid).Error
+	query := `insert into cart_infos (cart_id)values ($1) returning id ;`
+	err := c.DB.Exec(query, cid).Error
 	if err != nil {
 		return body, err
 	}
@@ -94,8 +96,9 @@ func (c *cartDatabase) CreateCartInfoByCid(cid uint) (domain.CartInfo, error) {
 
 func (c *cartDatabase) AddProductToCart(uid, pid, pfid uint) error {
 
-	query := `insert into carts (user_id,product_id,product_info,quantity)values ($1,$2,$3,$4);`
-	err := c.DB.Raw(query, uid, pid, pfid).Error
+	// var body domain.Product
+	query := `insert into carts (user_id,product_id,product_info,quantity) values ($1,$2,$3,1);`
+	err := c.DB.Exec(query, uid, pid, pfid).Error
 	if err != nil {
 		return err
 	}
@@ -106,7 +109,8 @@ func (c *cartDatabase) AddProductToCart(uid, pid, pfid uint) error {
 func (c *cartDatabase) AddProductToCartInfo(cid uint, pfr domain.Product) error {
 
 	query := `insert into cart_infos (cart_id,sub_total)values ($1,$2);`
-	err := c.DB.Raw(query, cid, pfr.Price).Error
+	fmt.Println("-----------------------------", pfr)
+	err := c.DB.Exec(query, cid, pfr.Price).Error
 	if err != nil {
 		return err
 	}
@@ -136,6 +140,21 @@ func (c *cartDatabase) RemoveProductfromCartInfo(cid uint) error {
 	return nil
 }
 
+func (c *cartDatabase) FindProductByPid(uid, pid uint) (bool, error) {
+
+	var body bool
+	query := `select exists(select * from carts where product_id = $1 and user_id = $2);`
+	err := c.DB.Raw(query, pid, uid).Scan(&body).Error
+	if err != nil {
+		fmt.Println("/<<<<<<>>>>>")
+		return false, err
+	}
+	if !body {
+		return false, err
+	}
+	return true, nil
+}
+
 func (c *cartDatabase) ListAllProductFromCart(pagination req.PageNation, uid uint) ([]res.DisplayCart, error) {
 
 	limit := pagination.Count
@@ -157,6 +176,7 @@ func (c *cartDatabase) ListAllProductFromCart(pagination req.PageNation, uid uin
 		 LIMIT
 		 	$2 OFFSET $3;`
 	err := c.DB.Raw(query, uid, limit, offset).Scan(&body).Error
+	fmt.Println(query)
 	if err != nil {
 		return body, err
 	}
