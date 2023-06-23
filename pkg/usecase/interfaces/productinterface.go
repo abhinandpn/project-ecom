@@ -11,11 +11,11 @@ import (
 type ProductuseCase interface {
 
 	/*
-		// Product
+		Product
 		FindProductByName(ctx context.Context, name string) (domain.Product, error)                    // Find product by name
 		FindProductById(ctx context.Context, id uint) (res.ProductResponce, error)                     // Find a product by a ID
 		ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View full Products
-		// curd
+		curd
 		AddProduct(ctx context.Context, product req.ReqProduct) error             // Add New Product
 		UpdateProduct(ctx context.Context, product req.ReqProduct, id uint) error // Update Product Info
 		DeleteProduct(ctx context.Context, id uint) error                         // Delete the product
@@ -41,4 +41,26 @@ type ProductuseCase interface {
 	FindSubByName(ctx context.Context, name string) (domain.SubCategory, error)    // find sub categiry sub category  by name
 	FindSubByCatId(ctx context.Context, id uint) (domain.SubCategory, error)       // find sub category by category id
 	FindSubByCatName(ctx context.Context, name string) (domain.SubCategory, error) // find sb category by category name
+
+	// ---------- PRODUCT UPDATED --------------
+
+	// Finding
+	GetProductByName(name string) (domain.Product, error)
+	GetProductById(id uint) (domain.Product, error)
+	GetAllProducts(pagination req.PageNation) ([]res.ProductResponce, error)
+	ListproductByBrand(brand string) (domain.Product, error)
+	ListProductByCategory(category string) (domain.Product, error)
+	// product images
+	AddImage(id uint, name string) error
+	// ListProductBySubCategory(pagination req.PageNation, name string) ([]res.ProductResponce, error)
+	// Opration
+	CreateProduct(product req.ReqProduct) error
+	DeleteProduct(id uint) error
+	UpdateProduct(product res.ResProduct, id uint) error
+	UpdateQuentity(id, qty uint) error
+
+	// brand
+	CreateBrand(name, img string) error
+	DeleteBrand(id uint) error
+	ViewFullBrand() (res.ResBrand, error)
 }

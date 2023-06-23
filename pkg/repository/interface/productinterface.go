@@ -44,4 +44,34 @@ type ProductRepository interface {
 	DeleteSubCategory(ctx context.Context, name string) error                                       // delete sub category
 	ChangeSubCatName(ctx context.Context, id uint, name string) (domain.SubCategory, error)         // change sub category name
 	ChangeSubCatCatogeryName(ctx context.Context, id uint, name string) (domain.SubCategory, error) // change category for sub category
+
+	// updated product query
+
+	// findind
+	FindProductByName(name string) (domain.Product, error)
+	FindProductById(id uint) (domain.Product, error)
+	FindProductByBrand(id uint) (domain.Product, error)
+	FindProductByCategory(id uint) (domain.Product, error)
+	FindProductBySubCat(id uint) (domain.Product, error)
+	FindAllProduct(pagination req.PageNation) ([]res.ProductResponce, error)
+	FindProductByProductInfo(id uint) (domain.Product, error)
+	FindProductWithQuentity(pagination req.PageNation) ([]res.ResProduct, error)
+	FinBrandByName(name string) (domain.Brand, error)
+	FindCategoryByName(name string) (domain.Category, error)
+	// product images
+	AddProductImage(id uint, img string) error
+	FindImage(img string) (domain.ProductImage, error)
+
+	// opration
+	CreateProduct(product req.ReqProduct) error
+	UpdateProduct(product res.ResProduct, id uint) error
+	DeletProduct(id uint) error
+	UpdateQuentity(id, qty uint) error
+
+	// brand
+	CreateBrand(name, img string) error
+	DeleteBrand(id uint) error
+	ViewFullBrand() (res.ResBrand, error)
+	FindBrandByName(name string) (domain.Brand, error)
+	FIndBrandById(id uint) (domain.Brand, error)
 }
