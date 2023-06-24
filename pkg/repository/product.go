@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -197,7 +198,19 @@ func (pr *productDatabase) UpdateProduct(ctx context.Context, info req.ReqProduc
 }
 */
 // Categories New updated
+// func (p *productDatabase) FindProductByPrinfo(pfid uint) (uint, error) {
 
+// 	var prinfo domain.ProductInfo
+// 	var id uint
+// 	qry := `select * from product_infos where id = $1;`
+// 	err := p.DB.Raw(qry, pfid).Scan(&prinfo).Error
+// 	id = prinfo.Id
+// 	// fmt.Println(prinfo)
+// 	if err != nil {
+// 		return id, err
+// 	}
+// 	return id, nil
+// }
 // -------------------FindcategoryById-------------------
 
 func (ct *productDatabase) FindCategoryById(ctx context.Context, CId uint) (domain.Category, error) {
@@ -478,16 +491,401 @@ func (prdt *productDatabase) UpdateQtyPinfo(ctx context.Context, pid uint, qty u
 	return nil
 }
 
-// func (p *productDatabase) FindProductByPrinfo(pfid uint) (uint, error) {
+// ----------------PRODUCT UPDATED---------------
 
-// 	var prinfo domain.ProductInfo
-// 	var id uint
-// 	qry := `select * from product_infos where id = $1;`
-// 	err := p.DB.Raw(qry, pfid).Scan(&prinfo).Error
-// 	id = prinfo.Id
-// 	// fmt.Println(prinfo)
-// 	if err != nil {
-// 		return id, err
-// 	}
-// 	return id, nil
-// }
+func (p *productDatabase) FindProductByName(name string) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from products where product_name =$1`
+	err := p.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindProductById(id uint) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from products where id = $1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindProductByBrand(id uint) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from products where brand_id = $1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindProductByCategory(id uint) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from products where category_id = $1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindProductBySubCat(id uint) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from products where sub_category_id = $1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$1 OFFSET $2;`
+
+	err := p.DB.Raw(query, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
+	fmt.Println("------------------ Start")
+	tx := p.DB.Begin() // transaction begin
+	var Time time.Time
+	var ProductTable domain.Product
+	// var ProductImage domain.ProductImage
+	var ProductInfo domain.ProductInfo
+
+	// add in to product table
+
+	query1 := `insert into products(product_name,
+					discription,
+					brand_id,
+					category_id,
+					created_at)values ($1,$2,$3,$4,$5) returning id;`
+	err := p.DB.Raw(query1, product.ProductName,
+		product.Discription,
+		product.BrandId,
+		product.CategoryID,
+		Time).Scan(&ProductTable).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	ProductId := ProductTable.Id
+	// add in to productimages table
+	// query2 := `insert into product_images (product_id,product_images)values ($1,$2) returning id;`
+	// err = p.DB.Raw(query2, ProductId, product.ImageId).Scan(&ProductImage).Error
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return err
+	// }
+
+	// ImageId := ProductImage.Id
+
+	// add in to product info table
+	query3 := `insert into product_infos (product_id,
+					price,
+					colour,
+					size,
+					quatity)values ($1,$2,$3,$4,$5);`
+	err = p.DB.Raw(query3, ProductId,
+		product.Price,
+		product.Color,
+		product.Size, 1).Scan(&ProductInfo).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// commit changes
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) UpdateProduct(product res.ResProduct, id uint) error {
+
+	tx := p.DB.Begin() // transaction begin
+	var Time time.Time
+	var ProductTable domain.Product
+	// var ProductImage domain.ProductImage
+	var ProductInfo domain.ProductInfo
+
+	// update product table
+	query1 := `update products set product_name =$1,
+						discription = $2,
+						brand_id =$3,
+						category_id =$4,
+						updated_at =$5 
+						where id =$6 returning id;`
+	err := p.DB.Raw(query1, product.ProductName,
+		product.Discription,
+		product.BrandId,
+		product.CategoryID,
+		Time,
+		id).Scan(&ProductTable).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	productId := ProductTable.Id
+	// update product images
+	// query2 := `update product_images set product_images =$1 where product_id =$2 returning id`
+	// err = p.DB.Raw(query2, product.Image, productId).Scan(&ProductImage).Error
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return err
+	// }
+
+	// Imageid := ProductImage.Id
+	// update product infos
+	query3 := `update product_infos set price = $1 ,
+			 colour = $2 ,
+			 size = $3 ,
+			 image_id = $4 where product_id = $5 ;`
+	err = p.DB.Raw(query3,
+		product.Price,
+		product.Color,
+		product.Size,
+		// Imageid,
+		productId).Scan(&ProductInfo).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// commit changes
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) DeletProduct(id uint) error {
+
+	tx := p.DB.Begin()
+
+	// delete product info
+	query1 := `delete from product_infos where id = $1`
+	err := p.DB.Exec(query1, id).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// delete product image
+	// query2 := `delete from product_images where id = $1`
+	// err = p.DB.Exec(query2, id).Error
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return err
+	// }
+
+	// delete product table
+	query3 := `delete from products where id = $1`
+	err = p.DB.Exec(query3, id).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// commit changes
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) FindProductByProductInfo(id uint) (domain.Product, error) {
+
+	var body domain.Product
+	query := `select * from product_infos where product_id =$1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) UpdateQuentity(id, qty uint) error {
+
+	query := `update product_infos set quentity =$1 where product_id =$2`
+	err := p.DB.Exec(query, qty, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) FindProductWithQuentity(pagination req.PageNation) ([]res.ResProduct, error) {
+
+	var body []res.ResProduct
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+	query := `SELECT
+				    p.product_name,
+				    sc.sub_category_name,
+				    br.brand_name,
+				    pi.price,
+				    pi.colour,
+				    pi.size,
+				    pr.product_images,
+				    pi.quatity
+				FROM
+				    products p
+				    JOIN product_infos pi ON p.id = pi.product_id
+				    JOIN brands br ON p.brand_id = br.id
+				    JOIN product_images pr ON p.id = pr.product_id
+				    JOIN sub_categories sc ON p.sub_category_id = sc.category_id
+				ORDER BY
+					created_at DESC
+			    LIMIT
+					$1 OFFSET $2;`
+	err := p.DB.Raw(query, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FinBrandByName(name string) (domain.Brand, error) {
+
+	var body domain.Brand
+	query := `select * from brands where brand_name =$1`
+	err := p.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindCategoryByName(name string) (domain.Category, error) {
+
+	var body domain.Category
+	query := `select * from categories where category_name =$1`
+	err := p.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) CreateBrand(name, img string) error {
+
+	var body domain.Brand
+	query := `insert into brands (brand_name,brand_image)values ($1,$2);`
+	err := p.DB.Raw(query, name, img).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) DeleteBrand(id uint) error {
+
+	query := `delete from brands where id =$1`
+	err := p.DB.Exec(query, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) ViewFullBrand() (res.ResBrand, error) {
+
+	var body res.ResBrand
+	query := `select * from brands order by id ;`
+	err := p.DB.Exec(query).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FindBrandByName(name string) (domain.Brand, error) {
+
+	var body domain.Brand
+	query := `select * from brands where brand_name = $1`
+	err := p.DB.Raw(query, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) FIndBrandById(id uint) (domain.Brand, error) {
+
+	var body domain.Brand
+	query := ` select * from brands where id =$1`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) AddProductImage(id uint, img string) error {
+
+	var body domain.ProductImage
+	query := `insert into product_images (product_id,product_images)values ($1,$2);`
+	err := p.DB.Raw(query, id, img).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *productDatabase) FindImage(img string) (domain.ProductImage, error) {
+
+	var body domain.ProductImage
+	query := `select * from product_images where product_images = $1`
+	err := p.DB.Raw(query, img).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}

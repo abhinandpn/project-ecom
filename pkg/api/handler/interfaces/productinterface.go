@@ -17,10 +17,16 @@ type ProductHandler interface {
 	DeleteCategory(ctx *gin.Context)   // delete category
 	Viewcategory(ctx *gin.Context)     // view each category
 	ViewFullcategory(ctx *gin.Context) // list all category
+
+	// brand
+	AddBrand(ctx *gin.Context)
+	DeletBrand(ctx *gin.Context)
+	ViewBrands(ctx *gin.Context)
+
 	// sub category
 	AddSubCategory(ctx *gin.Context)
 	DeleteSubCategory(ctx *gin.Context)
 	ViewFullSubCategory(ctx *gin.Context)
-	// ViewSubCategory(ctx *gin.Context)
 	EditSubCategory(ctx *gin.Context)
+	// ViewSubCategory(ctx *gin.Context)
 }
