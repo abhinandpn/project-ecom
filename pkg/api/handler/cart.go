@@ -1,14 +1,11 @@
 package handler
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
-	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"github.com/gin-gonic/gin"
 )
@@ -24,30 +21,30 @@ func NewCartHandler(cartUseCase service.CartUseCase) handlerInterface.CartHandle
 
 func (c *CartsHandler) AddCart(ctx *gin.Context) {
 
-	// UID := helper.GetUserId(ctx)
+	UID := helper.GetUserId(ctx)
 
-	// ParmId := ctx.Param("id")
-	// pfid, err := helper.StringToUInt(ParmId)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't find productinfoid",
-	// 		Errors:     err.Error(),
-	// 		Data:       nil,
-	// 	})
-	// 	return
-	// }
+	ParmId := ctx.Param("id")
+	pfid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productinfoid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
 
-	// err = c.CartUseCase.AddProduct(UID, pfid)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't add product in to cart",
-	// 		Errors:     err.Error(),
-	// 		Data:       nil,
-	// 	})
-	// 	return
-	// }
+	err = c.CartUseCase.AddToCart(UID, pfid, 1)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't add product in to cart",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, res.Response{
 		StatusCode: 200,
@@ -62,7 +59,7 @@ func (c *CartsHandler) RemoveFromCart(ctx *gin.Context) {
 	Uid := helper.GetUserId(ctx)
 
 	ParmId := ctx.Param("id")
-	pid, err := helper.StringToUInt(ParmId)
+	pfid, err := helper.StringToUInt(ParmId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
 			StatusCode: 400,
@@ -73,7 +70,7 @@ func (c *CartsHandler) RemoveFromCart(ctx *gin.Context) {
 		return
 	}
 
-	err = c.CartUseCase.RemoveProductFromCart(Uid, pid)
+	err = c.CartUseCase.RemoveFromCart(Uid, pfid)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
 			StatusCode: 400,
@@ -96,21 +93,21 @@ func (c *CartsHandler) ViewCart(ctx *gin.Context) {
 
 	Uid := helper.GetUserId(ctx)
 
-	count, err1 := helper.StringToUInt(ctx.Query("count"))
-	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	// count, err1 := helper.StringToUInt(ctx.Query("count"))
+	// pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
-	err1 = errors.Join(err1, err2)
-	if err1 != nil {
-		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
+	// err1 = errors.Join(err1, err2)
+	// if err1 != nil {
+	// 	response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+	// 	ctx.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
 
-	var Pagination req.ReqPagination
-	Pagination.Count = count
-	Pagination.PageNumber = pageNumber
+	// var Pagination req.ReqPagination
+	// Pagination.Count = count
+	// Pagination.PageNumber = pageNumber
 
-	body, err := c.CartUseCase.ListCart(Uid, req.PageNation(Pagination))
+	body, err := c.CartUseCase.CartDisplay(Uid)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
@@ -121,7 +118,6 @@ func (c *CartsHandler) ViewCart(ctx *gin.Context) {
 		})
 		return
 	}
-	fmt.Println(body)
 
 	ctx.JSON(http.StatusOK, res.Response{
 		StatusCode: 200,
