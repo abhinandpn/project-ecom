@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
@@ -351,3 +352,240 @@ func (sub *productUseCase) FindSubByCatName(ctx context.Context, name string) (d
 // 	}
 // 	return body, nil
 // }
+
+// -------------PRODUCT UPDATED-------------
+
+func (p *productUseCase) GetProductByName(name string) (domain.Product, error) {
+
+	product, err := p.productRepo.FindProductByName(name)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
+func (p *productUseCase) GetProductById(id uint) (domain.Product, error) {
+
+	product, err := p.productRepo.FindProductById(id)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
+func (p *productUseCase) GetAllProducts(pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	products, err := p.productRepo.FindAllProduct(pagination)
+	if err != nil {
+		return products, err
+	}
+	return products, nil
+}
+
+func (p *productUseCase) ListproductByBrand(brand string) (domain.Product, error) {
+
+	var product domain.Product
+	// find brand id
+	brands, err := p.productRepo.FinBrandByName(brand)
+	if err != nil {
+		return product, err
+	}
+
+	// list product
+	product, err = p.productRepo.FindProductByBrand(brands.Id)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
+func (p *productUseCase) ListProductByCategory(category string) (domain.Product, error) {
+
+	var product domain.Product
+	// find category
+	body, err := p.productRepo.FindCategoryByName(category)
+	if err != nil {
+		return product, err
+	}
+
+	// list product
+	product, err = p.productRepo.FindProductByCategory(body.Id)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
+func (p *productUseCase) CreateProduct(product req.ReqProduct) error {
+
+	var ctx context.Context // contexte
+	// check the name exist
+	Prdt, err := p.productRepo.FindProductByName(product.ProductName)
+	if err != nil {
+		return err
+	}
+	if Prdt.Id == 0 {
+
+		// find category
+		Cat, err := p.productRepo.FindCategoryById(ctx, product.CategoryID)
+
+		// if does not exist return
+		if err != nil {
+			return err
+		}
+		// find brand
+
+		// if exist
+		if Cat.Id != 0 {
+			brand, err := p.productRepo.FIndBrandById(product.BrandId)
+			if err != nil {
+				return err
+			}
+			if brand.Id != 0 {
+				err = p.productRepo.CreateProduct(product)
+				if err != nil {
+					return err
+				}
+			} else {
+				res := errors.New("brand does not exist")
+				return res
+			}
+
+		} else {
+			res := errors.New("category does not exist")
+			return res
+		}
+
+	} else {
+		res := errors.New("product alredy exist")
+		return res
+	}
+	// return
+	return nil
+}
+
+func (p *productUseCase) DeleteProduct(id uint) error {
+
+	// find product if exist or not
+	product, err := p.productRepo.FindProductById(id)
+	if err != nil {
+		return err
+	}
+
+	// if exist delet
+	if product.Id != 0 {
+
+		// delete product
+		err := p.productRepo.DeletProduct(id)
+		if err != nil {
+			return err
+		}
+	}
+
+	// response
+	return nil
+}
+
+func (p *productUseCase) UpdateProduct(product res.ResProduct, id uint) error {
+
+	// find product
+	prdt, err := p.productRepo.FindProductByName(product.ProductName)
+	if err != nil {
+		return err
+	}
+	if prdt.Id == 0 {
+		return errors.New("product does not exist")
+	}
+	err = p.productRepo.UpdateProduct(product, prdt.Id)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (p *productUseCase) UpdateQuentity(id, qty uint) error {
+
+	// find product
+	product, err := p.productRepo.FindProductById(id)
+	if err != nil {
+		return err
+	}
+	if product.Id == 0 {
+		return errors.New("product does not exist")
+	}
+	// update
+	err = p.productRepo.UpdateQuentity(id, qty)
+	if err != nil {
+		return err
+	}
+	// response
+	return err
+}
+
+func (p *productUseCase) CreateBrand(name, img string) error {
+
+	// check if exist or not
+	brand, err := p.productRepo.FinBrandByName(name)
+	if err != nil {
+		return err
+	}
+
+	// if does not exist create
+	if brand.Id != 0 {
+		if brand.Id != 0 {
+			res := fmt.Errorf("category alredy exist with this name :%v ", name)
+			return res
+		}
+	} else {
+		err = p.productRepo.CreateBrand(name, img)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *productUseCase) DeleteBrand(id uint) error {
+
+	// finc if id exit
+	brand, err := p.productRepo.FIndBrandById(id)
+	if err != nil {
+		return err
+	}
+	// if exist delete
+	if brand.Id != 0 {
+		err = p.productRepo.DeleteBrand(id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *productUseCase) ViewFullBrand() (res.ResBrand, error) {
+
+	body, err := p.productRepo.ViewFullBrand()
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productUseCase) AddImage(id uint, name string) error {
+
+	// check value
+	image, err := p.productRepo.FindImage(name)
+	if err != nil {
+		return err
+	}
+	if image.Id != 0 {
+		res := errors.New("image alredy exist")
+		return res
+	}
+	// add image
+	err = p.productRepo.AddProductImage(id, name)
+	if err != nil {
+		return err
+	}
+	return nil
+}

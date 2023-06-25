@@ -52,12 +52,19 @@ func AdminRoute(api *gin.RouterGroup,
 			category.DELETE("", ProductHandler.DeleteCategory) // Delete category
 		}
 		// sub category
-		subct := api.Group("subcategory")
+		subct := api.Group("/subcategory")
 		{
 			subct.GET("/all", ProductHandler.ViewFullSubCategory)  // list all sub category
 			subct.POST("/add", ProductHandler.AddSubCategory)      // add sub category
 			subct.DELETE("/:id", ProductHandler.DeleteSubCategory) // delete sub category
 			subct.PATCH("/:id", ProductHandler.EditSubCategory)    // edit sub catagory
+		}
+		// brand
+		brand := api.Group("/brand")
+		{
+			brand.POST("/add", ProductHandler.AddBrand)     // Add brand
+			brand.DELETE("/:id", ProductHandler.DeletBrand) // Delete brand
+			brand.GET("/all", ProductHandler.ViewBrands)    // View full brands
 		}
 	}
 }
