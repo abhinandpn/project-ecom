@@ -4,11 +4,11 @@ type ReqProduct struct {
 	ProductName string `json:"product_name" gorm:"not null" binding:"required,min=3,max=50"`
 	Discription string `json:"description" gorm:"not null" binding:"required,min=3,max=100"`
 	CategoryID  uint   `json:"category_id" binding:"required"`
+	BrandId     uint   `json:"brand_id" binding:"required"`
 	Price       uint   `json:"price" gorm:"not null" binding:"required,numeric"`
-	Image       string `json:"image" gorm:"not null" binding:"required"`
 	Color       string `json:"color" binding:"required"`
 	Size        uint   `json:"size" binding:"required" gorm:"not null"`
-	Brand       string `json:"brand" binding:"required"`
+	// ImageId     uint   `json:"image_id"`
 }
 type PrDelReq struct {
 	ProductName string `json:"product_name" gorm:"not null"`
@@ -22,8 +22,8 @@ type SubCategoryReq struct {
 	CategoryId      uint   `json:"category_id"`
 }
 type BrandReq struct {
-	Id        uint   `json:"id"`
-	BrandName string `json:"brand_name"`
+	BrandName  string `json:"brand_name"`
+	BrandImage string `json:"brand_image"`
 }
 type AddCategoryReq struct {
 	CategoryName string `json:"category_name" gorm:"not null"`
@@ -35,4 +35,30 @@ type UpdateCategoryReq struct {
 type SubCateCurdRes struct {
 	// CategoryId      uint   `josn:"category_id"`
 	SubCategoryName string `json:"sub_category_name"`
+}
+
+//  ---------- Sorting Struct ----------
+
+type SortReqColour struct {
+	Colour string `json:"colour"`
+}
+type SortReqSize struct {
+	Size int `json:"size"`
+}
+type SortReqCategory struct {
+	Category string `json:"category"`
+}
+type SortReqBrand struct {
+	Brand string `json:"brand"`
+}
+type SortReqName struct {
+	Name string `json:"name"`
+}
+type SortReqPrice struct {
+	PriceStart int `json:"price_start"`
+	PriceEnd   int `json:"price_end"`
+}
+type SortReqQuantity struct {
+	QuantityStart int `json:"quantity_start"`
+	QuantityEnd   int `json:"quantity_end"`
 }
