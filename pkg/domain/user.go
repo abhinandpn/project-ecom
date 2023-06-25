@@ -36,20 +36,17 @@ type Address struct {
 	// Default     *bool  `json:"is_default"`
 }
 
-type Cart struct {
-	Id          uint `json:"id" gorm:"not null"`
-	UserId      uint `json:"user_id" gorm:"not null"`
-	ProductId   uint `json:"product_id"`
-	ProductInfo uint `json:"product_info"`
-	Quantity    uint `json:"quantity"`
+type UserCart struct {
+	Id     uint `json:"id" gorm:"not null"`
+	UserId uint `json:"user_id" gorm:"not null"`
+	User   Users
 }
 
 type CartInfo struct {
-	Id       uint    `json:"id" gorm:"not null"`
-	CartId   uint    `json:"cart_id" gorm:"not null"`
-	SubTotal float64 `json:"subtotal"`
-	Discount float64 `json:"discount"`
-	Total    float32 `json:"total"`
+	Id            uint `json:"id" gorm:"not null"`
+	CartId        uint `json:"cart_id" gorm:"not null"`
+	ProductInfoId uint `json:"product_info_id"`
+	Quantity      uint `json:"quantity"`
 }
 
 type WishList struct {

@@ -386,8 +386,7 @@ func (subct *productDatabase) ListllSubCategory(ctx context.Context, pagination 
 				INNER JOIN sub_categories sc
 					ON c.id = sc.category_id
 				ORDER BY
-					id DESC
-				LIMIT
+				DB				LIMIT
 					$1 OFFSET $2;`
 
 	err := subct.DB.Raw(query, limit, offset).Scan(&body).Error
