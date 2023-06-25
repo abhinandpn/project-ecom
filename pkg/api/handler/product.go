@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/req"
@@ -46,36 +47,36 @@ func NewProductHandler(productUsecase service.ProductuseCase) handlerInterface.P
 // @Failure 500 {object} res.Response{}  "faild to get all products"
 func (pr *ProductHandler) ListProducts(ctx *gin.Context) {
 
-	// count, err1 := helper.StringToUInt(ctx.Query("count"))
-	// pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
-	// err1 = errors.Join(err1, err2)
-	// if err1 != nil {
-	// 	response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
-	// pagination := req.ReqPagination{
-	// 	PageNumber: pageNumber,
-	// 	Count:      count,
-	// }
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
 
-	// products, err := pr.ProductuseCase.ViewFullProduct(ctx, req.PageNation(pagination))
+	products, err := pr.ProductuseCase.GetAllProducts(req.PageNation(pagination))
 
-	// if err != nil {
-	// 	response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
-	// 	ctx.JSON(http.StatusInternalServerError, response)
-	// 	return
-	// }
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
 
-	// if products == nil {
-	// 	response := res.SuccessResponse(200, "there is no products to show", nil)
-	// 	ctx.JSON(http.StatusOK, response)
-	// 	return
-	// }
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
 
-	// respones := res.SuccessResponse(200, "successfully got all products", products)
-	// ctx.JSON(http.StatusOK, respones)
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
 }
 
 // AddProducts godoc
@@ -96,85 +97,86 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 		return
 	}
 
-	// product := domain.Product{
-	// 	ProductName: body.ProductName,
-	// 	CategoryID:  body.CategoryID,
-	// 	Discription: body.Discription,
-	// 	Price:       body.Price,
-	// 	Info: domain.ProductInfo{
-	// 		Colour: body.Color,
-	// 		Brand:  body.Brand,
-	// 		Size:   body.Size,
-	// 	},
-	// }
+	product := domain.Product{
+		ProductName: body.ProductName,
+		Discription: body.Discription,
+		CategoryId:  body.CategoryID,
+		BrandId:     body.BrandId,
+		Info: domain.ProductInfo{
+			Price:  float64(body.Price),
+			Colour: body.Color,
+			Size:   body.Size,
+			// ImageId: body.ImageId,
+		},
+	}
 
-	// err := pr.ProductuseCase.AddProduct(ctx, body)
+	err := pr.ProductuseCase.CreateProduct(body)
 
-	// if err != nil {
-	// 	response := res.ErrorResponse(400, "faild to add product", err.Error(), body)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to add product", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	// response := res.SuccessResponse(200, "successfully product added", body)
-	// ctx.JSON(http.StatusOK, response)
+	response := res.SuccessResponse(200, "successfully product added", product)
+	ctx.JSON(http.StatusOK, response)
 
 }
 
 func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
 
-	// var body req.ReqProduct
-	// if err := ctx.ShouldBindJSON(&body); err != nil {
-	// 	response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
+	var body res.ResProduct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	// ParamId := ctx.Param("id")
-	// id, err := helper.StringToUInt(ParamId)
-	// if err != nil {
-	// 	response := res.ErrorResponse(400, "invalid input", err.Error(), id)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
+	ParamId := ctx.Param("id")
+	id, err := helper.StringToUInt(ParamId)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), id)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	// err = pr.ProductuseCase.UpdateProduct(ctx, body, id)
-	// if err != nil {
-	// 	response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
-	// 	ctx.JSON(400, response)
-	// 	return
-	// }
+	err = pr.ProductuseCase.UpdateProduct(body, id)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
+		ctx.JSON(400, response)
+		return
+	}
 
-	// response := res.SuccessResponse(200, "successfully product updated ", body)
-	// ctx.JSON(200, response)
+	response := res.SuccessResponse(200, "successfully product updated ", body)
+	ctx.JSON(200, response)
 }
 
 func (pr *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
-	// ParmId := ctx.Param("id")
+	ParmId := ctx.Param("id")
 
-	// id, err := helper.StringToUInt(ParmId)
+	id, err := helper.StringToUInt(ParmId)
 
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't find productid",
-	// 		Errors:     err.Error(),
-	// 		Data:       nil,
-	// 	})
-	// 	return
-	// }
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
 
-	// err = pr.ProductuseCase.DeleteProduct(ctx, id)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't delete product",
-	// 		Data:       nil,
-	// 		Errors:     err.Error(),
-	// 	})
-	// 	return
-	// }
+	err = pr.ProductuseCase.DeleteProduct(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't delete product",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, res.Response{
 		StatusCode: 200,
@@ -186,33 +188,33 @@ func (pr *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
 func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
 
-	// ParmId := ctx.Param("id")
-	// id, err := helper.StringToUInt(ParmId)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't find productid",
-	// 		Errors:     err.Error(),
-	// 		Data:       nil,
-	// 	})
-	// 	return
-	// }
-	// data, err := pr.ProductuseCase.FindProductById(ctx, id)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusBadRequest, res.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "can't Find product",
-	// 		Data:       nil,
-	// 		Errors:     err.Error(),
-	// 	})
-	// 	return
-	// }
-	// ctx.JSON(http.StatusOK, res.Response{
-	// 	StatusCode: 200,
-	// 	Message:    "product Found",
-	// 	Data:       data,
-	// 	Errors:     nil,
-	// })
+	ParmId := ctx.Param("id")
+	id, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	data, err := pr.ProductuseCase.GetProductById(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't Find product",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, res.Response{
+		StatusCode: 200,
+		Message:    "product Found",
+		Data:       data,
+		Errors:     nil,
+	})
 }
 
 // Category Handler
@@ -221,26 +223,26 @@ func (pr *ProductHandler) ViewProduct(ctx *gin.Context) {
 
 func (ct *ProductHandler) Addcategory(ctx *gin.Context) {
 
-	// var body res.CategoryRes
+	var body res.CategoryRes
 
-	// err := ctx.ShouldBindJSON(&body)
-	// if err != nil {
-	// 	response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
-	// name := body.CategoryName
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	name := body.CategoryName
 
-	// category, err := ct.ProductuseCase.AddCategory(ctx, name)
+	category, err := ct.ProductuseCase.AddCategory(ctx, name)
 
-	// if err != nil {
-	// 	response := res.ErrorResponse(400, "failed to add category", err.Error(), category)
-	// 	ctx.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
+	if err != nil {
+		response := res.ErrorResponse(400, "failed to add category", err.Error(), category)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	// response := res.SuccessResponse(200, "successfully category added", body)
-	// ctx.JSON(200, response)
+	response := res.SuccessResponse(200, "successfully category added", body)
+	ctx.JSON(200, response)
 
 }
 
@@ -481,5 +483,59 @@ func (sub *ProductHandler) EditSubCategory(ctx *gin.Context) {
 		return
 	}
 	respones := res.SuccessResponse(200, "successfully get sub category", subcate)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (b *ProductHandler) AddBrand(ctx *gin.Context) {
+
+	var body req.BrandReq
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	err := b.ProductuseCase.CreateBrand(body.BrandName, body.BrandImage)
+	if err != nil {
+		response := res.SuccessResponse(500, "failed to create brand", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully create brand", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (b *ProductHandler) DeletBrand(ctx *gin.Context) {
+
+	Paramid := ctx.Param("id")
+
+	id, err := helper.StringToUInt(Paramid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't brand id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	err = b.ProductuseCase.DeleteBrand(id)
+	if err != nil {
+		response := res.SuccessResponse(500, "failed to delete brand", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully delete brand", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (b *ProductHandler) ViewBrands(ctx *gin.Context) {
+
+	body, err := b.ProductuseCase.ViewFullBrand()
+	if err != nil {
+		response := res.SuccessResponse(500, "failed to get brands", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully delete brand", body)
 	ctx.JSON(http.StatusOK, respones)
 }
