@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"errors"
+
+	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
-	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
@@ -16,128 +18,133 @@ func NewCartUseCase(CartRepo interfaces.Cartrepository, p interfaces.ProductRepo
 
 	return &CartUseCase{cartRepo: CartRepo, prd: p}
 }
+func (c *CartUseCase) FindCartInfoById(id uint) (domain.CartInfo, error) {
 
-/*
-func (c *CartUseCase) AddProduct(uid, pfid uint) error {
-
-		// check user have cart
-		cart, err := c.cartRepo.FindCartByUID(uid)
-		if err != nil {
-			return err
-		}
-
-		// if doesnt have crete one
-		var newcart domain.Cart
-		if cart.Id == 0 {
-			newcart, err = c.cartRepo.CreateCartByUID(uid)
-			if err != nil {
-				return err
-			}
-			cart.Id = newcart.Id
-		}
-
-		fmt.Println("cart id : ", cart.Id)
-
-		productId, err := c.prd.FindProductByPrinfo(pfid)
-		if err != nil {
-			return err
-		}
-
-		// check if porduct exist or not
-		val, err := c.cartRepo.FindProductByPid(uid, productId)
-		if err != nil {
-			return err
-		}
-		if val {
-			return errors.New("product alredt exist")
-		} else {
-			// if dosent exist add
-			err = c.cartRepo.AddProductToCart(uid, productId, pfid)
-			if err != nil {
-				return err
-			}
-		}
-		fmt.Println(">>>>>>>>>>>>>>>>>> cart added in to cart")
-		// create cart info
-		cartinfo, err := c.cartRepo.CreateCartInfoByCid(cart.Id)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(cartinfo)
-		var ctx context.Context
-		prdt, err := c.prd.FindProductById(ctx, productId)
-		if err != nil {
-			return err
-		}
-		// update cart info
-		err = c.cartRepo.AddProductToCartInfo(cart.Id, prdt)
-		if err != nil {
-			return err
-		}
-		// response
-		return nil
+	var body domain.CartInfo
+	// check if user have cart
+	cart, err := c.cartRepo.FindCartBy(id)
+	if err != nil {
+		return body, err
 	}
+	if cart.Id != 0 {
+		body, err := c.cartRepo.FindCartInfoById(id)
+		if err != nil {
+			return body, err
+		}
+	} else {
+		res := errors.New("user doest have cart info")
+		return body, res
+	}
+	// if exist response
+	return body, nil
+}
+func (c *CartUseCase) Createcart(id uint) error {
 
-func (c *CartUseCase) CreateCart(uid uint) error {
-
-		// check teh user have cart
-		cart, err := c.cartRepo.FindCartByUID(uid)
+	// checking
+	cart, err := c.cartRepo.FindCartBy(id)
+	if err != nil {
+		return err
+	}
+	if cart.Id == 0 {
+		cart, err = c.cartRepo.CreateUserCart(id)
 		if err != nil {
 			return err
 		}
-
-		// if its not exist create one
-		if cart.Id == 0 {
-			_, err := c.cartRepo.CreateCartByUID(uid)
-			if err != nil {
-				return err
-			}
-		}
-
-		// return
-		return nil
+	} else {
+		res := errors.New("user alredy have cart")
+		return res
 	}
-*/
-func (c *CartUseCase) RemoveProductFromCart(uid, pfid uint) error {
-
-	// find the user cart
-	// cart, err := c.cartRepo.FindCartByUID(uid)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// product, err := c.prd.FindProductByPrinfo(pfid)
-	// if err != nil {
-	// 	return err
-	// }
-	// find the product exist or not
-	// ct, err := c.cartRepo.FindProductFromCartByCId(product)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if ct.Id != cart.Id {
-	// 	return err
-	// }
-
-	// // if exist remove
-	// err = c.cartRepo.RemoveProductfromCart(uid, pfid)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = c.cartRepo.RemoveProductfromCartInfo(cart.Id)
-	// if err != nil {
-	// 	return err
-	// }
-	// return
+	// if doest not exist create
 	return nil
-
 }
 
-func (c *CartUseCase) ListCart(id uint, pagination req.PageNation) ([]res.DisplayCart, error) {
+func (c *CartUseCase) AddToCart(id, pfid, qty uint) error {
 
-	body, err := c.cartRepo.ListAllProductFromCart(pagination, id)
+	
+	var CartInfo domain.CartInfo
+	// check if user have cart
+	cart, err := c.cartRepo.FindCartBy(id)
+	if err != nil {
+		return err
+	}
+
+	// if does not exist create
+	if cart.Id == 0 {
+		cart, err = c.cartRepo.CreateUserCart(id)
+		if err != nil {
+			return err
+		}
+	}
+
+	// check if user have cart info
+	CartInfo, err = c.cartRepo.FindCartInfoById(cart.Id)
+	if err != nil {
+		return err
+	}
+
+	// if does not exist create one
+	if CartInfo.Id == 0 {
+		CartInfo, err = c.cartRepo.CreateCartinfo(cart.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	// check if the product exist or not
+	exist, err := c.cartRepo.FindProductIntoCart(CartInfo.Id, pfid)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		err := c.cartRepo.AddToCart(cart.Id, pfid, qty)
+		if err != nil {
+			return err
+		}
+	} else {
+		res := errors.New("product alredy exist")
+		return res
+	}
+
+	// response
+	return nil
+}
+
+func (c *CartUseCase) RemoveFromCart(id, pfid uint) error {
+
+	// check the usr have cart
+	cart, err := c.cartRepo.FindCartBy(id)
+	if err != nil {
+		return err
+	}
+	// check the product exist or not
+	exist, err := c.cartRepo.FindProductIntoCart(cart.Id, pfid)
+	if err != nil {
+		return err
+	}
+	if exist {
+		err := c.cartRepo.RemoveCart(id, pfid)
+		if err != nil {
+			return err
+		}
+	}
+	// response
+	return nil
+}
+
+func (c *CartUseCase) CartDisplay(id uint) (res.CartDisplay, error) {
+
+	var body res.CartDisplay
+	// find if user have cart
+	cart, err := c.cartRepo.FindCartBy(id)
+	if err != nil {
+		return body, err
+	}
+	if cart.Id == 0 {
+		res := errors.New("user cart doest not exst")
+		return body, res
+	}
+	body, err = c.cartRepo.ViewCart(id)
 	if err != nil {
 		return body, err
 	}
