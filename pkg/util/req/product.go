@@ -36,3 +36,29 @@ type SubCateCurdRes struct {
 	// CategoryId      uint   `josn:"category_id"`
 	SubCategoryName string `json:"sub_category_name"`
 }
+
+//  ---------- Sorting Struct ----------
+
+type SortReqColour struct {
+	Colour string `json:"colour"`
+}
+type SortReqSize struct {
+	Size int `json:"size"`
+}
+type SortReqCategory struct {
+	Category string `json:"category"`
+}
+type SortReqBrand struct {
+	Brand string `json:"brand"`
+}
+type SortReqName struct {
+	Name string `json:"name"`
+}
+type SortReqPrice struct {
+	PriceStart int `json:"price_start"`
+	PriceEnd   int `json:"price_end"`
+}
+type SortReqQuantity struct {
+	QuantityStart int `json:"quantity_start"`
+	QuantityEnd   int `json:"quantity_end"`
+}
