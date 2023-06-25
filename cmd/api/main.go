@@ -24,8 +24,4 @@ func main() {
 		server.Start()
 	}
 
-	// added
-	//
-	//
-	//
 }
