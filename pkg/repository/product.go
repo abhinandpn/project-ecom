@@ -888,3 +888,274 @@ func (p *productDatabase) FindImage(img string) (domain.ProductImage, error) {
 	}
 	return body, nil
 }
+
+// ----------- Sorting -----------
+
+func (p *productDatabase) ListByColour(colour string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+				product_infos.colour = $1
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$2 OFFSET $3;`
+
+	err := p.DB.Raw(query, colour, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) ListBySize(size uint,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+				product_infos.size = $1
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$2 OFFSET $3;`
+
+	err := p.DB.Raw(query, size, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) ListByCategory(id uint,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+				products.category_id = $1
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$2 OFFSET $3;`
+
+	err := p.DB.Raw(query, id, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) ListByBrand(id uint,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+				products.brand_id = $1
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$2 OFFSET $3;`
+
+	err := p.DB.Raw(query, id, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (p *productDatabase) ListByName(name string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+				products.product_name = $1
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$2 OFFSET $3;`
+
+	err := p.DB.Raw(query, name, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (p *productDatabase) ListByPrice(Start, End float64,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+			  	product_infos.price BETWEEN $1 AND $2
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$3 OFFSET $4;`
+
+	err := p.DB.Raw(query, Start, End, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (p *productDatabase) ListByQuantity(Start, End uint,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				products.product_name,
+				products.discription,
+				categories.category_name,
+				
+				brands.brand_name,
+				product_infos.price,
+				product_infos.colour,
+				product_infos.size
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  WHERE
+			  	product_infos.quatity BETWEEN $1 AND $2
+			  ORDER BY
+				created_at DESC
+			  LIMIT
+				$3 OFFSET $4;`
+	err := p.DB.Raw(query, Start, End, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}

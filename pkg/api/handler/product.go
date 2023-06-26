@@ -539,3 +539,292 @@ func (b *ProductHandler) ViewBrands(ctx *gin.Context) {
 	respones := res.SuccessResponse(200, "successfully delete brand", body)
 	ctx.JSON(http.StatusOK, respones)
 }
+
+// ----------- Sorting -----------
+
+func (p *ProductHandler) ProductGetByColour(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqColour
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByColour(body.Colour, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetBySize(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqSize
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetBySize(body.Size, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetByCategory(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqCategory
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByCategory(body.Category, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetByBrand(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqBrand
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByBrand(body.Brand, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetByName(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqName
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByName(body.Name, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetByPrice(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqPrice
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByPrice(body.PriceStart, body.PriceEnd, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (p *ProductHandler) ProductGetByQuantity(ctx *gin.Context) {
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	var body req.SortReqQuantity
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	products, err := p.ProductuseCase.GetByQuantity(body.QuantityStart, body.QuantityEnd, req.PageNation(pagination))
+
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	if products == nil {
+		response := res.SuccessResponse(200, "there is no products to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully got all products", products)
+	ctx.JSON(http.StatusOK, respones)
+}
