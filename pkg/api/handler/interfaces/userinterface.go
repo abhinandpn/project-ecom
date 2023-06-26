@@ -17,4 +17,9 @@ type UserHandler interface {
 	ListAllAddress(ctx *gin.Context) // list all category - for user
 	UpdateAddress(ctx *gin.Context)  // list all product - for user
 	// CreateCart(ctx *gin.Context)
+
+	// wishlist
+	AddIntoWishlit(ctx *gin.Context)     // add product in to wishlist
+	RemoveFromWIshList(ctx *gin.Context) // remove product from wishlist
+	ViewWishList(ctx *gin.Context)       // view wishlist
 }

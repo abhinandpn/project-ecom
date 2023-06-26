@@ -24,6 +24,8 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.Users{},
 		&domain.UserInfo{},
 		&domain.Address{},
+		&domain.WishList{},
+		&domain.WishListItems{},
 
 		// Admin Table
 		&domain.Admin{},

@@ -55,7 +55,6 @@ func UserRoutes(api *gin.RouterGroup,
 			address.GET("/all", userHandler.ListAllAddress)     // List all Address
 			address.PATCH("/update", userHandler.UpdateAddress) // Update Address
 		}
-		// Product
 
 		// Category
 		category := api.Group("/category")
@@ -68,6 +67,12 @@ func UserRoutes(api *gin.RouterGroup,
 			cart.POST("/:id", cartHandler.AddCart)         // product ad to cart
 			cart.PATCH("/:id", cartHandler.RemoveFromCart) // product remove from cart
 			cart.GET("/all", cartHandler.ViewCart)         // view all cart
+		}
+		// wishlist
+		wishlist := api.Group("/wishlist")
+		{
+			wishlist.POST("/add", userHandler.AddIntoWishlit)          // add product in to wishlist
+			wishlist.DELETE("/remove", userHandler.RemoveFromWIshList) // remove product in to wishlist
 		}
 	}
 

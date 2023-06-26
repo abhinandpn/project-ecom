@@ -31,3 +31,11 @@ type ResAddress struct {
 
 	// IsDefault *bool `json:"is_default"`
 }
+
+type ViewWishList struct {
+	ProductName string
+	Price       float64
+	Colour      string
+	Brand       string
+	Category    string
+}
