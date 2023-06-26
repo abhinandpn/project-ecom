@@ -74,4 +74,14 @@ type ProductRepository interface {
 	ViewFullBrand() (res.ResBrand, error)
 	FindBrandByName(name string) (domain.Brand, error)
 	FIndBrandById(id uint) (domain.Brand, error)
+
+	// ----------- Sorting -----------
+
+	ListByColour(colour string, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListBySize(size uint, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListByCategory(id uint, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListByBrand(id uint, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListByName(name string, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListByPrice(Start, End float64, pagination req.PageNation) ([]res.ProductResponce, error)
+	ListByQuantity(Start, End uint, pagination req.PageNation) ([]res.ProductResponce, error)
 }

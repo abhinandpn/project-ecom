@@ -10,16 +10,6 @@ import (
 
 type ProductuseCase interface {
 
-	/*
-		Product
-		FindProductByName(ctx context.Context, name string) (domain.Product, error)                    // Find product by name
-		FindProductById(ctx context.Context, id uint) (res.ProductResponce, error)                     // Find a product by a ID
-		ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) // View full Products
-		curd
-		AddProduct(ctx context.Context, product req.ReqProduct) error             // Add New Product
-		UpdateProduct(ctx context.Context, product req.ReqProduct, id uint) error // Update Product Info
-		DeleteProduct(ctx context.Context, id uint) error                         // Delete the product
-	*/
 	// Category
 	FindCategoryById(ctx context.Context, id uint) (res.CategoryRes, error)                     // Find category By an ID
 	FindCategoryByname(ctx context.Context, name string) (domain.Category, error)               // Find category by name
@@ -63,4 +53,12 @@ type ProductuseCase interface {
 	CreateBrand(name, img string) error
 	DeleteBrand(id uint) error
 	ViewFullBrand() (res.ResBrand, error)
+
+	GetByColour(colour string, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetBySize(size int, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetByCategory(name string, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetByBrand(name string, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetByName(name string, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetByPrice(Start, End int, pagination req.PageNation) ([]res.ProductResponce, error)
+	GetByQuantity(Start, End int, pagination req.PageNation) ([]res.ProductResponce, error)
 }

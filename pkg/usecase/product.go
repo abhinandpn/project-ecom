@@ -589,3 +589,101 @@ func (p *productUseCase) AddImage(id uint, name string) error {
 	}
 	return nil
 }
+
+// ------ SORTING -------
+
+func (p *productUseCase) GetByColour(colour string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	body, err := p.productRepo.ListByColour(colour, pagination)
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
+func (p *productUseCase) GetBySize(size int,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	s := uint(size)
+	body, err := p.productRepo.ListBySize(s, pagination)
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
+func (p *productUseCase) GetByCategory(name string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var ctx context.Context
+	var body []res.ProductResponce
+
+	category, err := p.productRepo.FindCategoryByname(ctx, name)
+	if err != nil {
+		return body, err
+	}
+
+	body, err = p.productRepo.ListByCategory(category.Id, pagination)
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+
+}
+
+func (p *productUseCase) GetByBrand(name string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	var body []res.ProductResponce
+
+	brand, err := p.productRepo.FindBrandByName(name)
+	if err != nil {
+		return body, err
+	}
+
+	body, err = p.productRepo.ListByBrand(brand.Id, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productUseCase) GetByName(name string,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	body, err := p.productRepo.ListByName(name, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productUseCase) GetByPrice(Start, End int,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	st := float64(Start)
+	ed := float64(End)
+
+	body, err := p.productRepo.ListByPrice(st, ed, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productUseCase) GetByQuantity(Start, End int,
+	pagination req.PageNation) ([]res.ProductResponce, error) {
+
+	st := uint(Start)
+	ed := uint(End)
+
+	body, err := p.productRepo.ListByQuantity(st, ed, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}

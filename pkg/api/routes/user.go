@@ -29,7 +29,16 @@ func UserRoutes(api *gin.RouterGroup,
 	}
 	product := api.Group("/product")
 	{
-		product.GET("/all", productHandler.ListProducts) // List all product
+		// ----------- Sorting -----------
+		product.GET("/all/colour", productHandler.ProductGetByColour)
+		product.GET("/all/size", productHandler.ProductGetBySize)
+		product.GET("/all/category", productHandler.ProductGetByCategory)
+		product.GET("/all/brand", productHandler.ProductGetByBrand)
+		product.GET("/all/name", productHandler.ProductGetByName)
+		product.GET("/all/price", productHandler.ProductGetByPrice)
+
+		// List all product
+		product.GET("/all", productHandler.ListProducts)
 	}
 	api.Use(middleware.AuthUser)
 	{

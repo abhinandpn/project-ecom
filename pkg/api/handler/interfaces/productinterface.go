@@ -29,4 +29,13 @@ type ProductHandler interface {
 	ViewFullSubCategory(ctx *gin.Context)
 	EditSubCategory(ctx *gin.Context)
 	// ViewSubCategory(ctx *gin.Context)
+
+	// ----------- Sorting -----------
+	ProductGetByColour(ctx *gin.Context)
+	ProductGetBySize(ctx *gin.Context)
+	ProductGetByCategory(ctx *gin.Context)
+	ProductGetByBrand(ctx *gin.Context)
+	ProductGetByName(ctx *gin.Context)
+	ProductGetByPrice(ctx *gin.Context)
+	ProductGetByQuantity(ctx *gin.Context)
 }
