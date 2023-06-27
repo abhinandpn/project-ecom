@@ -71,9 +71,9 @@ func UserRoutes(api *gin.RouterGroup,
 		// wishlist
 		wishlist := api.Group("/wishlist")
 		{
-			wishlist.POST("/add", userHandler.AddIntoWishlit)          // add product in to wishlist
-			wishlist.DELETE("/remove", userHandler.RemoveFromWIshList) // remove product in to wishlist
-			wishlist.GET("/all", userHandler.ViewWishList)             // view wishlist
+			wishlist.POST("/add/:id", userHandler.AddIntoWishlit)          // add product in to wishlist
+			wishlist.DELETE("/remove/:id", userHandler.RemoveFromWIshList) // remove product in to wishlist
+			wishlist.GET("/all", userHandler.ViewWishList)                 // view wishlist
 		}
 	}
 

@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
@@ -47,6 +48,7 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		if err != nil {
 			return err
 		}
+		fmt.Println("--------------", Uid)
 		err = usr.userRepo.CreateWishList(Uid)
 		if err != nil {
 			return err
@@ -174,17 +176,17 @@ func (w *userUseCase) FindWishLisItemByPFID(wid, pfid uint) (bool, error) {
 	wishlist, err := w.userRepo.FindWishListItemByWid(wid)
 	if err != nil {
 		if err != nil {
-
 			return body, err
 		}
 	}
+	// fmt.Println("wishlist id ", wishlist.Id)
+	// if wishlist.Id == 0 {
+	// 	res := errors.New("user does have wishlist item")
+	// 	return body, res
+	// }
+	fmt.Println("wish list id (usecase 187)", wishlist.WishListId)
+	body, err = w.userRepo.FindProductFromWIshListItem(wishlist.WishListId, pfid)
 
-	if wishlist.Id == 0 {
-		res := errors.New("user does have wishlist item")
-		return body, res
-	}
-
-	body, err = w.userRepo.FindProductFromWIshListItem(wid, pfid)
 	if err != nil {
 		return body, err
 	}
@@ -215,7 +217,7 @@ func (w *userUseCase) AddToWishListItem(wid, pfid uint) error {
 		}
 	}
 
-	if wishlist.Id != 0 {
+	if wishlist.Id == 0 {
 		body, err := w.userRepo.FindProductFromWIshListItem(wishlist.Id, pfid)
 		if err != nil {
 			return err
@@ -226,9 +228,6 @@ func (w *userUseCase) AddToWishListItem(wid, pfid uint) error {
 				return err
 			}
 		}
-	} else {
-		res := errors.New("user does have wishlist item")
-		return res
 	}
 	return nil
 }
@@ -241,9 +240,9 @@ func (w *userUseCase) RemoveWishListItem(wid, pfid uint) error {
 			return err
 		}
 	}
-
+	fmt.Println("wishlis (247 usecase)", wishlist)
 	if wishlist.Id != 0 {
-		err := w.userRepo.RemoveFromWishListItem(wishlist.Id, pfid)
+		err := w.userRepo.RemoveFromWishListItem(wishlist.WishListId, pfid)
 		if err != nil {
 			return err
 		}

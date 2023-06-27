@@ -389,8 +389,9 @@ func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 	}
 	// add in to wishlist
 	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
+	fmt.Println("product info id", Pfid)
 	if err != nil {
-		response := res.ErrorResponse(500, "Failed to find product in to wishlist", err.Error(), body)
+		response := res.ErrorResponse(500, "Failed to find product in to wishlist 1", err.Error(), wishlist)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -401,13 +402,13 @@ func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 	} else {
 		err = w.userUseCase.AddToWishListItem(wishlist.ID, Pfid)
 		if err != nil {
-			response := res.ErrorResponse(500, "Failed to add product in to wishlist", err.Error(), body)
+			response := res.ErrorResponse(500, "Failed to add product in to wishlist 2", err.Error(), wishlist)
 			ctx.JSON(http.StatusInternalServerError, response)
 			return
 		}
 	}
 	// response
-	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist)
+	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist.User.UserName)
 	ctx.JSON(http.StatusOK, response)
 }
 
@@ -439,13 +440,17 @@ func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	fmt.Println("wishlist id is (hanlder 443)", wishlist.ID)
 	// check the product if exist
 	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
+
 	if err != nil {
-		response := res.ErrorResponse(500, "Failed to find product in to wishlist", err.Error(), body)
+		response := res.ErrorResponse(500, "failed to find product in to wishlist", err.Error(), body)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	fmt.Println("body value (handler 452)", body)
+
 	// if true remove
 	if body {
 		err = w.userUseCase.RemoveWishListItem(wishlist.ID, Pfid)
@@ -461,7 +466,7 @@ func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
 	}
 
 	// response
-	response := res.SuccessResponse(200, "successfully remove product in to wishlist", wishlist)
+	response := res.SuccessResponse(200, "successfully remove product in to wishlist", body)
 	ctx.JSON(http.StatusOK, response)
 }
 

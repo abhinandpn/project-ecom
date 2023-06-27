@@ -99,18 +99,18 @@ func (usr *userDatabase) FindUserByUserName(ctx context.Context, username string
 func (usr *userDatabase) SaveUser(ctx context.Context, user domain.Users) (UserId uint, err error) {
 
 	query := `insert into users (user_name,f_name,l_name,email,number,password,created_at)
-	Values ($1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7)returning id ;`
-
+	Values ($1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7) returning id;`
+	var body domain.Users
 	createdAt := time.Now()
 	err = usr.DB.Raw(query, user.UserName, user.FName, user.LName,
-		user.Email, user.Number, user.Password, createdAt).Scan(&user).Error
-
+		user.Email, user.Number, user.Password, createdAt).Scan(&body).Error
+	fmt.Println(">>>>>>>>>>>>", body.ID)
 	if err != nil {
 
 		return 0, fmt.Errorf("faild to save user %v", user.UserName)
 	}
 
-	return UserId, nil
+	return body.ID, nil
 }
 
 func (usr *userDatabase) DeleteUser(ctx context.Context, id uint) error {
@@ -254,7 +254,7 @@ func (w *userDatabase) CreateWishList(id uint) error {
 	var body domain.WishList
 	query := `insert into wish_lists (user_id)values ($1);`
 
-	err := w.DB.Exec(query, id).Scan(&body).Error
+	err := w.DB.Raw(query, id).Scan(&body).Error
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func (w *userDatabase) AddToWishlistItem(uid, pfid uint) error {
 	var body domain.WishListItems
 	query := `insert into wish_list_items (wish_list_id,product_info_id)values ($1,$2);`
 
-	err := w.DB.Exec(query, uid, pfid).Scan(&body).Error
+	err := w.DB.Raw(query, uid, pfid).Scan(&body).Error
 	if err != nil {
 		return err
 	}
@@ -277,7 +277,11 @@ func (w *userDatabase) AddToWishlistItem(uid, pfid uint) error {
 
 func (w *userDatabase) RemoveFromWishListItem(wid, pfid uint) error {
 
-	query := `delete from wish_list_items where wish_list_id = $1 and product_info_id = $2;`
+	fmt.Println("Repo Remove Item Wislist ID = ", wid)
+	fmt.Println("Repo Remove Item Product Info  ID = ", pfid)
+
+	query := `DELETE FROM wish_list_items
+	WHERE wish_list_id = $1 AND product_info_id = $2;`
 	err := w.DB.Exec(query, wid, pfid).Error
 	if err != nil {
 		return err
@@ -313,13 +317,15 @@ func (w *userDatabase) FindWishListByUid(id uint) (domain.WishList, error) {
 
 func (w *userDatabase) FindProductFromWIshListItem(Wid, pfid uint) (bool, error) {
 
-	query := `select exists (select * from wish_list_items where wish_list_id = $1 and product_info_id = $2);`
+	query := `select exists (select * from wish_list_items where wish_list_id = $1 and product_info_id = $2) AS body`
 
 	var body bool
 	err := w.DB.Raw(query, Wid, pfid).Scan(&body).Error
 	if err != nil {
 		return body, err
 	}
+	fmt.Println("in repo (323) ,,,,, ", body)
+
 	return body, nil
 }
 

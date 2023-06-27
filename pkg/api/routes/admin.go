@@ -36,7 +36,7 @@ func AdminRoute(api *gin.RouterGroup,
 		// Product
 		product := api.Group("/product")
 		{
-			product.GET("", ProductHandler.ListProducts)         // list all product
+			product.GET("/all", ProductHandler.ListProducts)         // list all product
 			product.GET("/:id", ProductHandler.ViewProduct)      // View Single product
 			product.POST("", ProductHandler.AddProduct)          // Add Product
 			product.PATCH("/:id", ProductHandler.EditProduct)    // Edit / update Product
