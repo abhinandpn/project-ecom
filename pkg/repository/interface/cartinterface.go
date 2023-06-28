@@ -7,7 +7,7 @@ import (
 
 type Cartrepository interface {
 	// Find
-	FindCartBy(id uint) (domain.UserCart, error)
+	FindCartByUId(id uint) (domain.UserCart, error)
 	FindCartInfoById(id uint) (domain.CartInfo, error)
 	FindProductIntoCart(id, pfid uint) (bool, error)
 	// CURD
@@ -16,6 +16,6 @@ type Cartrepository interface {
 	AddToCart(id, pfid, qty uint) error
 	RemoveCart(id, pfid uint) error
 	// View Cart
-	ViewCart(id uint) (res.CartDisplay, error)
-	// CartInfo(id uint) (res.CartInfo, error)
+	ViewCart(id uint) ([]res.CartDisplay, error)
+	CartInfo(id uint) (res.CartInfo, error)
 }

@@ -9,6 +9,7 @@ import (
 func AdminRoute(api *gin.RouterGroup,
 	AdminHandler handlerInterface.AdminHandler,
 	ProductHandler handlerInterface.ProductHandler,
+	orderHandler handlerInterface.OrderHandler,
 ) {
 	// Sudo Admin Login Login
 	login := api.Group("/login")
@@ -36,7 +37,7 @@ func AdminRoute(api *gin.RouterGroup,
 		// Product
 		product := api.Group("/product")
 		{
-			product.GET("/all", ProductHandler.ListProducts)         // list all product
+			product.GET("/all", ProductHandler.ListProducts)     // list all product
 			product.GET("/:id", ProductHandler.ViewProduct)      // View Single product
 			product.POST("", ProductHandler.AddProduct)          // Add Product
 			product.PATCH("/:id", ProductHandler.EditProduct)    // Edit / update Product

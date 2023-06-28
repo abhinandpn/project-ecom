@@ -126,3 +126,27 @@ func (c *CartsHandler) ViewCart(ctx *gin.Context) {
 		Errors:     nil,
 	})
 }
+
+func (c *CartsHandler) CartInfo(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+
+	body, err := c.CartUseCase.CartInfo(Uid)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't get cart info",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, res.Response{
+		StatusCode: 200,
+		Message:    "sucess to get all carts",
+		Data:       body,
+		Errors:     nil,
+	})
+}

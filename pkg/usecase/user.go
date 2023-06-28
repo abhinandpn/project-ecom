@@ -16,10 +16,13 @@ import (
 
 type userUseCase struct {
 	userRepo interfaces.UserRepository
+	cartRepo interfaces.Cartrepository
 }
 
-func NewUserUseCase(repo interfaces.UserRepository) service.UserUseCase {
-	return &userUseCase{userRepo: repo}
+func NewUserUseCase(repo interfaces.UserRepository,
+	CartRepo interfaces.Cartrepository) service.UserUseCase {
+	return &userUseCase{userRepo: repo,
+		cartRepo: CartRepo}
 }
 
 // ........................................
@@ -48,8 +51,12 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("--------------", Uid)
+
 		err = usr.userRepo.CreateWishList(Uid)
+		if err != nil {
+			return err
+		}
+		_, err = usr.cartRepo.CreateUserCart(Uid)
 		if err != nil {
 			return err
 		}

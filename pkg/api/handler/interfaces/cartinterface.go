@@ -12,4 +12,7 @@ type CartHandler interface {
 
 	// List cart
 	ViewCart(ctx *gin.Context)
+
+	// cart infor about price
+	CartInfo(ctx *gin.Context)
 }
