@@ -10,6 +10,7 @@ func AdminRoute(api *gin.RouterGroup,
 	AdminHandler handlerInterface.AdminHandler,
 	ProductHandler handlerInterface.ProductHandler,
 	orderHandler handlerInterface.OrderHandler,
+	payment handlerInterface.PaymentHandler,
 ) {
 	// Sudo Admin Login Login
 	login := api.Group("/login")

@@ -45,6 +45,7 @@ type ProductRepository interface {
 	FindProductWithQuentity(pagination req.PageNation) ([]res.ResProduct, error)
 	FinBrandByName(name string) (domain.Brand, error)
 	FindCategoryByName(name string) (domain.Category, error)
+	FindProductInfoById(id uint) (domain.ProductInfo, error)
 	// product images
 	AddProductImage(id uint, img string) error
 	FindImage(img string) (domain.ProductImage, error)

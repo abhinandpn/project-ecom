@@ -12,7 +12,8 @@ func UserRoutes(api *gin.RouterGroup,
 	userHandler handlerInterface.UserHandler,
 	productHandler handlerInterface.ProductHandler,
 	cartHandler handlerInterface.CartHandler,
-	orderHandler handlerInterface.OrderHandler) {
+	orderHandler handlerInterface.OrderHandler,
+	paymentHandler handlerInterface.PaymentHandler) {
 
 	// login
 	login := api.Group("/login")

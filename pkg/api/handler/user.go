@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	"fmt"
+
 	"net/http"
 
 	twillio "github.com/abhinandpn/project-ecom/pkg/Twillio"
@@ -74,8 +74,6 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 // UserLogin godoc
 
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
-
-	fmt.Println("-------login function started")
 
 	var body req.LoginStruct
 
@@ -389,7 +387,7 @@ func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 	}
 	// add in to wishlist
 	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
-	fmt.Println("product info id", Pfid)
+
 	if err != nil {
 		response := res.ErrorResponse(500, "Failed to find product in to wishlist 1", err.Error(), wishlist)
 		ctx.JSON(http.StatusInternalServerError, response)
@@ -440,7 +438,7 @@ func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	fmt.Println("wishlist id is (hanlder 443)", wishlist.ID)
+
 	// check the product if exist
 	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
 
@@ -449,7 +447,6 @@ func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	fmt.Println("body value (handler 452)", body)
 
 	// if true remove
 	if body {

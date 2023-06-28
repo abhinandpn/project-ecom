@@ -15,14 +15,17 @@ import (
 )
 
 type userUseCase struct {
-	userRepo interfaces.UserRepository
-	cartRepo interfaces.Cartrepository
+	userRepo  interfaces.UserRepository
+	cartRepo  interfaces.Cartrepository
+	orderRepo interfaces.OrderRepository
 }
 
 func NewUserUseCase(repo interfaces.UserRepository,
-	CartRepo interfaces.Cartrepository) service.UserUseCase {
+	CartRepo interfaces.Cartrepository,
+	OrderRepo interfaces.OrderRepository) service.UserUseCase {
 	return &userUseCase{userRepo: repo,
-		cartRepo: CartRepo}
+		cartRepo:  CartRepo,
+		orderRepo: OrderRepo}
 }
 
 // ........................................
@@ -52,11 +55,15 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 			return err
 		}
 
-		err = usr.userRepo.CreateWishList(Uid)
+		err = usr.userRepo.CreateWishList(Uid) // wishlist creating
 		if err != nil {
 			return err
 		}
-		_, err = usr.cartRepo.CreateUserCart(Uid)
+		_, err = usr.cartRepo.CreateUserCart(Uid) // cart creating
+		if err != nil {
+			return err
+		}
+		err = usr.orderRepo.CreateUserOrder(Uid) // order table
 		if err != nil {
 			return err
 		}

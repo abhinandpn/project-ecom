@@ -46,8 +46,6 @@ func (usr *userDatabase) FindUserByEmail(ctx context.Context, email string) (dom
 
 	}
 
-	fmt.Println("\n\ndb user detail", user)
-
 	return user, nil
 }
 
@@ -63,8 +61,6 @@ func (usr *userDatabase) FindUserByNumber(ctx context.Context, number string) (d
 		return user, fmt.Errorf("faild to find user with number %v", number)
 
 	}
-
-	fmt.Println("\n\ndb user detail", user)
 
 	return user, nil
 }
@@ -86,9 +82,7 @@ func (usr *userDatabase) FindUserByUserName(ctx context.Context, username string
 	var user domain.Users
 
 	query := `select * from users where user_name = $1;`
-	// fmt.Println("--xxxxxx----- > ", username)
 	err := usr.DB.Raw(query, username).Scan(&user).Error
-	// fmt.Println("--------------------------- >", usr.DB.Raw(query, username))
 	if err != nil {
 		return user, err
 	}
@@ -104,7 +98,6 @@ func (usr *userDatabase) SaveUser(ctx context.Context, user domain.Users) (UserI
 	createdAt := time.Now()
 	err = usr.DB.Raw(query, user.UserName, user.FName, user.LName,
 		user.Email, user.Number, user.Password, createdAt).Scan(&body).Error
-	fmt.Println(">>>>>>>>>>>>", body.ID)
 	if err != nil {
 
 		return 0, fmt.Errorf("faild to save user %v", user.UserName)
@@ -197,7 +190,6 @@ func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.Re
 		// addres.IsDefault,
 		addres.Landmark).Scan(&body).Error
 
-	fmt.Println("address", body)
 	if err != nil {
 		return err
 	}
@@ -324,7 +316,6 @@ func (w *userDatabase) FindProductFromWIshListItem(Wid, pfid uint) (bool, error)
 	if err != nil {
 		return body, err
 	}
-	fmt.Println("in repo (323) ,,,,, ", body)
 
 	return body, nil
 }
@@ -366,6 +357,17 @@ func (w *userDatabase) ViewWishList(uid uint, pagination req.PageNation) ([]res.
 					$2 OFFSET $3;`
 
 	err := w.DB.Raw(query, uid, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) GetAddressByUid(uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id =$1`
+	err := u.DB.Raw(query, uid).Scan(&body).Error
 	if err != nil {
 		return body, err
 	}

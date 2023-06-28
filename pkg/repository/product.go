@@ -698,6 +698,17 @@ func (p *productDatabase) FindImage(img string) (domain.ProductImage, error) {
 	return body, nil
 }
 
+func (p *productDatabase) FindProductInfoById(id uint) (domain.ProductInfo, error) {
+
+	var body domain.ProductInfo
+	query := `select * from product_infos where id = $1;`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
 // ----------- Sorting -----------
 
 func (p *productDatabase) ListByColour(colour string,

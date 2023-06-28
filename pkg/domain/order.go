@@ -3,25 +3,26 @@ package domain
 import "time"
 
 type UserOrder struct {
-	Id     uint
+	Id     uint `gorm:"primaryKey;unique;not null"`
 	UserId uint
-	Users  Users
+	// Users  Users
 }
 type OrderInfo struct {
-	Id          uint
-	UserOrderId uint
+	Id          uint `gorm:"primaryKey;unique;not null"`
+	OrderId     uint
 	OrderTime   time.Time
 	AddressId   uint
-	Address     Address
 	CouponCode  string
 	TotalPrice  float64
 	OrderStatus string
+	// Address     Address
 }
 type OrderItem struct {
-	Id            uint
+	Id            uint `gorm:"primaryKey;unique;not null"`
 	UserOrderId   uint
-	OrderInfo     OrderInfo
 	ProductInfoId uint
-	ProductInfo   ProductInfo
 	Quantity      uint
+	UserCartId    uint
+	// ProductInfo   ProductInfo
+	// OrderInfo     OrderInfo
 }
