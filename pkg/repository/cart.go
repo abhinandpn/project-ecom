@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -86,7 +86,7 @@ func (c *cartDatabase) RemoveCart(id, pfid uint) error {
 
 func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 
-	fmt.Println("print id is  : ", id)
+	
 	var body []res.CartDisplay
 	query := `SELECT p.product_name, pi.size, pi.colour, b.brand_name, c.category_name, pi.price
 					FROM user_carts uc
@@ -107,8 +107,7 @@ func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 
 	var body bool
-	fmt.Println("id is ", id)
-	fmt.Println("pfid is ", pfid)
+	
 
 	query := `select  exists(select * from cart_infos where cart_id = $1 and product_info_id = $2);`
 	err := c.DB.Raw(query, id, pfid).Scan(&body).Error

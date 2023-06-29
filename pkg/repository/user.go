@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"time"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
@@ -268,9 +269,6 @@ func (w *userDatabase) AddToWishlistItem(uid, pfid uint) error {
 }
 
 func (w *userDatabase) RemoveFromWishListItem(wid, pfid uint) error {
-
-	fmt.Println("Repo Remove Item Wislist ID = ", wid)
-	fmt.Println("Repo Remove Item Product Info  ID = ", pfid)
 
 	query := `DELETE FROM wish_list_items
 	WHERE wish_list_id = $1 AND product_info_id = $2;`

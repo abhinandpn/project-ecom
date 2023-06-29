@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"time"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
@@ -391,7 +392,7 @@ func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.Produ
 }
 
 func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
-	fmt.Println("------------------ Start")
+
 	tx := p.DB.Begin() // transaction begin
 	var Time time.Time
 	var ProductTable domain.Product
@@ -643,11 +644,11 @@ func (p *productDatabase) DeleteBrand(id uint) error {
 	return nil
 }
 
-func (p *productDatabase) ViewFullBrand() (res.ResBrand, error) {
+func (p *productDatabase) ViewFullBrand() ([]res.ResBrand, error) {
 
-	var body res.ResBrand
+	var body []res.ResBrand
 	query := `select * from brands order by id ;`
-	err := p.DB.Exec(query).Scan(&body).Error
+	err := p.DB.Raw(query).Scan(&body).Error
 	if err != nil {
 		return body, err
 	}
@@ -702,6 +703,34 @@ func (p *productDatabase) FindProductInfoById(id uint) (domain.ProductInfo, erro
 
 	var body domain.ProductInfo
 	query := `select * from product_infos where id = $1;`
+	err := p.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (p *productDatabase) ProductViewByPid(id uint) (res.ResProductOrder, error) {
+
+	var body res.ResProductOrder
+	query := `SELECT 
+				    p.product_name AS "ProductName",
+				    p.discription AS "Description",
+				    c.category_name AS "CategoryName",
+				    b.brand_name AS "BrandName",
+				    pi.size AS "Size",
+				    pi.price AS "Price",
+				    pi.colour AS "Colour"
+				FROM 
+				    products p
+				JOIN 
+				    product_infos pi ON p.id = pi.product_id
+				JOIN 
+				    brands b ON p.brand_id = b.id
+				JOIN 
+				    categories c ON p.category_id = c.id
+				WHERE 
+				    p.id = $1;`
 	err := p.DB.Raw(query, id).Scan(&body).Error
 	if err != nil {
 		return body, err

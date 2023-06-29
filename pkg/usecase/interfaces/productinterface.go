@@ -52,7 +52,7 @@ type ProductuseCase interface {
 	// brand
 	CreateBrand(name, img string) error
 	DeleteBrand(id uint) error
-	ViewFullBrand() (res.ResBrand, error)
+	ViewFullBrand() ([]res.ResBrand, error)
 
 	GetByColour(colour string, pagination req.PageNation) ([]res.ProductResponce, error)
 	GetBySize(size int, pagination req.PageNation) ([]res.ProductResponce, error)

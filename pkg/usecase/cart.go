@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
+	
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -91,7 +91,7 @@ func (c *CartUseCase) AddToCart(id, pfid, qty uint) error {
 
 func (c *CartUseCase) RemoveFromCart(id, pfid uint) error {
 
-	fmt.Println("in usecase")
+	
 	// check the usr have cart
 	cart, err := c.cartRepo.FindCartByUId(id)
 	if err != nil {
@@ -102,7 +102,7 @@ func (c *CartUseCase) RemoveFromCart(id, pfid uint) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("return", exist)
+	
 	if exist {
 		err := c.cartRepo.RemoveCart(cart.Id, pfid)
 		if err != nil {

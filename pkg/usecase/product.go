@@ -23,139 +23,6 @@ func NewProductUseCase(ProductRepo interfaces.ProductRepository) service.Product
 	return &productUseCase{productRepo: ProductRepo}
 }
 
-// Product
-/*
-func (pr *productUseCase) FindProductByName(ctx context.Context, name string) (domain.Product, error) {
-
-	body, err := pr.productRepo.FindProductByName(ctx, name)
-	if err != nil {
-		return body, err
-	}
-	return body, nil
-}
-
-// -------------------AddProduct-------------------
-
-func (pr *productUseCase) AddProduct(ctx context.Context, product req.ReqProduct) error {
-
-	// check Given product is exist or not
-	name := product.ProductName
-
-	body, err := pr.FindProductByName(ctx, name)
-	if err != nil {
-		return err
-	}
-
-	if body.Id != 0 {
-		err = fmt.Errorf("product alredy exist name : %v", body.ProductName)
-		return err
-	}
-
-	// check the category if exist or not
-	ct, err := pr.FindCategoryById(ctx, product.CategoryID)
-	if err != nil {
-		return err
-	}
-
-	cat, err := pr.FindCategoryByname(ctx, ct.CategoryName)
-	if err != nil {
-		return err
-	}
-	// cat res
-	if cat.Id == 0 {
-		err = fmt.Errorf("category name : %v", cat.CategoryName)
-		return err
-	}
-
-	// product res
-	if body.Id != 0 {
-		err = fmt.Errorf("product alredy exist with this name : %v", name)
-		return err
-	}
-
-	// if its found then create a new product with new data
-	err = pr.productRepo.CreateProduct(ctx, product)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("successfully product saved\n\n")
-	return nil
-}
-
-func (pr *productUseCase) UpdateProduct(ctx context.Context, product req.ReqProduct, id uint) error {
-
-	// check if the product exist or not
-	body, err := pr.productRepo.FindProductById(ctx, id)
-	if err != nil {
-		return err
-	}
-	if body.Id == 0 {
-		err = fmt.Errorf("unabel to find product by Id %v", id)
-		return err
-	}
-
-	// check if exist in category
-	category, err := pr.productRepo.FindCategoryById(ctx, product.CategoryID)
-	if err != nil {
-		return err
-	}
-	if category.Id == 0 {
-		err = fmt.Errorf("unabel to find category by Id %v", id)
-		return err
-	}
-	// if exist update product table
-	err = pr.productRepo.UpdateProduct(ctx, product, id)
-	if err != nil {
-		return err
-	}
-	// responce
-	return nil
-}
-
-func (pr *productUseCase) DeleteProduct(ctx context.Context, id uint) error {
-
-	// check the product exist or not
-	body, err := pr.productRepo.FindProductById(ctx, id)
-	if err != nil {
-		return err
-	}
-	if body.Id == 0 {
-		return fmt.Errorf("invalid product id %v", body.Id)
-	}
-
-	// if exist then delete
-	err = pr.productRepo.DeletProduct(ctx, body.Id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (pr *productUseCase) FindProductById(ctx context.Context, id uint) (res.ProductResponce, error) {
-
-	var Product res.ProductResponce
-	body, err := pr.productRepo.FindProductById(ctx, id)
-	if err != nil {
-		return Product, err
-	}
-
-	err = copier.Copy(&Product, &body)
-	if err != nil {
-		return Product, err
-	}
-	return Product, nil
-}
-
-func (pr *productUseCase) ViewFullProduct(ctx context.Context, pagination req.PageNation) ([]res.ProductResponce, error) {
-
-	body, err := pr.productRepo.ViewFullProduct(ctx, pagination)
-	if err != nil {
-		return body, err
-	}
-	return body, nil
-}
-*/
 // CATEGORY USECASE
 
 // -------------------FindCategoryById-------------------
@@ -562,7 +429,7 @@ func (p *productUseCase) DeleteBrand(id uint) error {
 	return nil
 }
 
-func (p *productUseCase) ViewFullBrand() (res.ResBrand, error) {
+func (p *productUseCase) ViewFullBrand() ([]res.ResBrand, error) {
 
 	body, err := p.productRepo.ViewFullBrand()
 	if err != nil {

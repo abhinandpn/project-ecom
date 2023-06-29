@@ -3,10 +3,9 @@ package res
 import "time"
 
 type ProductResponce struct {
-	ID          uint   `json:"product_id"`
-	ProductName string `json:"product_name"`
-	Discription string `json:"description" `
-	// CategoryID    uint      `json:"category_id"`
+	ID            uint      `json:"product_id"`
+	ProductName   string    `json:"product_name"`
+	Discription   string    `json:"description" `
 	CategoryName  string    `json:"category_name"`
 	Size          uint      `json:"size"`
 	Price         uint      `json:"price"`
@@ -14,6 +13,7 @@ type ProductResponce struct {
 	Image         string    `json:"image"`
 	CreatedAt     time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt     time.Time `json:"updated_at"`
+	// CategoryID    uint      `json:"category_id"`
 }
 type CategoryRes struct {
 	Id           uint   `json:"id"`
@@ -57,18 +57,30 @@ type ResBrand struct {
 
 /*
 SELECT
-    p.product_name,
-    sc.sub_category_name,
-    br.brand_name,
-    pi.price,
-    pi.colour,
-    pi.size,
-    pr.product_images,
-    pi.quatity
+
+	p.product_name,
+	sc.sub_category_name,
+	br.brand_name,
+	pi.price,
+	pi.colour,
+	pi.size,
+	pr.product_images,
+	pi.quatity
+
 FROM
-    products p
-    JOIN product_infos pi ON p.id = pi.product_id
-    JOIN brands br ON p.brand_id = br.id
-    JOIN product_images pr ON p.id = pr.product_id
-    JOIN sub_categories sc ON p.sub_category_id = sc.category_id;
+
+	products p
+	JOIN product_infos pi ON p.id = pi.product_id
+	JOIN brands br ON p.brand_id = br.id
+	JOIN product_images pr ON p.id = pr.product_id
+	JOIN sub_categories sc ON p.sub_category_id = sc.category_id;
 */
+type ResProductOrder struct {
+	ProductName  string
+	Discription  string
+	CategoryName string
+	BrandName    string
+	Size         uint
+	Price        float64
+	Colour       string
+}

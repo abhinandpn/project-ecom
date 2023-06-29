@@ -46,6 +46,7 @@ type ProductRepository interface {
 	FinBrandByName(name string) (domain.Brand, error)
 	FindCategoryByName(name string) (domain.Category, error)
 	FindProductInfoById(id uint) (domain.ProductInfo, error)
+	ProductViewByPid(id uint) (res.ResProductOrder, error)
 	// product images
 	AddProductImage(id uint, img string) error
 	FindImage(img string) (domain.ProductImage, error)
@@ -59,7 +60,7 @@ type ProductRepository interface {
 	// brand
 	CreateBrand(name, img string) error
 	DeleteBrand(id uint) error
-	ViewFullBrand() (res.ResBrand, error)
+	ViewFullBrand() ([]res.ResBrand, error)
 	FindBrandByName(name string) (domain.Brand, error)
 	FIndBrandById(id uint) (domain.Brand, error)
 

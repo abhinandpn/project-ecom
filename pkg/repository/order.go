@@ -9,11 +9,14 @@ import (
 )
 
 type OrderDatabase struct {
-	DB *gorm.DB
+	DB   *gorm.DB
+	user interfaces.UserRepository
 }
 
-func NewOrderRepository(db *gorm.DB) interfaces.OrderRepository {
-	return &OrderDatabase{DB: db}
+func NewOrderRepository(db *gorm.DB, UserRepo interfaces.UserRepository) interfaces.OrderRepository {
+	return &OrderDatabase{DB: db,
+		user: UserRepo,
+	}
 }
 
 func (o *OrderDatabase) CreateUserOrder(id uint) error {
@@ -77,4 +80,43 @@ func (o *OrderDatabase) AddOrderItem(oid, pfid, qty uint) error {
 		return err
 	}
 	return nil
+}
+
+// func (o *OrderDatabase) CartOrderAll(cid uint) error {
+
+// }
+
+func (o *OrderDatabase) AddOrderItemCartAll(oid, cid uint) error {
+
+	var body domain.OrderItem
+	query := `insert into order_items (user_order_id,user_cart_id)values ($1,$2,$3);`
+	err := o.DB.Raw(query, oid, cid).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) UpdatePaymentMethod(id, pid uint) error {
+
+	var body domain.OrderInfo
+	query := `UPDATE order_infos
+				SET payment_id = $1
+				WHERE id = $2;`
+	err := o.DB.Raw(query, pid, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) FindOrderInfoByOrderId(id uint) (domain.OrderInfo, error) {
+
+	var body domain.OrderInfo
+	query := `select * from order_infos where order_id = $1`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
 }
