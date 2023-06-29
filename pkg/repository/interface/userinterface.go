@@ -27,4 +27,14 @@ type UserRepository interface {
 	AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error     // Add Address
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error // Update Address
 	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)    // Delete Address
+	GetAddressByUid(uid uint) (domain.Address, error)                          // get address
+
+	// wishlist
+	CreateWishList(id uint) error
+	AddToWishlistItem(uid, pfid uint) error
+	RemoveFromWishListItem(wid, pfid uint) error
+	FindWishListByUid(id uint) (domain.WishList, error)
+	FindWishListItemByWid(id uint) (domain.WishListItems, error)
+	FindProductFromWIshListItem(Wid, pfid uint) (bool, error)
+	ViewWishList(uid uint, pagination req.PageNation) ([]res.ViewWishList, error)
 }

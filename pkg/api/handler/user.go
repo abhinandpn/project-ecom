@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	"fmt"
+
 	"net/http"
 
 	twillio "github.com/abhinandpn/project-ecom/pkg/Twillio"
@@ -74,8 +74,6 @@ func (usr *UserHandler) UserSignUp(ctx *gin.Context) {
 // UserLogin godoc
 
 func (usr *UserHandler) UserLogin(ctx *gin.Context) {
-
-	fmt.Println("-------login function started")
 
 	var body req.LoginStruct
 
@@ -302,14 +300,6 @@ func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 	var body res.ResAddress
 
 	body.UserId = UserId
-	// body.City
-	// body.District
-	// body.House
-	// body.Landmark
-	// body.Name
-	// body.PhoneNumber
-	// body.Pincode
-	// body.Street
 
 	// Bind json
 	err := ctx.ShouldBindJSON(&body)
@@ -362,5 +352,149 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 
 	// responce
 	response := res.SuccessResponse(200, "successfully update user Address", body)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// ---------- wishlist --------------
+
+func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+
+	ParmId := ctx.Param("id")
+	Pfid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	// find wishlist
+	wishlist, err := w.userUseCase.FindWishList(UserId)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to find wishlist", err.Error(), wishlist)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	if wishlist.ID == 0 {
+		response := res.ErrorResponse(500, "wishlist not created yet", err.Error(), wishlist)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	// add in to wishlist
+	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
+
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to find product in to wishlist 1", err.Error(), wishlist)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	if body {
+		response := res.ErrorResponse(500, "product alredy exist", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	} else {
+		err = w.userUseCase.AddToWishListItem(wishlist.ID, Pfid)
+		if err != nil {
+			response := res.ErrorResponse(500, "Failed to add product in to wishlist 2", err.Error(), wishlist)
+			ctx.JSON(http.StatusInternalServerError, response)
+			return
+		}
+	}
+	// response
+	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist.User.UserName)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+
+	ParmId := ctx.Param("id")
+	Pfid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	// check the user have wishlist
+	wishlist, err := w.userUseCase.FindWishList(UserId)
+	if err != nil {
+		response := res.ErrorResponse(500, "Failed to find wishlist", err.Error(), wishlist)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	if wishlist.ID == 0 {
+		response := res.ErrorResponse(500, "wishlist not created yet", err.Error(), wishlist)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// check the product if exist
+	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
+
+	if err != nil {
+		response := res.ErrorResponse(500, "failed to find product in to wishlist", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// if true remove
+	if body {
+		err = w.userUseCase.RemoveWishListItem(wishlist.ID, Pfid)
+		if err != nil {
+			response := res.ErrorResponse(500, "Failed to remove product in to wishlist", err.Error(), body)
+			ctx.JSON(http.StatusInternalServerError, response)
+			return
+		}
+	} else {
+		response := res.ErrorResponse(500, "product does not exist in the wishlist", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// response
+	response := res.SuccessResponse(200, "successfully remove product in to wishlist", body)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (w *UserHandler) ViewWishList(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	var pagination req.PageNation
+	pagination.Count = count
+	pagination.PageNumber = pageNumber
+
+	body, err := w.userUseCase.ViewWishList(UserId, pagination)
+	if err != nil {
+		response := res.ErrorResponse(500, "failed to get product from wishlist", err.Error(), body)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	if body == nil {
+		response := res.SuccessResponse(200, "there is no product to show", nil)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully remove product in to wishlist", body)
 	ctx.JSON(http.StatusOK, response)
 }

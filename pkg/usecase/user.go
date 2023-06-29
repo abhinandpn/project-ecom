@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
@@ -14,11 +15,17 @@ import (
 )
 
 type userUseCase struct {
-	userRepo interfaces.UserRepository
+	userRepo  interfaces.UserRepository
+	cartRepo  interfaces.Cartrepository
+	orderRepo interfaces.OrderRepository
 }
 
-func NewUserUseCase(repo interfaces.UserRepository) service.UserUseCase {
-	return &userUseCase{userRepo: repo}
+func NewUserUseCase(repo interfaces.UserRepository,
+	CartRepo interfaces.Cartrepository,
+	OrderRepo interfaces.OrderRepository) service.UserUseCase {
+	return &userUseCase{userRepo: repo,
+		cartRepo:  CartRepo,
+		orderRepo: OrderRepo}
 }
 
 // ........................................
@@ -36,26 +43,34 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		hashpass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 
 		if err != nil {
-			// return errors.New("error to hash the password")
 			return err
-
 		}
 
 		// save the password in hash
 		user.Password = string(hashpass)
 
 		// save the user
-		_, err = usr.userRepo.SaveUser(ctx, user)
+		Uid, err := usr.userRepo.SaveUser(ctx, user)
 		if err != nil {
-			// return errors.New("error to save user")
 			return err
+		}
 
+		err = usr.userRepo.CreateWishList(Uid) // wishlist creating
+		if err != nil {
+			return err
+		}
+		_, err = usr.cartRepo.CreateUserCart(Uid) // cart creating
+		if err != nil {
+			return err
+		}
+		err = usr.orderRepo.CreateUserOrder(Uid) // order table
+		if err != nil {
+			return err
 		}
 		return nil
 	}
 
 	// if user exist then check which field is exist
-
 	return helper.UserCheck(user, checkUser)
 
 }
@@ -155,4 +170,120 @@ func (usr *userUseCase) ListAllAddress(ctx context.Context, Uid uint) ([]res.Res
 	return body, err
 }
 
-// --------------------------------------------------------------
+// ----------------------- wishlist -------------------------------
+
+func (w *userUseCase) FindWishList(id uint) (domain.WishList, error) {
+
+	var body domain.WishList
+	body, err := w.userRepo.FindWishListByUid(id)
+
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (w *userUseCase) FindWishLisItemByPFID(wid, pfid uint) (bool, error) {
+
+	var body bool
+
+	wishlist, err := w.userRepo.FindWishListItemByWid(wid)
+	if err != nil {
+		if err != nil {
+			return body, err
+		}
+	}
+	// fmt.Println("wishlist id ", wishlist.Id)
+	// if wishlist.Id == 0 {
+	// 	res := errors.New("user does have wishlist item")
+	// 	return body, res
+	// }
+	fmt.Println("wish list id (usecase 187)", wishlist.WishListId)
+	body, err = w.userRepo.FindProductFromWIshListItem(wishlist.WishListId, pfid)
+
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (w *userUseCase) CreteWishList(id uint) error {
+
+	wishlist, err := w.userRepo.FindWishListByUid(id)
+	if err != nil {
+		return err
+	}
+	if wishlist.ID == 0 {
+		err := w.userRepo.CreateWishList(id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (w *userUseCase) AddToWishListItem(wid, pfid uint) error {
+
+	wishlist, err := w.userRepo.FindWishListItemByWid(wid)
+	if err != nil {
+		if err != nil {
+			return err
+		}
+	}
+
+	if wishlist.Id == 0 {
+		body, err := w.userRepo.FindProductFromWIshListItem(wishlist.Id, pfid)
+		if err != nil {
+			return err
+		}
+		if !body {
+			err := w.userRepo.AddToWishlistItem(wid, pfid)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (w *userUseCase) RemoveWishListItem(wid, pfid uint) error {
+
+	wishlist, err := w.userRepo.FindWishListItemByWid(wid)
+	if err != nil {
+		if err != nil {
+			return err
+		}
+	}
+	fmt.Println("wishlis (247 usecase)", wishlist)
+	if wishlist.Id != 0 {
+		err := w.userRepo.RemoveFromWishListItem(wishlist.WishListId, pfid)
+		if err != nil {
+			return err
+		}
+
+	} else {
+		res := errors.New("user does have wishlist item")
+		return res
+	}
+	return nil
+}
+
+func (w *userUseCase) ViewWishList(uid uint, pagination req.PageNation) ([]res.ViewWishList, error) {
+
+	var body []res.ViewWishList
+	wishlist, err := w.userRepo.FindWishListByUid(uid)
+	if err != nil {
+		return body, err
+	}
+
+	if wishlist.ID == 0 {
+		res := errors.New("user doee not have wishlist")
+		return body, res
+	}
+
+	body, err = w.userRepo.ViewWishList(uid, pagination)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -15,10 +17,10 @@ func NewCartRepository(db *gorm.DB) interfaces.Cartrepository {
 
 	return &cartDatabase{DB: db}
 }
-func (c *cartDatabase) FindCartBy(id uint) (domain.UserCart, error) {
+func (c *cartDatabase) FindCartByUId(id uint) (domain.UserCart, error) {
 
 	var body domain.UserCart
-	query := `select * from user_carts where id = $1`
+	query := `select * from user_carts where user_id = $1`
 	err := c.DB.Raw(query, id).Scan(&body).Error
 	if err != nil {
 		return body, err
@@ -62,12 +64,9 @@ func (c *cartDatabase) CreateCartinfo(id uint) (domain.CartInfo, error) {
 func (c *cartDatabase) AddToCart(id, pfid, qty uint) error {
 
 	var body domain.CartInfo
-	query := `UPDATE cart_infos
-					SET product_info_id = $1,
-					  quantity = $2
-					WHERE cart_id = $3;`
+	query := `insert into cart_infos (cart_id,product_info_id,quantity)values ($1,$2,$3);`
 
-	err := c.DB.Raw(query, pfid, qty, id).Scan(&body).Error
+	err := c.DB.Raw(query, id, pfid, 1).Scan(&body).Error
 	if err != nil {
 		return err
 	}
@@ -76,33 +75,27 @@ func (c *cartDatabase) AddToCart(id, pfid, qty uint) error {
 
 func (c *cartDatabase) RemoveCart(id, pfid uint) error {
 
-	query := `delete from cart_infos where cart_id = $1;`
-	err := c.DB.Exec(query, id).Error
+	query := `DELETE FROM cart_infos
+				WHERE cart_id = $1 AND product_info_id = $2;	`
+	err := c.DB.Exec(query, id, pfid).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *cartDatabase) ViewCart(id uint) (res.CartDisplay, error) {
+func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 
-	var body res.CartDisplay
-	query := `SELECT
-				    p.product_name,
-				    pi.size,
-				    pi.colour,
-				    b.brand_name,
-				    c.category_name,
-				    pi.price
-				FROM
-				    user_carts uc
-				    JOIN cart_infos ci ON uc.id = ci.cart_id
-				    JOIN product_infos pi ON ci.product_info_id = pi.id
-				    JOIN products p ON pi.product_id = p.id
-				    JOIN brands b ON p.brand_id = b.id
-				    JOIN categories c ON p.category_id = c.id
-				WHERE
-				    uc.id = $1;`
+	fmt.Println("print id is  : ", id)
+	var body []res.CartDisplay
+	query := `SELECT p.product_name, pi.size, pi.colour, b.brand_name, c.category_name, pi.price
+					FROM user_carts uc
+					JOIN cart_infos ci ON uc.id = ci.cart_id
+					JOIN products p ON ci.product_info_id = p.id
+					JOIN product_infos pi ON p.id = pi.product_id
+					JOIN brands b ON p.brand_id = b.id
+					JOIN categories c ON p.category_id = c.id
+					WHERE uc.user_id = $1;`
 	err := c.DB.Raw(query, id).Scan(&body).Error
 	if err != nil {
 		return body, err
@@ -114,6 +107,9 @@ func (c *cartDatabase) ViewCart(id uint) (res.CartDisplay, error) {
 func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 
 	var body bool
+	fmt.Println("id is ", id)
+	fmt.Println("pfid is ", pfid)
+
 	query := `select  exists(select * from cart_infos where cart_id = $1 and product_info_id = $2);`
 	err := c.DB.Raw(query, id, pfid).Scan(&body).Error
 	if err != nil {
@@ -127,8 +123,25 @@ func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 
 }
 
-// func (c *cartDatabase) CartInfo(id uint) (res.CartInfo, error) {
+func (c *cartDatabase) CartInfo(id uint) (res.CartInfo, error) {
 
-// 	var body res.CartInfo
+	var body res.CartInfo
 
-// }
+	query := `SELECT
+					SUM(pi.price * ci.quantity) AS subtotal,
+					0 AS discountprice,
+					SUM(pi.price * ci.quantity) - 0 AS totalprice
+				  FROM
+					user_carts uc
+				  JOIN
+					cart_infos ci ON uc.id = ci.cart_id
+				  JOIN
+					product_infos pi ON ci.product_info_id = pi.id
+				  WHERE
+					uc.user_id = $1;`
+	err := c.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}

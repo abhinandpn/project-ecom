@@ -13,5 +13,5 @@ type CartDisplay struct {
 type CartInfo struct {
 	Subtotal      float64
 	DIscountPrice float64
-	TotalPrice    float64
+	Totalprice    float64
 }

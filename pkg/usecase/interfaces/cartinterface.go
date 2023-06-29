@@ -9,6 +9,7 @@ type CartUseCase interface {
 	FindCartInfoById(id uint) (domain.CartInfo, error)
 	Createcart(id uint) error
 	AddToCart(id, pfid, qty uint) error
-	RemoveFromCart(id,pfid uint) error
-	CartDisplay(id uint) (res.CartDisplay, error)
+	RemoveFromCart(id, pfid uint) error
+	CartDisplay(id uint) ([]res.CartDisplay, error)
+	CartInfo(id uint) (res.CartInfo, error)
 }

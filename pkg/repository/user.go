@@ -46,8 +46,6 @@ func (usr *userDatabase) FindUserByEmail(ctx context.Context, email string) (dom
 
 	}
 
-	fmt.Println("\n\ndb user detail", user)
-
 	return user, nil
 }
 
@@ -63,8 +61,6 @@ func (usr *userDatabase) FindUserByNumber(ctx context.Context, number string) (d
 		return user, fmt.Errorf("faild to find user with number %v", number)
 
 	}
-
-	fmt.Println("\n\ndb user detail", user)
 
 	return user, nil
 }
@@ -86,9 +82,7 @@ func (usr *userDatabase) FindUserByUserName(ctx context.Context, username string
 	var user domain.Users
 
 	query := `select * from users where user_name = $1;`
-	// fmt.Println("--xxxxxx----- > ", username)
 	err := usr.DB.Raw(query, username).Scan(&user).Error
-	// fmt.Println("--------------------------- >", usr.DB.Raw(query, username))
 	if err != nil {
 		return user, err
 	}
@@ -99,18 +93,17 @@ func (usr *userDatabase) FindUserByUserName(ctx context.Context, username string
 func (usr *userDatabase) SaveUser(ctx context.Context, user domain.Users) (UserId uint, err error) {
 
 	query := `insert into users (user_name,f_name,l_name,email,number,password,created_at)
-	Values ($1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7)`
-
+	Values ($1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7) returning id;`
+	var body domain.Users
 	createdAt := time.Now()
 	err = usr.DB.Raw(query, user.UserName, user.FName, user.LName,
-		user.Email, user.Number, user.Password, createdAt).Scan(&user).Error
-
+		user.Email, user.Number, user.Password, createdAt).Scan(&body).Error
 	if err != nil {
 
 		return 0, fmt.Errorf("faild to save user %v", user.UserName)
 	}
 
-	return UserId, nil
+	return body.ID, nil
 }
 
 func (usr *userDatabase) DeleteUser(ctx context.Context, id uint) error {
@@ -197,7 +190,6 @@ func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.Re
 		// addres.IsDefault,
 		addres.Landmark).Scan(&body).Error
 
-	fmt.Println("address", body)
 	if err != nil {
 		return err
 	}
@@ -241,6 +233,141 @@ func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) ([]res.Re
 
 	err := usr.DB.Raw(query, Uid).Scan(&body).Error
 
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+// wishlist
+
+func (w *userDatabase) CreateWishList(id uint) error {
+
+	var body domain.WishList
+	query := `insert into wish_lists (user_id)values ($1);`
+
+	err := w.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (w *userDatabase) AddToWishlistItem(uid, pfid uint) error {
+
+	var body domain.WishListItems
+	query := `insert into wish_list_items (wish_list_id,product_info_id)values ($1,$2);`
+
+	err := w.DB.Raw(query, uid, pfid).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (w *userDatabase) RemoveFromWishListItem(wid, pfid uint) error {
+
+	fmt.Println("Repo Remove Item Wislist ID = ", wid)
+	fmt.Println("Repo Remove Item Product Info  ID = ", pfid)
+
+	query := `DELETE FROM wish_list_items
+	WHERE wish_list_id = $1 AND product_info_id = $2;`
+	err := w.DB.Exec(query, wid, pfid).Error
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (w *userDatabase) FindWishListItemByWId(id uint) (domain.WishListItems, error) {
+
+	var body domain.WishListItems
+	query := `select * from wish_list_items where wish_list_id =$1;`
+
+	err := w.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (w *userDatabase) FindWishListByUid(id uint) (domain.WishList, error) {
+
+	var body domain.WishList
+	query := `select * from wish_lists where user_id =$1;`
+
+	err := w.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (w *userDatabase) FindProductFromWIshListItem(Wid, pfid uint) (bool, error) {
+
+	query := `select exists (select * from wish_list_items where wish_list_id = $1 and product_info_id = $2) AS body`
+
+	var body bool
+	err := w.DB.Raw(query, Wid, pfid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
+func (w *userDatabase) FindWishListItemByWid(id uint) (domain.WishListItems, error) {
+
+	var body domain.WishListItems
+	query := `select * from wish_list_items where wish_list_id = $1`
+
+	err := w.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (w *userDatabase) ViewWishList(uid uint, pagination req.PageNation) ([]res.ViewWishList, error) {
+
+	var body []res.ViewWishList
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				    p.product_name AS "ProductName",
+				    pi.price AS "Price",
+				    pi.colour AS "Colour",
+				    b.brand_name AS "Brand",
+				    c.category_name AS "Category"
+				FROM
+				    wish_lists wl
+				    INNER JOIN wish_list_items wli ON wl.id = wli.wish_list_id
+				    INNER JOIN product_infos pi ON wli.product_info_id = pi.id
+				    INNER JOIN products p ON pi.product_id = p.id
+				    LEFT JOIN brands b ON p.brand_id = b.id
+				    LEFT JOIN categories c ON p.category_id = c.id
+				WHERE
+				    wl.user_id = $1
+				LIMIT
+					$2 OFFSET $3;`
+
+	err := w.DB.Raw(query, uid, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) GetAddressByUid(uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id =$1`
+	err := u.DB.Raw(query, uid).Scan(&body).Error
 	if err != nil {
 		return body, err
 	}
