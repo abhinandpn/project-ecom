@@ -1,25 +1,38 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 )
 
 type OrderUseCase struct {
 	orderRepo   interfaces.OrderRepository
 	userRepo    interfaces.UserRepository
 	productRepo interfaces.ProductRepository
+	cartRepo    interfaces.Cartrepository
+	paymentRepo interfaces.PaymentRepository
 }
 
 func NewOrderUseCase(OrderRepo interfaces.OrderRepository,
 	UserRepo interfaces.UserRepository,
-	ProductRepo interfaces.ProductRepository) service.OrderUseCase {
+	ProductRepo interfaces.ProductRepository,
+	CartRepo interfaces.Cartrepository,
+	PaymentRepo interfaces.PaymentRepository,
+) service.OrderUseCase {
 	return &OrderUseCase{orderRepo: OrderRepo,
 		userRepo:    UserRepo,
-		productRepo: ProductRepo}
+		productRepo: ProductRepo,
+		cartRepo:    CartRepo,
+		paymentRepo: PaymentRepo,
+	}
 }
+
+var ctx context.Context
+
 func (or *OrderUseCase) CreateUserOrder(id uint) error {
 
 	// check of exist
@@ -103,4 +116,92 @@ func (o *OrderUseCase) OrderByPfId(uid, id uint) error {
 
 	// response
 	return nil
+}
+
+func (o *OrderUseCase) CartOrderAll(uid, pyid uint) error {
+
+	// get user order id
+	order, err := o.orderRepo.FindUserOrderById(uid)
+	if err != nil {
+		return err
+	}
+
+	// get cart id by uid
+	cart, err := o.cartRepo.FindCartByUId(uid)
+	if err != nil {
+		return err
+	}
+
+	// get cartinfo
+	cartinfo, err := o.cartRepo.CartInfo(uid)
+	if err != nil {
+		return err
+	}
+
+	// get address
+	address, err := o.userRepo.GetAddressByUid(uid)
+	if err != nil {
+		return err
+	}
+
+	// select payment method
+	payment, err := o.paymentRepo.FindPaymentMethodById(pyid)
+	if err != nil {
+		return err
+	}
+
+	var cpid string
+	status := "product ordered"
+
+	// update order infos
+	oid, err := o.orderRepo.AddOrderInfo(order.Id, address.ID, cpid, cartinfo.Totalprice, status)
+	if err != nil {
+		return err
+	}
+
+	// update payment
+	err = o.orderRepo.UpdatePaymentMethod(oid, payment.Id)
+	if err != nil {
+		return err
+	}
+
+	// update order items
+	err = o.orderRepo.AddOrderItemCartAll(oid, cart.Id)
+	if err != nil {
+		return err
+	}
+
+	// response
+	return nil
+}
+
+func (c *OrderUseCase) OrderStatus(id, oid uint) (res.OrderStatus, error) {
+
+	var body res.OrderStatus
+
+	user, err := c.userRepo.FindUserById(ctx, id)
+	if err != nil {
+		return body, err
+	}
+	body.Name = user.UserName // name update (1/6)
+
+	addres, err := c.userRepo.GetAddressByUid(user.ID)
+	if err != nil {
+		return body, err
+	}
+	body.Adress = addres // adress update (2/6)
+
+	orderinfo, err := c.orderRepo.FindOrderInfoByOrderId(oid)
+	if err != nil {
+		return body, err
+	}
+	body.OrderStatus = orderinfo.OrderStatus // order status update (3/6)
+
+	cart, err := c.cartRepo.ViewCart(user.ID)
+	if err != nil {
+		return body, err
+	}
+	body.CartRes = cart // updated
+
+	return body, nil
 }

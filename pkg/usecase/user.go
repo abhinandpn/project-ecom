@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
@@ -198,7 +197,7 @@ func (w *userUseCase) FindWishLisItemByPFID(wid, pfid uint) (bool, error) {
 	// 	res := errors.New("user does have wishlist item")
 	// 	return body, res
 	// }
-	fmt.Println("wish list id (usecase 187)", wishlist.WishListId)
+
 	body, err = w.userRepo.FindProductFromWIshListItem(wishlist.WishListId, pfid)
 
 	if err != nil {
@@ -231,7 +230,7 @@ func (w *userUseCase) AddToWishListItem(wid, pfid uint) error {
 		}
 	}
 
-	if wishlist.Id == 0 {
+	if wishlist.Id != 0 {
 		body, err := w.userRepo.FindProductFromWIshListItem(wishlist.Id, pfid)
 		if err != nil {
 			return err
@@ -254,7 +253,7 @@ func (w *userUseCase) RemoveWishListItem(wid, pfid uint) error {
 			return err
 		}
 	}
-	fmt.Println("wishlis (247 usecase)", wishlist)
+
 	if wishlist.Id != 0 {
 		err := w.userRepo.RemoveFromWishListItem(wishlist.WishListId, pfid)
 		if err != nil {

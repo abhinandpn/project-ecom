@@ -405,8 +405,9 @@ func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 			return
 		}
 	}
+
 	// response
-	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist.User.UserName)
+	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist.User)
 	ctx.JSON(http.StatusOK, response)
 }
 

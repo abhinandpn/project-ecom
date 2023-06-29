@@ -15,6 +15,7 @@ type OrderInfo struct {
 	CouponCode  string
 	TotalPrice  float64
 	OrderStatus string
+	PaymentId   string
 	// Address     Address
 }
 type OrderItem struct {

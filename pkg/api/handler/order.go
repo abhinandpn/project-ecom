@@ -49,3 +49,63 @@ func (o *OrderHandler) BuyNow(ctx *gin.Context) {
 	respones := res.SuccessResponse(200, "successfully product ordered", nil)
 	ctx.JSON(http.StatusOK, respones)
 }
+
+func (o *OrderHandler) CartAllOrder(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+
+	ParmId := ctx.Param("id")
+	payid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	err = o.orderUseCase.CartOrderAll(Uid, payid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't order cart products",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully cart product ordered", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) CartOrderStatus(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+
+	ParmId := ctx.Param("id")
+	Oid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	body, err := o.orderUseCase.OrderStatus(Uid, Oid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
