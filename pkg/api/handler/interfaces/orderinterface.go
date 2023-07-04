@@ -6,4 +6,5 @@ type OrderHandler interface {
 	BuyNow(ctx *gin.Context)
 	CartAllOrder(ctx *gin.Context)
 	CartOrderStatus(ctx *gin.Context)
+	OrderByproductId(ctx *gin.Context)
 }
