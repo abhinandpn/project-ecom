@@ -123,9 +123,9 @@ func (pr *ProductHandler) AddProduct(ctx *gin.Context) {
 
 }
 
-func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
+func (pr *ProductHandler) UpdateProduct(ctx *gin.Context) {
 
-	var body res.ResProduct
+	var body req.UpdateProduct
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -140,7 +140,7 @@ func (pr *ProductHandler) EditProduct(ctx *gin.Context) {
 		return
 	}
 
-	err = pr.ProductuseCase.UpdateProduct(body, id)
+	err = pr.ProductuseCase.ProductUpdationNew(body, id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to update product", err.Error(), body)
 		ctx.JSON(400, response)

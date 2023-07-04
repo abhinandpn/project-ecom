@@ -6,7 +6,7 @@ type ProductHandler interface {
 
 	// porduct
 	AddProduct(ctx *gin.Context)    // add product
-	EditProduct(ctx *gin.Context)   // edit product
+	UpdateProduct(ctx *gin.Context) // update product
 	DeleteProduct(ctx *gin.Context) // delete product
 	ListProducts(ctx *gin.Context)  // list all product
 	ViewProduct(ctx *gin.Context)   // view each product
