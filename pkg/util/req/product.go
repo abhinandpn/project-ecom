@@ -62,3 +62,16 @@ type SortReqQuantity struct {
 	QuantityStart int `json:"quantity_start"`
 	QuantityEnd   int `json:"quantity_end"`
 }
+
+// ------- sorting end -------
+type UpdateProduct struct {
+	ProductName string
+	Discription string
+	BrandId     uint
+	CategoryId  uint
+	Price       float64
+	Colour      string
+	Size        uint
+	Quantity    uint
+	// Image       string
+}
