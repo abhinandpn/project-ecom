@@ -13,6 +13,7 @@ type UserHandler interface {
 	UserOtpLogin(ctx *gin.Context)       // otp logi for user with number
 	UserLoginOtpVerify(ctx *gin.Context) // otp verify with auth
 	AddAddress(ctx *gin.Context)         // add address
+	UserStatus(ctx *gin.Context)         // Get user Block status
 	// address
 	ListAllAddress(ctx *gin.Context) // list all category - for user
 	UpdateAddress(ctx *gin.Context)  // list all product - for user
