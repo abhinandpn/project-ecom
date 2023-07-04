@@ -41,6 +41,7 @@ func AuthHelperUser(ctx *gin.Context, user string) {
 	// claim the userId and set it on context
 	ctx.Set("userId", claims.Id)
 }
+
 func AuthHelperAdmin(ctx *gin.Context, user string) {
 
 	tokenString, err := ctx.Cookie(user + "-auth") // get cookie for user or admin with name
