@@ -17,5 +17,4 @@ type AdminHandler interface {
 	FindUserWithNumber(ctx *gin.Context) // user find with number
 	FindUserWithId(ctx *gin.Context)     // user find with id
 	//
-	//
 }

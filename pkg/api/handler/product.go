@@ -61,7 +61,7 @@ func (pr *ProductHandler) ListProducts(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	products, err := pr.ProductuseCase.GetAllProducts(req.PageNation(pagination))
+	products, err := pr.ProductuseCase.GetAllQtyInfoProduct(req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)

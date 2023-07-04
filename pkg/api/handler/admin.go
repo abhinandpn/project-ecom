@@ -217,15 +217,20 @@ func (adm *AdminHandler) BlockUser(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("binding ok")
 	err = adm.AdminUseCase.BlockUser(ctx, id)
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to change user block_status", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	fmt.Println("block func calling ok")
-	response := res.SuccessResponse(200, "Successfully changed user block_status", user)
+
+	var data res.UserBlockRes
+	data.Email = user.Email
+	data.Number = user.Number
+	data.UserName = user.UserName
+	data.BlockStatus = (!user.IsBlocked)
+
+	response := res.SuccessResponse(200, "Successfully changed user block_status", data)
 	// if successfully blocked or unblock user then response 200
 	ctx.JSON(http.StatusOK, response)
 }
