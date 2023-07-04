@@ -1,8 +1,10 @@
 package req
 
-type UserOrderReq struct {
-	AddressId       uint `json:"address_id"`
-	PaymentMethodId uint `json:"payment_method_id"`
-	ProductInfoId   uint `json:"product_info_id"`
-	Quantity        uint `json:"quantity"`
+type OrderByProduct struct {
+	UserId          uint
+	ProductInfoId   uint
+	AddressId       uint
+	PaymentMethodId uint
+	CouponId        uint
+	Quantity        uint
 }
