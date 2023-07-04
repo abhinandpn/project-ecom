@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 
 	"net/http"
 
@@ -290,7 +291,7 @@ func (usr *UserHandler) AddAddress(ctx *gin.Context) {
 
 }
 
-// -----------------ListAllAddress-----------------
+// ----------------- ListAllAddress -----------------
 
 func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 
@@ -498,4 +499,25 @@ func (w *UserHandler) ViewWishList(ctx *gin.Context) {
 	}
 	response := res.SuccessResponse(200, "successfully remove product in to wishlist", body)
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (u *UserHandler) UserStatus(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+
+	user, err := u.userUseCase.FindUserById(ctx, UserId)
+	if err != nil {
+		response := res.ErrorResponse(500, "failed to get user details", err.Error(), user)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	fmt.Println(user)
+	if user.IsBlocked {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"StatusCode": 401,
+			"msg":        "this user is blocked by admin",
+		})
+		return
+	}
+
 }
