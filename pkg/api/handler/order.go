@@ -6,6 +6,7 @@ import (
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/helper"
 	services "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
+	"github.com/abhinandpn/project-ecom/pkg/util/req"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"github.com/gin-gonic/gin"
 )
@@ -109,3 +110,25 @@ func (o *OrderHandler) CartOrderStatus(ctx *gin.Context) {
 	respones := res.SuccessResponse(200, "successfully order status", body)
 	ctx.JSON(http.StatusOK, respones)
 }
+
+func (o *OrderHandler) OrderByproductId(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+
+	var body req.OrderByProduct
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	
+
+	// updation for body
+	body.UserId = Uid 
+	// body.AddressId
+	// body.CouponId
+	// body.PaymentMethodId
+	// body.ProductInfoId
+	// body.Quantity
+}	
