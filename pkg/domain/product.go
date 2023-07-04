@@ -31,8 +31,8 @@ type ProductInfo struct {
 	Price     float64 `json:"price" gorm:"not null"`
 	Colour    string  `json:"colour"`
 	Size      uint    `json:"size" gorm:"not null"`
+	Quantity  uint    `json:"quantity"`
 	// ImageId   uint    `json:"image_id" gorm:"not null"`
-	Quatity uint `json:"quantity"`
 }
 type Brand struct {
 	Id         uint   `json:"id" gorm:"primaryKey;not null"`

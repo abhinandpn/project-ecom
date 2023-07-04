@@ -3,12 +3,12 @@ package domain
 import "time"
 
 type PaymentMethod struct {
-	Id     uint
+	Id     uint `json:"id" gorm:"primaryKey;not null"`
 	Method string
 }
 
 type PaymentDetail struct {
-	Id              uint
+	Id              uint `json:"id" gorm:"primaryKey;not null"`
 	OrderId         uint
 	TotalPrice      float64
 	PaymentMethodId uint
@@ -18,6 +18,6 @@ type PaymentDetail struct {
 }
 
 type PaymentStatus struct {
-	Id            uint
+	Id            uint `json:"id" gorm:"primaryKey;not null"`
 	PaymentStatus string
 }
