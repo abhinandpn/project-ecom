@@ -44,47 +44,50 @@ func UserRoutes(api *gin.RouterGroup,
 	}
 	api.Use(middleware.AuthUser)
 	{
-		user := api.Group("/user")
+		api.Use(userHandler.UserStatus)
 		{
-			user.GET("/home", userHandler.UserHome)      // User Home
-			user.GET("/info", userHandler.UserInfo)      // user Information
-			user.POST("/logout", userHandler.UserLogout) // User Logout
-		}
-		// Address
-		address := api.Group("/address")
-		{
-			address.POST("/add", userHandler.AddAddress)        // Add Address
-			address.GET("/all", userHandler.ListAllAddress)     // List all Address
-			address.PATCH("/update", userHandler.UpdateAddress) // Update Address
-		}
 
-		// Category
-		category := api.Group("/category")
-		{
-			category.GET("", productHandler.ViewFullcategory) // View full category
-		}
-		// Cart
-		cart := api.Group("/cart")
-		{
-			cart.POST("/:id", cartHandler.AddCart)          // product ad to cart
-			cart.DELETE("/:id", cartHandler.RemoveFromCart) // product remove from cart
-			cart.GET("/all", cartHandler.ViewCart)          // view all cart
-			cart.GET("/info", cartHandler.CartInfo)         // cart info
-		}
-		//order
-		order := api.Group("/order")
-		{
-			order.POST("/cart/all/:id", orderHandler.CartAllOrder) // cart all product order
-			order.GET("/status/:id", orderHandler.CartOrderStatus) // order status
-			order.POST("/buynow/:id", orderHandler.BuyNow)         // order by pfid
-		}
-		// wishlist
-		wishlist := api.Group("/wishlist")
-		{
-			wishlist.POST("/add/:id", userHandler.AddIntoWishlit)          // add product in to wishlist
-			wishlist.DELETE("/remove/:id", userHandler.RemoveFromWIshList) // remove product in to wishlist
-			wishlist.GET("/all", userHandler.ViewWishList)                 // view wishlist
+			user := api.Group("/user")
+			{
+				user.GET("/home", userHandler.UserHome)      // User Home
+				user.GET("/info", userHandler.UserInfo)      // user Information
+				user.POST("/logout", userHandler.UserLogout) // User Logout
+			}
+			// Address
+			address := api.Group("/address")
+			{
+				address.POST("/add", userHandler.AddAddress)        // Add Address
+				address.GET("/all", userHandler.ListAllAddress)     // List all Address
+				address.PATCH("/update", userHandler.UpdateAddress) // Update Address
+			}
+
+			// Category
+			category := api.Group("/category")
+			{
+				category.GET("", productHandler.ViewFullcategory) // View full category
+			}
+			// Cart
+			cart := api.Group("/cart")
+			{
+				cart.POST("/:id", cartHandler.AddCart)          // product ad to cart
+				cart.DELETE("/:id", cartHandler.RemoveFromCart) // product remove from cart
+				cart.GET("/all", cartHandler.ViewCart)          // view all cart
+				cart.GET("/info", cartHandler.CartInfo)         // cart info
+			}
+			//order
+			order := api.Group("/order")
+			{
+				order.POST("/cart/all/:id", orderHandler.CartAllOrder) // cart all product order
+				order.GET("/status/:id", orderHandler.CartOrderStatus) // order status
+				order.POST("/buynow/:id", orderHandler.BuyNow)         // order by pfid
+			}
+			// wishlist
+			wishlist := api.Group("/wishlist")
+			{
+				wishlist.POST("/add/:id", userHandler.AddIntoWishlit)          // add product in to wishlist
+				wishlist.DELETE("/remove/:id", userHandler.RemoveFromWIshList) // remove product in to wishlist
+				wishlist.GET("/all", userHandler.ViewWishList)                 // view wishlist
+			}
 		}
 	}
-
 }
