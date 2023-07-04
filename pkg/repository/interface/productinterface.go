@@ -13,6 +13,7 @@ type ProductRepository interface {
 	// ------------------------Category------------------------
 	FindCategoryById(ctx context.Context, CId uint) (domain.Category, error)                   // Find Category By Id
 	FindCategoryByname(ctx context.Context, name string) (domain.Category, error)              // Find cTegory by name
+	FindCategoryByName(name string) (domain.Category, error)                                   // Find Category By name
 	FindAllCategory(ctx context.Context, pagination req.PageNation) ([]res.CategoryRes, error) // View Full category
 	//------------CURD
 	CreateCategory(ctx context.Context, name string) (domain.Category, error)                // Creating new Category
@@ -35,25 +36,24 @@ type ProductRepository interface {
 	// updated product query
 
 	// findind
-	FindProductByName(name string) (domain.Product, error)
-	FindProductById(id uint) (domain.Product, error)
-	FindProductByBrand(id uint) (domain.Product, error)
-	FindProductByCategory(id uint) (domain.Product, error)
-	FindProductBySubCat(id uint) (domain.Product, error)
-	FindAllProduct(pagination req.PageNation) ([]res.ProductResponce, error)
-	FindProductByProductInfo(id uint) (domain.Product, error)
-	FindProductWithQuentity(pagination req.PageNation) ([]res.ResProduct, error)
-	FinBrandByName(name string) (domain.Brand, error)
-	FindCategoryByName(name string) (domain.Category, error)
-	FindProductInfoById(id uint) (domain.ProductInfo, error)
-	ProductViewByPid(id uint) (res.ResProductOrder, error)
+	FindProductByName(name string) (domain.Product, error)                             // Find Product By name
+	FindProductById(id uint) (domain.Product, error)                                   // Find Product By Id
+	FindProductByBrand(id uint) (domain.Product, error)                                // Find Product By Brand
+	FindProductByCategory(id uint) (domain.Product, error)                             // Find Product By category
+	FindProductBySubCat(id uint) (domain.Product, error)                               // Find Product By subcategory
+	FindProductByProductInfo(id uint) (domain.Product, error)                          // Find Product By productinfo Id
+	FindProductInfoById(id uint) (domain.ProductInfo, error)                           // Find Product info by Id
+	FindAllProduct(pagination req.PageNation) ([]res.ProductResponce, error)           // Find All products
+	ProductViewByPid(id uint) (res.ResProductOrder, error)                             // Find Produdct By Pinfo id
+	FindAllProductWithQuantity(pagination req.PageNation) ([]res.ProductQtyRes, error) // Find All product with quantity
+
 	// product images
 	AddProductImage(id uint, img string) error
 	FindImage(img string) (domain.ProductImage, error)
 
 	// opration
 	CreateProduct(product req.ReqProduct) error
-	UpdateProduct(product res.ResProduct, id uint) error
+	ProductUpdate(product req.UpdateProduct, id uint) error // Upatede product
 	DeletProduct(id uint) error
 	UpdateQuentity(id, qty uint) error
 
@@ -62,6 +62,7 @@ type ProductRepository interface {
 	DeleteBrand(id uint) error
 	ViewFullBrand() ([]res.ResBrand, error)
 	FindBrandByName(name string) (domain.Brand, error)
+	FinBrandByName(name string) (domain.Brand, error) // Find Product By
 	FIndBrandById(id uint) (domain.Brand, error)
 
 	// ----------- Sorting -----------

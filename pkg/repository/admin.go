@@ -30,7 +30,7 @@ func (adm *adminDatabase) EnvAdminFind(ctx context.Context) (domain.Admin, error
 		Password: enfCfg.AdminPassword,
 		Username: enfCfg.AdminUserName,
 	}
-	fmt.Println("email", envAdmin.Email, "pass", envAdmin.Password)
+
 	if envAdmin.Email == "" || envAdmin.Password == "" || envAdmin.Username == "" {
 		return envAdmin, errors.New("admin not found")
 	}
@@ -82,7 +82,10 @@ func (adm *adminDatabase) BlockUser(ctx context.Context, userId uint) error {
 	// check the user id
 	var user domain.Users
 	query := `select * from users where id = $1;`
-	adm.DB.Exec(query, userId).Scan(&user)
+	err := adm.DB.Raw(query, userId).Scan(&user).Error
+	if err != nil {
+		return err
+	}
 	// validating the user
 	/*
 		validating for if we get any user id
@@ -92,14 +95,14 @@ func (adm *adminDatabase) BlockUser(ctx context.Context, userId uint) error {
 		in the time the vaidation we can validate from the user variable
 		the user is exist or not by cheking any users key like emil,number etc...!
 	*/
-	if user.ID != 0 {
+
+	if user.ID == 0 {
 		return errors.New("invalid user id user does not exist")
 	}
-	fmt.Println("user details ", user)
 	// if we get the user
 	// Start the function
 
-	blockQry := `update users set block_status = $1 where id = $2`
+	blockQry := `update users set is_blocked = $1 where id = $2;`
 	if adm.DB.Exec(blockQry, !user.IsBlocked, userId).Error != nil {
 		return fmt.Errorf("faild to update block_status to %v", !user.IsBlocked)
 	}

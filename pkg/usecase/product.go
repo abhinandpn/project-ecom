@@ -249,6 +249,15 @@ func (p *productUseCase) GetAllProducts(pagination req.PageNation) ([]res.Produc
 	return products, nil
 }
 
+func (p *productUseCase) GetAllQtyInfoProduct(pagination req.PageNation) ([]res.ProductQtyRes, error) {
+
+	product, err := p.productRepo.FindAllProductWithQuantity(pagination)
+	if err != nil {
+		return product, err
+	}
+	return product, nil
+}
+
 func (p *productUseCase) ListproductByBrand(brand string) (domain.Product, error) {
 
 	var product domain.Product
@@ -353,23 +362,6 @@ func (p *productUseCase) DeleteProduct(id uint) error {
 	return nil
 }
 
-func (p *productUseCase) UpdateProduct(product res.ResProduct, id uint) error {
-
-	// find product
-	prdt, err := p.productRepo.FindProductByName(product.ProductName)
-	if err != nil {
-		return err
-	}
-	if prdt.Id == 0 {
-		return errors.New("product does not exist")
-	}
-	err = p.productRepo.UpdateProduct(product, prdt.Id)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
 func (p *productUseCase) UpdateQuentity(id, qty uint) error {
 
 	// find product
@@ -389,6 +381,35 @@ func (p *productUseCase) UpdateQuentity(id, qty uint) error {
 	return err
 }
 
+// ------------ update product final usecase ------------
+
+func (p *productUseCase) ProductUpdationNew(product req.UpdateProduct, id uint) error {
+
+	body, err := p.productRepo.FindProductInfoById(id)
+	if err != nil {
+		return err
+	}
+	if body.Id == 0 {
+		return errors.New("product info does not exist")
+	}
+
+	prdt, err := p.productRepo.FindProductById(body.ProductId)
+	if err != nil {
+		return err
+	}
+	if prdt.Id == 0 {
+		return errors.New("product does not exist")
+	}
+
+	err = p.productRepo.ProductUpdate(product, body.Id)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// ----------------
 func (p *productUseCase) CreateBrand(name, img string) error {
 
 	// check if exist or not

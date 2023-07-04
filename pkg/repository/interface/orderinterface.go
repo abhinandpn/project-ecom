@@ -12,11 +12,12 @@ type OrderRepository interface {
 	AddOrderItem(oid, pfid, qty uint) error
 	AddOrderItemCartAll(oid, cid uint) error
 	UpdatePaymentMethod(id, pid uint) error
+
 	// OrderStatus(id, oid uint) (res.OrderStatus, error)
 	// CartOrderAll(cid uint) error
 
-	//
 	/*
+
 		UPDATION NEED ....!
 	*/
 	FindOrderInfoByOrderId(id uint) (domain.OrderInfo, error)

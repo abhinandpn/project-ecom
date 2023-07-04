@@ -53,7 +53,6 @@ func (usr *userUseCase) SignUp(ctx context.Context, user domain.Users) error {
 		if err != nil {
 			return err
 		}
-
 		err = usr.userRepo.CreateWishList(Uid) // wishlist creating
 		if err != nil {
 			return err

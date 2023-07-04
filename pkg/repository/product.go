@@ -363,10 +363,10 @@ func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.Produ
 	limit := pagination.Count
 	offset := (pagination.PageNumber - 1) * limit
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -389,6 +389,42 @@ func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.Produ
 		return body, err
 	}
 	return body, nil
+}
+
+func (p *productDatabase) FindAllProductWithQuantity(pagination req.PageNation) ([]res.ProductQtyRes, error) {
+
+	var body []res.ProductQtyRes
+	limit := pagination.Count
+	offset := (pagination.PageNumber - 1) * limit
+
+	query := `SELECT
+				product_infos.id,
+				products.product_name,
+				products.discription,
+				product_infos.colour,
+				categories.category_name,
+				brands.brand_name,
+				product_infos.price,
+				product_infos.size,
+				product_infos.quantity
+			  FROM
+				products
+			  INNER JOIN
+				categories ON products.category_id = categories.id
+			  INNER JOIN
+				brands ON products.brand_id = brands.id
+			  INNER JOIN
+				product_infos ON products.id = product_infos.product_id
+			  ORDER BY
+			  product_infos.id ASC
+			  LIMIT
+				$1 OFFSET $2;`
+	err := p.DB.Raw(query, limit, offset).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
 }
 
 func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
@@ -437,67 +473,6 @@ func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
 		product.Price,
 		product.Color,
 		product.Size, 1).Scan(&ProductInfo).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// commit changes
-	err = tx.Commit().Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	return nil
-}
-
-func (p *productDatabase) UpdateProduct(product res.ResProduct, id uint) error {
-
-	tx := p.DB.Begin() // transaction begin
-	var Time time.Time
-	var ProductTable domain.Product
-	// var ProductImage domain.ProductImage
-	var ProductInfo domain.ProductInfo
-
-	// update product table
-	query1 := `update products set product_name =$1,
-						discription = $2,
-						brand_id =$3,
-						category_id =$4,
-						updated_at =$5 
-						where id =$6 returning id;`
-	err := p.DB.Raw(query1, product.ProductName,
-		product.Discription,
-		product.BrandId,
-		product.CategoryID,
-		Time,
-		id).Scan(&ProductTable).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	productId := ProductTable.Id
-	// update product images
-	// query2 := `update product_images set product_images =$1 where product_id =$2 returning id`
-	// err = p.DB.Raw(query2, product.Image, productId).Scan(&ProductImage).Error
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
-
-	// Imageid := ProductImage.Id
-	// update product infos
-	query3 := `update product_infos set price = $1 ,
-			 colour = $2 ,
-			 size = $3 ,
-			 image_id = $4 where product_id = $5 ;`
-	err = p.DB.Raw(query3,
-		product.Price,
-		product.Color,
-		product.Size,
-		// Imageid,
-		productId).Scan(&ProductInfo).Error
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -568,37 +543,6 @@ func (p *productDatabase) UpdateQuentity(id, qty uint) error {
 		return err
 	}
 	return nil
-}
-
-func (p *productDatabase) FindProductWithQuentity(pagination req.PageNation) ([]res.ResProduct, error) {
-
-	var body []res.ResProduct
-	limit := pagination.Count
-	offset := (pagination.PageNumber - 1) * limit
-	query := `SELECT
-				    p.product_name,
-				    sc.sub_category_name,
-				    br.brand_name,
-				    pi.price,
-				    pi.colour,
-				    pi.size,
-				    pr.product_images,
-				    pi.quatity
-				FROM
-				    products p
-				    JOIN product_infos pi ON p.id = pi.product_id
-				    JOIN brands br ON p.brand_id = br.id
-				    JOIN product_images pr ON p.id = pr.product_id
-				    JOIN sub_categories sc ON p.sub_category_id = sc.category_id
-				ORDER BY
-					created_at DESC
-			    LIMIT
-					$1 OFFSET $2;`
-	err := p.DB.Raw(query, limit, offset).Scan(&body).Error
-	if err != nil {
-		return body, err
-	}
-	return body, nil
 }
 
 func (p *productDatabase) FinBrandByName(name string) (domain.Brand, error) {
@@ -714,6 +658,7 @@ func (p *productDatabase) ProductViewByPid(id uint) (res.ResProductOrder, error)
 
 	var body res.ResProductOrder
 	query := `SELECT 
+					
 				    p.product_name AS "ProductName",
 				    p.discription AS "Description",
 				    c.category_name AS "CategoryName",
@@ -738,6 +683,63 @@ func (p *productDatabase) ProductViewByPid(id uint) (res.ResProductOrder, error)
 	return body, nil
 }
 
+// PRODUCT UPDATION FINAL FUNC
+
+func (p *productDatabase) ProductUpdate(product req.UpdateProduct, id uint) error {
+
+	tx := p.DB.Begin() // transaction begins
+	var productTable domain.Product
+	var ProductInfo domain.ProductInfo
+	var Time time.Time
+
+	// update product info table
+	querypf := `update product_infos set price = $1 ,
+								colour = $2 ,
+								size = $3 ,
+								quantity = $4 where id = $5 returning product_id;`
+	err := p.DB.Raw(querypf,
+		product.Price,
+		product.Colour,
+		product.Size,
+		product.Quantity,
+		id).Scan(&ProductInfo).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// update product table
+	queryPr := `update products set product_name = $1,
+								discription = $2,
+								brand_id = $3,
+								category_id = $4,
+								updated_at = $5
+								where id = $6 returning id ;`
+	err = p.DB.Raw(queryPr,
+		product.ProductName,
+		product.Discription,
+		product.BrandId,
+		product.CategoryId,
+		Time,
+		ProductInfo.ProductId).Scan(&productTable).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// commit changes
+	err = tx.Commit().Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
 // ----------- Sorting -----------
 
 func (p *productDatabase) ListByColour(colour string,
@@ -748,10 +750,10 @@ func (p *productDatabase) ListByColour(colour string,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -767,7 +769,7 @@ func (p *productDatabase) ListByColour(colour string,
 			  WHERE
 				product_infos.colour = $1
 			  ORDER BY
-				created_at DESC
+			 	 product_infos.id ASC
 			  LIMIT
 				$2 OFFSET $3;`
 
@@ -786,10 +788,10 @@ func (p *productDatabase) ListBySize(size uint,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -805,7 +807,7 @@ func (p *productDatabase) ListBySize(size uint,
 			  WHERE
 				product_infos.size = $1
 			  ORDER BY
-				created_at DESC
+			  	product_infos.id ASC
 			  LIMIT
 				$2 OFFSET $3;`
 
@@ -824,10 +826,10 @@ func (p *productDatabase) ListByCategory(id uint,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -843,7 +845,7 @@ func (p *productDatabase) ListByCategory(id uint,
 			  WHERE
 				products.category_id = $1
 			  ORDER BY
-				created_at DESC
+			  	product_infos.id ASC
 			  LIMIT
 				$2 OFFSET $3;`
 
@@ -862,10 +864,10 @@ func (p *productDatabase) ListByBrand(id uint,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -881,7 +883,7 @@ func (p *productDatabase) ListByBrand(id uint,
 			  WHERE
 				products.brand_id = $1
 			  ORDER BY
-				created_at DESC
+				product_infos.id ASC
 			  LIMIT
 				$2 OFFSET $3;`
 
@@ -901,10 +903,10 @@ func (p *productDatabase) ListByName(name string,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -920,7 +922,7 @@ func (p *productDatabase) ListByName(name string,
 			  WHERE
 				products.product_name = $1
 			  ORDER BY
-				created_at DESC
+			  	product_infos.id ASC
 			  LIMIT
 				$2 OFFSET $3;`
 
@@ -940,10 +942,10 @@ func (p *productDatabase) ListByPrice(Start, End float64,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -959,7 +961,7 @@ func (p *productDatabase) ListByPrice(Start, End float64,
 			  WHERE
 			  	product_infos.price BETWEEN $1 AND $2
 			  ORDER BY
-				created_at DESC
+			 	 product_infos.id ASC
 			  LIMIT
 				$3 OFFSET $4;`
 
@@ -979,10 +981,10 @@ func (p *productDatabase) ListByQuantity(Start, End uint,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+				product_infos.id,
 				products.product_name,
 				products.discription,
 				categories.category_name,
-				
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
@@ -998,7 +1000,7 @@ func (p *productDatabase) ListByQuantity(Start, End uint,
 			  WHERE
 			  	product_infos.quatity BETWEEN $1 AND $2
 			  ORDER BY
-				created_at DESC
+			  	product_infos.id ASC
 			  LIMIT
 				$3 OFFSET $4;`
 	err := p.DB.Raw(query, Start, End, limit, offset).Scan(&body).Error

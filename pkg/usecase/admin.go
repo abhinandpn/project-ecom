@@ -86,12 +86,13 @@ func (adm *AdminUseCase) BlockUser(ctx context.Context, UserId uint) error {
 	if err != nil {
 		return err
 	}
-
 	// if exist block
 	if user.ID != 0 {
 		adm.adminRepo.BlockUser(ctx, UserId)
+	} else {
+		res := errors.New("user does not exist")
+		return res
 	}
-
 	// return
 	return nil
 }

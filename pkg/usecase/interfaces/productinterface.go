@@ -38,15 +38,18 @@ type ProductuseCase interface {
 	GetProductByName(name string) (domain.Product, error)
 	GetProductById(id uint) (domain.Product, error)
 	GetAllProducts(pagination req.PageNation) ([]res.ProductResponce, error)
+	GetAllQtyInfoProduct(pagination req.PageNation) ([]res.ProductQtyRes, error)
 	ListproductByBrand(brand string) (domain.Product, error)
 	ListProductByCategory(category string) (domain.Product, error)
+
 	// product images
 	AddImage(id uint, name string) error
 	// ListProductBySubCategory(pagination req.PageNation, name string) ([]res.ProductResponce, error)
+
 	// Opration
 	CreateProduct(product req.ReqProduct) error
 	DeleteProduct(id uint) error
-	UpdateProduct(product res.ResProduct, id uint) error
+	ProductUpdationNew(product req.UpdateProduct, id uint) error
 	UpdateQuentity(id, qty uint) error
 
 	// brand
