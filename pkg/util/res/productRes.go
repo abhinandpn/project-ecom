@@ -40,6 +40,7 @@ type ProductQuentity struct {
 	Quentity     uint
 }
 type ResProduct struct {
+	Id          uint   `json:"id"`
 	ProductName string `json:"product_name" gorm:"not null" binding:"required,min=3,max=50"`
 	Discription string `json:"description" gorm:"not null" binding:"required,min=3,max=100"`
 	CategoryID  uint   `json:"category_id" binding:"required"`
@@ -48,6 +49,7 @@ type ResProduct struct {
 	Color       string `json:"color" binding:"required"`
 	Size        uint   `json:"size" binding:"required" gorm:"not null"`
 	Image       string `json:"image" gorm:"not null" binding:"required"`
+	Quantity    uint   `json:"quantity" `
 }
 
 type ResBrand struct {
@@ -55,27 +57,8 @@ type ResBrand struct {
 	BrandImage string `json:"brand_image"`
 }
 
-/*
-SELECT
-
-	p.product_name,
-	sc.sub_category_name,
-	br.brand_name,
-	pi.price,
-	pi.colour,
-	pi.size,
-	pr.product_images,
-	pi.quatity
-
-FROM
-
-	products p
-	JOIN product_infos pi ON p.id = pi.product_id
-	JOIN brands br ON p.brand_id = br.id
-	JOIN product_images pr ON p.id = pr.product_id
-	JOIN sub_categories sc ON p.sub_category_id = sc.category_id;
-*/
 type ResProductOrder struct {
+	Id           uint
 	ProductName  string
 	Discription  string
 	CategoryName string
@@ -83,4 +66,16 @@ type ResProductOrder struct {
 	Size         uint
 	Price        float64
 	Colour       string
+}
+
+type ProductQtyRes struct {
+	Id           uint
+	ProductName  string
+	Discription  string
+	Colour       string
+	CategoryName string
+	BrandName    string
+	Price        float64
+	Size         string
+	Quantity     uint
 }
