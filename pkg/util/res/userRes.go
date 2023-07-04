@@ -39,3 +39,9 @@ type ViewWishList struct {
 	Brand       string
 	Category    string
 }
+type UserBlockRes struct {
+	UserName    string
+	Email       string
+	Number      string
+	BlockStatus bool
+}
