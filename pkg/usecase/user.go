@@ -220,27 +220,34 @@ func (w *userUseCase) CreteWishList(id uint) error {
 	return nil
 }
 
-func (w *userUseCase) AddToWishListItem(wid, pfid uint) error {
+func (w *userUseCase) AddToWishListItem(uid, pfid uint) error {
 
-	wishlist, err := w.userRepo.FindWishListItemByWid(wid)
+	// get user wishist info
+	wishlist, err := w.userRepo.FindWishListByUid(uid)
 	if err != nil {
+		return err
+	}
+	if wishlist.ID == 0 {
+		res := errors.New("user does not have wishlist")
+		return res
+	}
+
+	// check the product alredy exsit or not in the wishlist
+	status, err := w.userRepo.FindProductFromWIshListItem(wishlist.ID, pfid)
+	if err != nil {
+		return err
+	}
+	if status {
+		res := errors.New("product alredy exist")
+		return res
+	} else {
+		err = w.userRepo.AddToWishlistItem(wishlist.ID, pfid)
 		if err != nil {
 			return err
 		}
 	}
 
-	if wishlist.Id != 0 {
-		body, err := w.userRepo.FindProductFromWIshListItem(wishlist.Id, pfid)
-		if err != nil {
-			return err
-		}
-		if !body {
-			err := w.userRepo.AddToWishlistItem(wid, pfid)
-			if err != nil {
-				return err
-			}
-		}
-	}
+	// response
 	return nil
 }
 

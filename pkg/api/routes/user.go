@@ -77,7 +77,7 @@ func UserRoutes(api *gin.RouterGroup,
 			//order
 			order := api.Group("/order")
 			{
-				order.POST("/cart/all/:id", orderHandler.CartAllOrder) // cart all product order
+				order.POST("/cart", orderHandler.CartAllOrder)         // cart all product order
 				order.GET("/status/:id", orderHandler.CartOrderStatus) // order status
 				order.POST("/buynow/:id", orderHandler.BuyNow)         // order by pfid
 			}
@@ -87,6 +87,10 @@ func UserRoutes(api *gin.RouterGroup,
 				wishlist.POST("/add/:id", userHandler.AddIntoWishlit)          // add product in to wishlist
 				wishlist.DELETE("/remove/:id", userHandler.RemoveFromWIshList) // remove product in to wishlist
 				wishlist.GET("/all", userHandler.ViewWishList)                 // view wishlist
+			}
+			payment := api.Group("payment")
+			{
+				payment.GET("/methods", paymentHandler.GetPaymentMethods) // get payment mehods
 			}
 		}
 	}

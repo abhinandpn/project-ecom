@@ -31,7 +31,7 @@ type UserRepository interface {
 
 	// wishlist
 	CreateWishList(id uint) error
-	AddToWishlistItem(uid, pfid uint) error
+	AddToWishlistItem(wid, pfid uint) error
 	RemoveFromWishListItem(wid, pfid uint) error
 	FindWishListByUid(id uint) (domain.WishList, error)
 	FindWishListItemByWid(id uint) (domain.WishListItems, error)

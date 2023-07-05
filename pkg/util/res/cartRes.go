@@ -1,6 +1,7 @@
 package res
 
 type CartDisplay struct {
+	Id           uint
 	ProductName  string
 	Size         uint
 	Colour       string

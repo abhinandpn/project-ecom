@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 
 	"net/http"
 
@@ -356,7 +355,7 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-// ---------- wishlist --------------
+// ---------------------------- WISH LIST ----------------------------
 
 func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 
@@ -374,41 +373,19 @@ func (w *UserHandler) AddIntoWishlit(ctx *gin.Context) {
 		return
 	}
 
-	// find wishlist
-	wishlist, err := w.userUseCase.FindWishList(UserId)
+	err = w.userUseCase.AddToWishListItem(UserId, Pfid)
 	if err != nil {
-		response := res.ErrorResponse(500, "Failed to find wishlist", err.Error(), wishlist)
-		ctx.JSON(http.StatusInternalServerError, response)
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't add product in to wishlist",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
 		return
-	}
-	if wishlist.ID == 0 {
-		response := res.ErrorResponse(500, "wishlist not created yet", err.Error(), wishlist)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	}
-	// add in to wishlist
-	body, err := w.userUseCase.FindWishLisItemByPFID(wishlist.ID, Pfid)
-
-	if err != nil {
-		response := res.ErrorResponse(500, "Failed to find product in to wishlist 1", err.Error(), wishlist)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	}
-	if body {
-		response := res.ErrorResponse(500, "product alredy exist", err.Error(), body)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	} else {
-		err = w.userUseCase.AddToWishListItem(wishlist.ID, Pfid)
-		if err != nil {
-			response := res.ErrorResponse(500, "Failed to add product in to wishlist 2", err.Error(), wishlist)
-			ctx.JSON(http.StatusInternalServerError, response)
-			return
-		}
 	}
 
 	// response
-	response := res.SuccessResponse(200, "successfully add product in to wishlist", wishlist.User)
+	response := res.SuccessResponse(200, "successfully add product in to wishlist", Pfid)
 	ctx.JSON(http.StatusOK, response)
 }
 
@@ -511,7 +488,6 @@ func (u *UserHandler) UserStatus(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	fmt.Println(user)
 	if user.IsBlocked {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"StatusCode": 401,

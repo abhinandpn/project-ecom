@@ -5,6 +5,7 @@ import "time"
 type PaymentMethod struct {
 	Id     uint `json:"id" gorm:"primaryKey;not null"`
 	Method string
+	Status bool
 }
 
 type PaymentDetail struct {

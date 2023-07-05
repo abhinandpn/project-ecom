@@ -27,7 +27,7 @@ type UserUseCase interface {
 	FindWishList(id uint) (domain.WishList, error)
 	FindWishLisItemByPFID(wid, pfid uint) (bool, error)
 	CreteWishList(id uint) error
-	AddToWishListItem(wid, pfid uint) error
+	AddToWishListItem(uid, pfid uint) error
 	RemoveWishListItem(wid, pfid uint) error
 	ViewWishList(uid uint, pagination req.PageNation) ([]res.ViewWishList, error)
 }

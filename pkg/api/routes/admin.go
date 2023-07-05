@@ -10,7 +10,7 @@ func AdminRoute(api *gin.RouterGroup,
 	AdminHandler handlerInterface.AdminHandler,
 	ProductHandler handlerInterface.ProductHandler,
 	orderHandler handlerInterface.OrderHandler,
-	payment handlerInterface.PaymentHandler,
+	PaymentHandler handlerInterface.PaymentHandler,
 ) {
 	// Sudo Admin Login Login
 	login := api.Group("/login")
@@ -76,6 +76,13 @@ func AdminRoute(api *gin.RouterGroup,
 			brand.POST("/add", ProductHandler.AddBrand)     // Add brand
 			brand.DELETE("/:id", ProductHandler.DeletBrand) // Delete brand
 			brand.GET("/all", ProductHandler.ViewBrands)    // View full brands
+		}
+		// payment
+		payment := api.Group("/payment")
+		{
+			payment.POST("/add/:name", PaymentHandler.AddPaymentMethod)       // add payment method
+			payment.DELETE("/delete/:id", PaymentHandler.DeletePaymentMethod) // delete payment method
+			payment.GET("/all", PaymentHandler.GetPaymentMethods)             // get all payment methods
 		}
 	}
 }

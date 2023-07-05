@@ -33,6 +33,7 @@ type ResAddress struct {
 }
 
 type ViewWishList struct {
+	Id          uint
 	ProductName string
 	Price       float64
 	Colour      string

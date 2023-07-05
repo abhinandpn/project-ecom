@@ -255,12 +255,12 @@ func (w *userDatabase) CreateWishList(id uint) error {
 
 }
 
-func (w *userDatabase) AddToWishlistItem(uid, pfid uint) error {
+func (w *userDatabase) AddToWishlistItem(wid, pfid uint) error {
 
 	var body domain.WishListItems
 	query := `insert into wish_list_items (wish_list_id,product_info_id)values ($1,$2);`
 
-	err := w.DB.Raw(query, uid, pfid).Scan(&body).Error
+	err := w.DB.Raw(query, wid, pfid).Scan(&body).Error
 	if err != nil {
 		return err
 	}
@@ -337,6 +337,7 @@ func (w *userDatabase) ViewWishList(uid uint, pagination req.PageNation) ([]res.
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
+					pi.id,
 				    p.product_name AS "ProductName",
 				    pi.price AS "Price",
 				    pi.colour AS "Colour",
