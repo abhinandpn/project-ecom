@@ -34,6 +34,8 @@ func AdminRoute(api *gin.RouterGroup,
 			user.GET("/number/:number", AdminHandler.FindUserWithNumber)     // Find user with number
 			user.GET("/email/:email", AdminHandler.FindUserWithEmail)        // Find User With email
 			user.GET("/username/:username", AdminHandler.FindUserByUserName) // Find User With User name
+			user.GET("/order/detail/:id", AdminHandler.UserOrderDetails)
+			user.PATCH("/order/:id/:status", AdminHandler.ChangeOrderStatus)
 		}
 		// Product
 		product := api.Group("/product")

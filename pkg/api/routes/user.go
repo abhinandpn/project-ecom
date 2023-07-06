@@ -56,9 +56,10 @@ func UserRoutes(api *gin.RouterGroup,
 			// Address
 			address := api.Group("/address")
 			{
-				address.POST("/add", userHandler.AddAddress)        // Add Address
-				address.GET("/all", userHandler.ListAllAddress)     // List all Address
-				address.PATCH("/update", userHandler.UpdateAddress) // Update Address
+				address.POST("/add", userHandler.AddAddress)               // Add Address
+				address.GET("/all", userHandler.ListAllAddress)            // List all Address
+				address.PATCH("/update", userHandler.UpdateAddress)        // Update Address
+				address.GET("/default", userHandler.GetUserDefaultAddress) // get default address
 			}
 
 			// Category
@@ -77,9 +78,10 @@ func UserRoutes(api *gin.RouterGroup,
 			//order
 			order := api.Group("/order")
 			{
-				order.POST("/cart", orderHandler.CartAllOrder)         // cart all product order
+				order.POST("/cart/", orderHandler.CartAllOrder)        // cart all product order
 				order.GET("/status/:id", orderHandler.CartOrderStatus) // order status
 				order.POST("/buynow/:id", orderHandler.BuyNow)         // order by pfid
+				order.GET("/detail", orderHandler.OrderDetail)         // order details
 			}
 			// wishlist
 			wishlist := api.Group("/wishlist")
