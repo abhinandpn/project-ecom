@@ -123,6 +123,7 @@ func (usr *UserHandler) UserLogin(ctx *gin.Context) {
 	ctx.SetCookie("user-auth", tokenString["jwtToken"], 60*60, "", "", false, true)
 
 	response := res.SuccessResponse(200, "successfully logged in", tokenString["jwtToken"])
+
 	ctx.JSON(http.StatusOK, response)
 
 }
@@ -297,26 +298,15 @@ func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 	// collect the user id
 	UserId := helper.GetUserId(ctx)
 
-	var body res.ResAddress
-
-	body.UserId = UserId
-
-	// Bind json
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
-		response := res.ErrorResponse(500, "Failed to bind address", err.Error(), body)
-		ctx.JSON(http.StatusInternalServerError, response)
-		return
-	}
 	// List func calling
 	address, err := usr.userUseCase.ListAllAddress(ctx, UserId)
 	if err != nil {
-		response := res.ErrorResponse(500, "Failed to list all address", err.Error(), body)
+		response := res.ErrorResponse(500, "Failed to list all address", err.Error(), address)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	if address == nil {
-		response := res.ErrorResponse(500, "there no address found", err.Error(), body)
+		response := res.ErrorResponse(500, "there no address found", err.Error(), address)
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -352,6 +342,58 @@ func (usr *UserHandler) UpdateAddress(ctx *gin.Context) {
 
 	// responce
 	response := res.SuccessResponse(200, "successfully update user Address", body)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (a *UserHandler) GetUserDefaultAddress(ctx *gin.Context) {
+
+	UserId := helper.GetUserId(ctx)
+
+	address, err := a.userUseCase.GetUserDefaultAddressId(UserId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find user deafult address",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	if address.ID == 0 {
+		response := res.SuccessResponse(200, "user dosent have default address", address)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully get user default address", address)
+	ctx.JSON(http.StatusOK, response)
+}
+
+// make default address
+func (a *UserHandler) MakeAddressDefault(ctx *gin.Context) {
+
+	userId := helper.GetUserId(ctx)
+	ParmId := ctx.Param("id")
+	Aid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find address id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	err = a.userUseCase.MakeAddressDefault(userId, Aid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't make user  address deafult",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	response := res.SuccessResponse(200, "successfully make user address default ", Aid)
 	ctx.JSON(http.StatusOK, response)
 }
 
