@@ -15,9 +15,10 @@ type UserHandler interface {
 	AddAddress(ctx *gin.Context)         // add address
 	UserStatus(ctx *gin.Context)         // Get user Block status
 	// address
-	ListAllAddress(ctx *gin.Context) // list all category - for user
-	UpdateAddress(ctx *gin.Context)  // list all product - for user
-	// CreateCart(ctx *gin.Context)
+	ListAllAddress(ctx *gin.Context)        // List all category - for user
+	UpdateAddress(ctx *gin.Context)         // List all product - for user
+	GetUserDefaultAddress(ctx *gin.Context) // Get user default address
+	MakeAddressDefault(ctx *gin.Context)    // Make address Default
 
 	// wishlist
 	AddIntoWishlit(ctx *gin.Context)     // add product in to wishlist
