@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/api/middleware"
 	"github.com/gin-gonic/gin"
@@ -18,7 +16,6 @@ func UserRoutes(api *gin.RouterGroup,
 	// login
 	login := api.Group("/login")
 	{
-		fmt.Println("--------------- route------")
 		login.POST("", userHandler.UserLogin)
 		login.POST("/otp-send", userHandler.UserOtpLogin)
 		login.POST("/otp-verify", userHandler.UserLoginOtpVerify)
@@ -44,6 +41,12 @@ func UserRoutes(api *gin.RouterGroup,
 	}
 	api.Use(middleware.AuthUser)
 	{
+		// logout
+		logout := api.Group("/logout")
+		{
+			logout.DELETE("", userHandler.UserLogout)
+		}
+
 		api.Use(userHandler.UserStatus)
 		{
 
@@ -56,10 +59,11 @@ func UserRoutes(api *gin.RouterGroup,
 			// Address
 			address := api.Group("/address")
 			{
-				address.POST("/add", userHandler.AddAddress)               // Add Address
-				address.GET("/all", userHandler.ListAllAddress)            // List all Address
-				address.PATCH("/update", userHandler.UpdateAddress)        // Update Address
-				address.GET("/default", userHandler.GetUserDefaultAddress) // get default address
+				address.POST("/add", userHandler.AddAddress)                  // Add Address
+				address.GET("/all", userHandler.ListAllAddress)               // List all Address
+				address.PATCH("/update", userHandler.UpdateAddress)           // Update Address
+				address.GET("/default", userHandler.GetUserDefaultAddress)    // get default address
+				address.PATCH("/default/:id", userHandler.MakeAddressDefault) // make address default
 			}
 
 			// Category
