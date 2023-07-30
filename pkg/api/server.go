@@ -18,7 +18,8 @@ func NewServerHTTP(userHandler handlerInterface.UserHandler,
 	productHandler handlerInterface.ProductHandler,
 	cartHandler handlerInterface.CartHandler,
 	orderHandler handlerInterface.OrderHandler,
-	paymentHandler handlerInterface.PaymentHandler) *ServerHTTP {
+	paymentHandler handlerInterface.PaymentHandler,
+	couponHandler handlerInterface.CouponHandler) *ServerHTTP {
 
 	Engine := gin.New()
 	Engine.Use(gin.Logger())
@@ -30,8 +31,18 @@ func NewServerHTTP(userHandler handlerInterface.UserHandler,
 	Engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// For Routes
-	routes.UserRoutes(Engine.Group("/"), userHandler, productHandler, cartHandler, orderHandler, paymentHandler)
-	routes.AdminRoute(Engine.Group("/admin"), adminHandler, productHandler, orderHandler, paymentHandler)
+	routes.UserRoutes(Engine.Group("/"),
+		userHandler,
+		productHandler,
+		cartHandler,
+		orderHandler,
+		paymentHandler)
+	routes.AdminRoute(Engine.Group("/admin"),
+		adminHandler,
+		productHandler,
+		orderHandler,
+		paymentHandler,
+		couponHandler)
 
 	return &ServerHTTP{engine: Engine}
 }
