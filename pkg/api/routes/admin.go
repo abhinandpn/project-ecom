@@ -11,6 +11,7 @@ func AdminRoute(api *gin.RouterGroup,
 	ProductHandler handlerInterface.ProductHandler,
 	orderHandler handlerInterface.OrderHandler,
 	PaymentHandler handlerInterface.PaymentHandler,
+	CouponHandler handlerInterface.CouponHandler,
 ) {
 	// Sudo Admin Login Login
 	login := api.Group("/login")
@@ -85,6 +86,16 @@ func AdminRoute(api *gin.RouterGroup,
 			payment.POST("/add/:name", PaymentHandler.AddPaymentMethod)       // add payment method
 			payment.DELETE("/delete/:id", PaymentHandler.DeletePaymentMethod) // delete payment method
 			payment.GET("/all", PaymentHandler.GetPaymentMethods)             // get all payment methods
+		}
+		// coupon
+		coupon := api.Group("/coupon")
+		{
+			coupon.POST("/add", CouponHandler.CrateCoupon)       // create coupon
+			coupon.PATCH("/update", CouponHandler.UpdateCoupon)  // update coupon
+			coupon.DELETE("/:id", CouponHandler.DeleteCoupon)    // delete coupon
+			coupon.GET("/:name", CouponHandler.ViewCouponByCode) // get coupon by name
+			coupon.GET("/:id", CouponHandler.ViewCouponById)     // get coupon by id
+			coupon.GET("/all", CouponHandler.ListCoupon)         // get full coupons
 		}
 	}
 }
