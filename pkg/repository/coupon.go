@@ -16,35 +16,32 @@ func NewCouponRepository(db *gorm.DB) interfaces.Couponrepository {
 	return &CouponDatabase{DB: db}
 }
 
-func (cp *CouponDatabase) AddCoupon(coupon req.CouponReq) error {
+func (cp *CouponDatabase) AddCouponWithMoney(coupon req.CouponWithMoney) error {
 
 	var body domain.Coupon
 	query := `insert into coupons (code,
-					discount_persentage,
 					discount_price,
 					minimum_purchase,
-					exp_date)values ($1,$2,$3,$4,$5);`
+					exp_date)values ($1,$2,$3,$4);`
 	err := cp.DB.Raw(query,
 		coupon.Code,
-		coupon.DiscountPersentage,
 		coupon.DiscountPrice,
-		coupon.MinimumPurchase).Scan(&body).Error
+		coupon.MinimumPurchase,
+		coupon.ExpDate).Scan(&body).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (cp *CouponDatabase) UpdateCoupon(coupon req.CouponReq, Id uint) (domain.Coupon, error) {
+func (cp *CouponDatabase) UpdateCoupon(coupon req.CouponWithMoney, Id uint) (domain.Coupon, error) {
 
 	var body domain.Coupon
 	query := `update coupons set code = $1,
-						discount_persentage =$2 ,
-						discount_price = $3,
-						minimum_purchase = $4,
-						exp_date =$5 where id = $7;`
+						discount_price = $2,
+						minimum_purchase = $3,
+						exp_date =$4 where id = $5;`
 	err := cp.DB.Raw(query, coupon.Code,
-		coupon.DiscountPersentage,
 		coupon.DiscountPrice,
 		coupon.MinimumPurchase,
 		coupon.ExpDate, Id).Scan(&body).Error
@@ -91,6 +88,41 @@ func (cp *CouponDatabase) ViewCouponByCode(code string) (domain.Coupon, error) {
 	var body domain.Coupon
 	query := `select * from coupons where code = $1;`
 	err := cp.DB.Raw(query, code).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (c *CouponDatabase) ApplyCoupon(cid, uid uint) error {
+
+	var body domain.UserCart
+	query := `update user_carts set coupon_id = $1 where user_id = $2;`
+	err := c.DB.Raw(query, cid, uid).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CouponDatabase) RemoveCoupon(uid uint) error {
+
+	var body domain.UserCart
+	query := `UPDATE user_carts     
+			SET coupon_id = NULL  
+			WHERE user_id = $1;`
+	err := c.DB.Raw(query, uid).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CouponDatabase) FindCoupon(cid, uid uint) (domain.Coupon, error) {
+
+	var body domain.Coupon
+	query := `select * from user_carts where user_id = $1 and coupon_id= $2;`
+	err := c.DB.Raw(query, uid, cid).Scan(&body).Error
 	if err != nil {
 		return body, err
 	}
