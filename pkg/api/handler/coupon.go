@@ -20,27 +20,19 @@ func NewCouponHandler(couponUsecase service.CouponUseCase) handlerInterface.Coup
 	return &CouponHandler{CouponUseCase: couponUsecase}
 }
 
-func (cp *CouponHandler) CrateCoupon(ctx *gin.Context) {
+func (cp *CouponHandler) CrateCouponWithmoney(ctx *gin.Context) {
 
-	var body req.CouponReq
-	err := ctx.Bind(&body)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, res.Response{
-			StatusCode: 400,
-			Message:    "bind faild",
-			Data:       nil,
-			Errors:     err.Error(),
-		})
+	var body req.CouponWithMoney
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
 		return
 	}
-	err = cp.CouponUseCase.AddCoupon(body)
+
+	err := cp.CouponUseCase.AddCoupon(body)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, res.Response{
-			StatusCode: 400,
-			Message:    "cant create coupon",
-			Data:       nil,
-			Errors:     err.Error(),
-		})
+		response := res.ErrorResponse(400, "faild to add coupon", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 	respones := res.SuccessResponse(200, "successfully create coupon", body)
@@ -60,7 +52,7 @@ func (cp *CouponHandler) UpdateCoupon(ctx *gin.Context) {
 		})
 		return
 	}
-	var body req.CouponReq
+	var body req.CouponWithMoney
 	err = ctx.Bind(&body)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
@@ -158,6 +150,7 @@ func (cp *CouponHandler) ListCoupon(ctx *gin.Context) {
 func (c *CouponHandler) ViewCouponByCode(ctx *gin.Context) {
 
 	Coupon := ctx.Param("name")
+
 	body, err := c.CouponUseCase.ViewCouponByCode(Coupon)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
@@ -169,5 +162,41 @@ func (c *CouponHandler) ViewCouponByCode(ctx *gin.Context) {
 		return
 	}
 	respones := res.SuccessResponse(200, "successfully get coupon", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (c *CouponHandler) ApplyCoupon(ctx *gin.Context) {
+
+	userId := helper.GetUserId(ctx)
+	Coupon := ctx.Param("name")
+	err := c.CouponUseCase.ApplyCoupon(Coupon, userId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "cat apply coupon",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully apply coupon", Coupon)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (c *CouponHandler) RemoveCoupon(ctx *gin.Context) {
+
+	userId := helper.GetUserId(ctx)
+	Coupon := ctx.Param("name")
+	err := c.CouponUseCase.RemoveCoupon(Coupon, userId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "cat remove coupon",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully remove coupon", Coupon)
 	ctx.JSON(http.StatusOK, respones)
 }
