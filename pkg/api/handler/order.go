@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
@@ -54,9 +55,13 @@ func (o *OrderHandler) BuyNow(ctx *gin.Context) {
 func (o *OrderHandler) CartAllOrder(ctx *gin.Context) {
 
 	Uid := helper.GetUserId(ctx)
+	PaymentId, err1 := helper.StringToUInt(ctx.Query("payid"))
+	AddressId, err2 := helper.StringToUInt(ctx.Query("addressid"))
 
-	ParmId := ctx.Param("id")
-	payid, err := helper.StringToUInt(ParmId)
+	var copid uint
+
+	err := errors.Join(err1, err2)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
 			StatusCode: 400,
@@ -67,7 +72,7 @@ func (o *OrderHandler) CartAllOrder(ctx *gin.Context) {
 		return
 	}
 
-	err = o.orderUseCase.CartOrderAll(Uid, payid)
+	err = o.orderUseCase.CartOrderAll(Uid, PaymentId, copid, AddressId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, res.Response{
 			StatusCode: 400,
@@ -112,7 +117,7 @@ func (o *OrderHandler) CartOrderStatus(ctx *gin.Context) {
 }
 
 func (o *OrderHandler) OrderByproductId(ctx *gin.Context) {
-
+	// CreateOrderStatus(ctx * gin.Context)
 	Uid := helper.GetUserId(ctx)
 
 	var body req.OrderByProduct
@@ -122,13 +127,154 @@ func (o *OrderHandler) OrderByproductId(ctx *gin.Context) {
 		return
 	}
 
-	
-
 	// updation for body
-	body.UserId = Uid 
+	body.UserId = Uid
 	// body.AddressId
 	// body.CouponId
 	// body.PaymentMethodId
 	// body.ProductInfoId
 	// body.Quantity
-}	
+}
+
+func (o *OrderHandler) OrderDetail(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+
+	body, err := o.orderUseCase.UserOrders(Uid)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't get order details",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get order details", body)
+	ctx.JSON(http.StatusOK, respones)
+
+}
+
+func (or *OrderHandler) CreateOrderStatus(ctx *gin.Context) {
+
+	var body req.OrderStatus
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	err = or.orderUseCase.CreateOrderStatus(body.Status)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant create order status", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully create order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (or *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	Oid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	var body req.OrderStatus
+	err = ctx.ShouldBindJSON(&body)
+	if err != nil {
+		respones := res.ErrorResponse(400, "invalid input", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+
+	order, err := or.orderUseCase.UpdateOrderStatus(Oid, body.Status)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant update order status", err.Error(), body)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update order status", order)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (or *OrderHandler) DeleteOrderStatus(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	Oid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	err = or.orderUseCase.DeletOrderStatus(Oid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant delete order status", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully delet order status", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (or *OrderHandler) FindOrderStatusByStatus(ctx *gin.Context) {
+
+	Status := ctx.Param("name")
+	body, err := or.orderUseCase.FindOrderStatusByStatus(Status)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant find order status", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (or *OrderHandler) FindOrderStatusById(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	Oid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	body, err := or.orderUseCase.FindOrderStatusById(Oid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant find order status", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (or *OrderHandler) GetAllOrderStatus(ctx *gin.Context) {
+
+	body, err := or.orderUseCase.FindAllOrderStatus()
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant find order status", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
