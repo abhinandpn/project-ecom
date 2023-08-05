@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	service "github.com/abhinandpn/project-ecom/pkg/usecase/interfaces"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -36,7 +37,7 @@ var ctx context.Context
 func (or *OrderUseCase) CreateUserOrder(id uint) error {
 
 	// check of exist
-	order, err := or.orderRepo.FindUserOrderById(id)
+	order, err := or.orderRepo.FindUserOrderByUId(id)
 	if err != nil {
 		return err
 	}
@@ -54,23 +55,6 @@ func (or *OrderUseCase) CreateUserOrder(id uint) error {
 	return nil
 }
 
-func (or *OrderUseCase) AddOrderInfo(uid, aid uint, cpid string, price float64, status string) (uint, error) {
-
-	var OrderId uint
-	// find order id
-	UserOrder, err := or.orderRepo.FindUserOrderById(uid)
-	if err != nil {
-		return OrderId, err
-	}
-	// add info
-	OrderId, err = or.orderRepo.AddOrderInfo(UserOrder.Id, aid, cpid, price, status)
-	if err != nil {
-		return OrderId, err
-	}
-	// response
-	return OrderId, nil
-}
-
 func (or *OrderUseCase) AddOrderItems(oid, pfid, qty uint) error {
 
 	err := or.orderRepo.AddOrderItem(oid, pfid, qty)
@@ -82,94 +66,95 @@ func (or *OrderUseCase) AddOrderItems(oid, pfid, qty uint) error {
 
 func (o *OrderUseCase) OrderByPfId(uid, id uint) error {
 
-	// find the user order table
-	userorder, err := o.orderRepo.FindUserOrderById(uid)
-	if err != nil {
-		return err
-	}
-	// find user address
-	address, err := o.userRepo.GetAddressByUid(uid)
-	if err != nil {
-		return err
-	}
-
-	// find product info
-	productinfo, err := o.productRepo.FindProductInfoById(id)
-	if err != nil {
-		return err
-	}
-
-	var cpid string
-	var status string
-
-	// add to orderinfo
-	oid, err := o.orderRepo.AddOrderInfo(userorder.Id, address.ID, cpid, productinfo.Price, status)
-	if err != nil {
-		return err
-	}
-
-	// add to order items
-	err = o.orderRepo.AddOrderItem(oid, productinfo.Id, 1)
-	if err != nil {
-		return err
-	}
-
+	//
+	//
+	// UPDATION NEED
+	//
+	//
+	//
 	// response
 	return nil
 }
 
-func (o *OrderUseCase) CartOrderAll(uid, pyid uint) error {
+func (o *OrderUseCase) CartOrderAll(uid, payid, copId, adrsId uint) error {
 
-	// get user order id
-	order, err := o.orderRepo.FindUserOrderById(uid)
+	// get user orderid
+	order, err := o.orderRepo.FindUserOrderByUId(uid)
 	if err != nil {
 		return err
 	}
+	// get user cart info
+	// cart, err := o.cartRepo.FindCartByUId(uid)
+	// if err != nil {
+	// 	return err
+	// }
 
-	// get cart id by uid
-	cart, err := o.cartRepo.FindCartByUId(uid)
+	// get cartitems
+	cartitem, err := o.cartRepo.ViewCart(uid)
 	if err != nil {
 		return err
 	}
+	if cartitem == nil {
+		res := errors.New("cart is empty")
+		return res
+	}
 
-	// get cartinfo
 	cartinfo, err := o.cartRepo.CartInfo(uid)
 	if err != nil {
 		return err
 	}
 
 	// get address
-	address, err := o.userRepo.GetAddressByUid(uid)
+	address, err := o.userRepo.GetAddressByAdrsId(uid, adrsId)
 	if err != nil {
 		return err
 	}
-
 	// select payment method
-	payment, err := o.paymentRepo.FindPaymentMethodById(pyid)
+	payment, err := o.paymentRepo.FindPaymentMethodById(payid)
 	if err != nil {
 		return err
 	}
-
-	var cpid string
-	status := "product ordered"
-
-	// update order infos
-	oid, err := o.orderRepo.AddOrderInfo(order.Id, address.ID, cpid, cartinfo.Totalprice, status)
+	status := "ordered"
+	var orderInfo uint
+	if address.ID == 0 {
+		// get default address
+		defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
+		if err != nil {
+			return err
+		}
+		if defaultad.ID == 0 {
+			res := errors.New("no default address is found")
+			return res
+		}
+		orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+			defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
+		if err != nil {
+			return err
+		}
+	} else {
+		// update order infos
+		orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+			address.ID, copId, cartinfo.Totalprice, status, payment.Id)
+		if err != nil {
+			return err
+		}
+	}
+	// if address.ID == 0 {
+	// 	defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+	// 		defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	err = o.orderRepo.CartAllOrder(order.Id, orderInfo, cartitem)
 	if err != nil {
 		return err
 	}
-
-	// update payment
-	err = o.orderRepo.UpdatePaymentMethod(oid, payment.Id)
-	if err != nil {
-		return err
-	}
-
-	// update order items
-	err = o.orderRepo.AddOrderItemCartAll(oid, cart.Id)
-	if err != nil {
-		return err
-	}
+	//
 
 	// response
 	return nil
@@ -203,5 +188,130 @@ func (c *OrderUseCase) OrderStatus(id, oid uint) (res.OrderStatus, error) {
 	}
 	body.CartRes = cart // updated
 
+	return body, nil
+}
+
+func (o *OrderUseCase) UserOrders(id uint) ([]res.ResOrder, error) {
+
+	body, err := o.orderRepo.OrderDetail(id)
+	if err != nil {
+		return body, err
+	}
+	if body == nil {
+		res := errors.New("user does not have orders")
+		return body, res
+	}
+	return body, nil
+}
+
+func (o *OrderUseCase) ChangeOrderStatus(status string, id uint) error {
+
+	order, err := o.orderRepo.FindUserOrderByUId(id)
+	if err != nil {
+		return err
+	}
+	err = o.orderRepo.ChangeOrderStatus(status, order.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ------------- order status -------------
+
+func (or *OrderUseCase) CreateOrderStatus(status string) error {
+
+	body, err := or.orderRepo.GetOrderStatusByStatus(status)
+	if err != nil {
+		return err
+	}
+	if body.Id != 0 {
+		res := errors.New("status alredy exist")
+		return res
+	}
+	err = or.orderRepo.AddOrderStatus(status)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (or *OrderUseCase) UpdateOrderStatus(id uint, status string) (domain.OrderStatus, error) {
+
+	body, err := or.orderRepo.GetOrderStatusById(id)
+	if err != nil {
+		return body, err
+	}
+	if body.Id != 0 {
+		order, err := or.orderRepo.GetOrderStatusByStatus(status)
+		if err != nil {
+			return order, err
+		}
+		if order.Id != 0 {
+			res := errors.New("status alredy exist")
+			return order, res
+		}
+		body, err = or.orderRepo.EditOrderStatus(id, status)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
+}
+
+func (or *OrderUseCase) DeletOrderStatus(id uint) error {
+
+	body, err := or.orderRepo.GetOrderStatusById(id)
+	if err != nil {
+		return err
+	}
+	if body.Id != 0 {
+		err := or.orderRepo.DeleteOrderStatusById(id)
+		if err != nil {
+			return err
+		}
+	} else {
+		res := errors.New("order status does not exist")
+		return res
+	}
+	return nil
+}
+
+func (or *OrderUseCase) FindOrderStatusById(id uint) (domain.OrderStatus, error) {
+
+	body, err := or.orderRepo.GetOrderStatusById(id)
+	if err != nil {
+		return body, err
+	}
+	if body.Id == 0 {
+		res := errors.New("order status does not exist")
+		return body, res
+	}
+	return body, nil
+}
+
+func (or *OrderUseCase) FindOrderStatusByStatus(status string) (domain.OrderStatus, error) {
+
+	body, err := or.orderRepo.GetOrderStatusByStatus(status)
+	if err != nil {
+		return body, err
+	}
+	if body.Id == 0 {
+		res := errors.New("order status does not exist")
+		return body, res
+	}
+	return body, nil
+}
+
+func (or *OrderUseCase) FindAllOrderStatus() ([]domain.OrderStatus, error) {
+
+	body, err := or.orderRepo.GetAllOrderStatus()
+	if err != nil {
+		return body, err
+	}
+	if body == nil {
+		res := errors.New("order status does not exist")
+		return body, res
+	}
 	return body, nil
 }
