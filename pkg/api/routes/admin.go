@@ -43,7 +43,7 @@ func AdminRoute(api *gin.RouterGroup,
 		{
 			product.GET("/all", ProductHandler.ListProducts)     // list all product
 			product.GET("/:id", ProductHandler.ViewProduct)      // View Single product
-			product.POST("", ProductHandler.AddProduct)          // Add Product
+			product.POST("/add", ProductHandler.AddProduct)      // Add Product
 			product.PATCH("/:id", ProductHandler.UpdateProduct)  // Edit / update Product
 			product.DELETE("/:id", ProductHandler.DeleteProduct) // Delete product
 
@@ -90,12 +90,25 @@ func AdminRoute(api *gin.RouterGroup,
 		// coupon
 		coupon := api.Group("/coupon")
 		{
-			coupon.POST("/add", CouponHandler.CrateCoupon)       // create coupon
-			coupon.PATCH("/update", CouponHandler.UpdateCoupon)  // update coupon
-			coupon.DELETE("/:id", CouponHandler.DeleteCoupon)    // delete coupon
-			coupon.GET("/:name", CouponHandler.ViewCouponByCode) // get coupon by name
-			coupon.GET("/:id", CouponHandler.ViewCouponById)     // get coupon by id
-			coupon.GET("/all", CouponHandler.ListCoupon)         // get full coupons
+			coupon.POST("/add/money", CouponHandler.CrateCouponWithmoney) // create coupon
+			coupon.PATCH("/update/:id", CouponHandler.UpdateCoupon)       // update coupon
+			coupon.DELETE("/:id", CouponHandler.DeleteCoupon)             // delete coupon
+			coupon.GET("/code/:name", CouponHandler.ViewCouponByCode)     // get coupon by name
+			coupon.GET("/:id", CouponHandler.ViewCouponById)              // get coupon by id
+			coupon.GET("/all", CouponHandler.ListCoupon)                  // get full coupons
+
+			//
+
+		}
+		// order
+		orderstatus := api.Group("/order/status")
+		{
+			orderstatus.POST("/new", orderHandler.CreateOrderStatus)
+			orderstatus.PATCH("/edit/:id", orderHandler.UpdateOrderStatus)
+			orderstatus.DELETE("/:id", orderHandler.DeleteOrderStatus)
+			orderstatus.GET("/all", orderHandler.GetAllOrderStatus)
+			orderstatus.GET("/:id", orderHandler.FindOrderStatusById)
+			orderstatus.GET("/get/:name", orderHandler.FindOrderStatusByStatus)
 		}
 	}
 }
