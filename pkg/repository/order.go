@@ -1,10 +1,12 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
+	"github.com/abhinandpn/project-ecom/pkg/util/res"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +32,7 @@ func (o *OrderDatabase) CreateUserOrder(id uint) error {
 	return nil
 }
 
-func (o *OrderDatabase) FindUserOrderById(uid uint) (domain.UserOrder, error) {
+func (o *OrderDatabase) FindUserOrderByUId(uid uint) (domain.UserOrder, error) {
 
 	var body domain.UserOrder
 	query := `select * from user_orders where user_id = $1;`
@@ -41,18 +43,24 @@ func (o *OrderDatabase) FindUserOrderById(uid uint) (domain.UserOrder, error) {
 	return body, nil
 }
 
-func (o *OrderDatabase) AddOrderInfo(uid, aid uint, cpid string, price float64, status string) (uint, error) {
+func (o *OrderDatabase) AddOrderInfo(orderId,
+	AdrsId,
+	CopId uint,
+	price float64,
+	status string,
+	payId uint) (uint, error) {
 
 	var body domain.OrderInfo
 	CurrentTime := time.Now()
 
 	query := `insert into order_infos (order_id,
-					order_time,
-					address_id,
-					coupon_code,
-					total_price,
-					order_status)values ($1,$2,$3,$4,$5,$6)returning id;`
-	err := o.DB.Raw(query, uid, CurrentTime, aid, cpid, price, status).Scan(&body).Error
+		                      order_time,
+		                      address_id,
+		                      coupon_code,
+		                      total_price,
+		                      order_status,
+		                      payment_id)values ($1,$2,$3,$4,$5,$6,$7)returning id;`
+	err := o.DB.Raw(query, orderId, CurrentTime, AdrsId, CopId, price, status, payId).Scan(&body).Error
 
 	if err != nil {
 		return body.Id, err
@@ -82,18 +90,27 @@ func (o *OrderDatabase) AddOrderItem(oid, pfid, qty uint) error {
 	return nil
 }
 
-// func (o *OrderDatabase) CartOrderAll(cid uint) error {
+func (o *OrderDatabase) CartAllOrder(orderId, OrderinfoId uint, cart []res.CartDisplay) error {
 
-// }
+	for _, item := range cart {
+		query := "INSERT INTO order_items (order_id,order_info,product_info_id, quantity) VALUES ($1, $2,$3,$4);"
 
-func (o *OrderDatabase) AddOrderItemCartAll(oid, cid uint) error {
+		err := o.DB.Exec(query, orderId, OrderinfoId, item.Id, item.Quantity).Error
 
-	var body domain.OrderItem
-	query := `insert into order_items (user_order_id,user_cart_id)values ($1,$2,$3);`
-	err := o.DB.Raw(query, oid, cid).Scan(&body).Error
-	if err != nil {
-		return err
+		if err != nil {
+			return fmt.Errorf("failed to add order item: %v", err)
+		}
 	}
+
+	// var body domain.OrderItem
+	// query := `insert into order_items (order_id,
+	// 							order_info,
+	// 							product_info_id,
+	// 							quantity)values ($1,$2,$3,$4);`
+	// err := o.DB.Raw(query, oid, ofid, pfid, qty).Scan(&body).Error
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -115,6 +132,107 @@ func (o *OrderDatabase) FindOrderInfoByOrderId(id uint) (domain.OrderInfo, error
 	var body domain.OrderInfo
 	query := `select * from order_infos where order_id = $1`
 	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (o *OrderDatabase) OrderDetail(uid uint) ([]res.ResOrder, error) {
+
+	var body []res.ResOrder
+	query := `SELECT
+				oi.id,
+				oi.address_id,
+				oi.total_price,
+				oi.order_status,
+				oi.payment_id,
+				oi2.product_info_id,
+				oi2.quantity
+			  FROM
+				user_orders uo
+				JOIN order_infos oi ON uo.id = oi.order_id
+				JOIN order_items oi2 ON oi.order_id = oi2.order_id
+			  WHERE
+				uo.user_id = $1;`
+
+	err := o.DB.Raw(query, uid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (o *OrderDatabase) ChangeOrderStatus(status string, id uint) error {
+
+	query := `update order_infos set order_status =$1  where order_id =$2 ;`
+	err := o.DB.Exec(query, status, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// --------Order Status-------
+func (or *OrderDatabase) AddOrderStatus(status string) error {
+
+	var body domain.OrderStatus
+	query := `insert into order_statuses (status)values ($1);`
+	err := or.DB.Raw(query, status).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (or *OrderDatabase) EditOrderStatus(id uint, status string) (domain.OrderStatus, error) {
+
+	var body domain.OrderStatus
+	query := `update order_statuses set status = $1 where id = $2 ;`
+	err := or.DB.Raw(query, status, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, err
+}
+
+func (or *OrderDatabase) DeleteOrderStatusById(id uint) error {
+
+	query := `delete from order_statuses where id = $1;`
+	err := or.DB.Exec(query, id).Error
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (or *OrderDatabase) GetOrderStatusById(id uint) (domain.OrderStatus, error) {
+
+	var body domain.OrderStatus
+	query := `select * from order_statuses where id = $1;`
+	err := or.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (or *OrderDatabase) GetOrderStatusByStatus(status string) (domain.OrderStatus, error) {
+
+	var body domain.OrderStatus
+	query := `select * from order_statuses where status =$1; `
+	err := or.DB.Raw(query, status).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (pr *OrderDatabase) GetAllOrderStatus() ([]domain.OrderStatus, error) {
+
+	var body []domain.OrderStatus
+	query := `select * from order_statuses;`
+	err := pr.DB.Raw(query).Find(&body).Error
 	if err != nil {
 		return body, err
 	}
