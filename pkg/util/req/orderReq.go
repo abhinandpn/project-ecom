@@ -8,3 +8,7 @@ type OrderByProduct struct {
 	CouponId        uint
 	Quantity        uint
 }
+
+type OrderStatus struct {
+	Status string
+}
