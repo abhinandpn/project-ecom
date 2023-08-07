@@ -60,3 +60,87 @@ func (p *PaymentUseCase) DeletePaymentMethod(id uint) error {
 	}
 	return nil
 }
+
+func (p *PaymentUseCase) CreatePaymentStatus(name string) error {
+
+	body, err := p.paymentRepo.GetPaymentStatusByName(name)
+	if err != nil {
+		return err
+	}
+	if body.Id != 0 {
+		res := errors.New("payment status alredy exist")
+		return res
+	}
+	err = p.paymentRepo.AddPaymentStatus(name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PaymentUseCase) UpdatePaymentStatus(id uint, name string) (domain.PaymentStatus, error) {
+
+	body, err := p.paymentRepo.GetPaymentStatusById(id)
+	if err != nil {
+		return body, err
+	}
+	if body.Id != 0 {
+		body, err := p.paymentRepo.GetPaymentStatusByName(name)
+		if err != nil {
+			return body, err
+		}
+		if body.Id != 0 {
+			res := errors.New("status alredy exist")
+			return body, res
+		}
+		body, err = p.paymentRepo.EditPaymentStatus(id, name)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
+}
+
+func (p *PaymentUseCase) DeltePaymentStatus(id uint) error {
+
+	body, err := p.paymentRepo.GetPaymentStatusById(id)
+	if err != nil {
+		return err
+	}
+	if body.Id != 0 {
+		err := p.paymentRepo.DeltePaymentStatus(id)
+		if err != nil {
+			return err
+		}
+	} else {
+		res := errors.New("status does not exist")
+		return res
+	}
+	return nil
+}
+
+func (p *PaymentUseCase) FindPaymentStatusById(id uint) (domain.PaymentStatus, error) {
+
+	body, err := p.paymentRepo.GetPaymentStatusById(id)
+	if err != nil {
+		return body, err
+	}
+	if body.Id == 0 {
+		res := errors.New("payment status does not exist")
+		return body, res
+	}
+	return body, nil
+}
+
+func (p *PaymentUseCase) GetAllPaymentStatus() ([]domain.PaymentStatus, error) {
+
+	body, err := p.paymentRepo.GetAllPaymentStatus()
+	if err != nil {
+		return body, err
+	}
+	if body == nil {
+		res := errors.New("payment status does not exist")
+		return body, res
+	}
+	return body, nil
+}
