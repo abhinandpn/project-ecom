@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -16,6 +17,7 @@ type OrderUseCase struct {
 	productRepo interfaces.ProductRepository
 	cartRepo    interfaces.Cartrepository
 	paymentRepo interfaces.PaymentRepository
+	couponRepo  interfaces.Couponrepository
 }
 
 func NewOrderUseCase(OrderRepo interfaces.OrderRepository,
@@ -23,12 +25,14 @@ func NewOrderUseCase(OrderRepo interfaces.OrderRepository,
 	ProductRepo interfaces.ProductRepository,
 	CartRepo interfaces.Cartrepository,
 	PaymentRepo interfaces.PaymentRepository,
+	CouponRepo interfaces.Couponrepository,
 ) service.OrderUseCase {
 	return &OrderUseCase{orderRepo: OrderRepo,
 		userRepo:    UserRepo,
 		productRepo: ProductRepo,
 		cartRepo:    CartRepo,
 		paymentRepo: PaymentRepo,
+		couponRepo:  CouponRepo,
 	}
 }
 
@@ -78,84 +82,88 @@ func (o *OrderUseCase) OrderByPfId(uid, id uint) error {
 
 func (o *OrderUseCase) CartOrderAll(uid, payid, copId, adrsId uint) error {
 
-	// get user orderid
-	order, err := o.orderRepo.FindUserOrderByUId(uid)
-	if err != nil {
-		return err
-	}
-	// get user cart info
-	// cart, err := o.cartRepo.FindCartByUId(uid)
-	// if err != nil {
-	// 	return err
-	// }
+	// Updating Stoping the CartOrderAll for updationg
 
-	// get cartitems
-	cartitem, err := o.cartRepo.ViewCart(uid)
-	if err != nil {
-		return err
-	}
-	if cartitem == nil {
-		res := errors.New("cart is empty")
-		return res
-	}
-
-	cartinfo, err := o.cartRepo.CartInfo(uid)
-	if err != nil {
-		return err
-	}
-
-	// get address
-	address, err := o.userRepo.GetAddressByAdrsId(uid, adrsId)
-	if err != nil {
-		return err
-	}
-	// select payment method
-	payment, err := o.paymentRepo.FindPaymentMethodById(payid)
-	if err != nil {
-		return err
-	}
-	status := "ordered"
-	var orderInfo uint
-	if address.ID == 0 {
-		// get default address
-		defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
+	/*
+		// get user orderid
+		order, err := o.orderRepo.FindUserOrderByUId(uid)
 		if err != nil {
 			return err
 		}
-		if defaultad.ID == 0 {
-			res := errors.New("no default address is found")
+		// get user cart info
+		// cart, err := o.cartRepo.FindCartByUId(uid)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// get cartitems
+		cartitem, err := o.cartRepo.ViewCart(uid)
+		if err != nil {
+			return err
+		}
+		if cartitem == nil {
+			res := errors.New("cart is empty")
 			return res
 		}
-		orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
-			defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
-		if err != nil {
-			return err
-		}
-	} else {
-		// update order infos
-		orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
-			address.ID, copId, cartinfo.Totalprice, status, payment.Id)
-		if err != nil {
-			return err
-		}
-	}
-	// if address.ID == 0 {
-	// 	defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
-	// 		defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	err = o.orderRepo.CartAllOrder(order.Id, orderInfo, cartitem)
-	if err != nil {
-		return err
-	}
-	//
 
+		cartinfo, err := o.cartRepo.CartInfo(uid)
+		if err != nil {
+			return err
+		}
+
+		// get address
+		address, err := o.userRepo.GetAddressByAdrsId(uid, adrsId)
+		if err != nil {
+			return err
+		}
+		// select payment method
+		payment, err := o.paymentRepo.FindPaymentMethodById(payid)
+		if err != nil {
+			return err
+		}
+
+		status := "ordered"
+		var orderInfo uint
+		if address.ID == 0 {
+			// get default address
+			defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
+			if err != nil {
+				return err
+			}
+			if defaultad.ID == 0 {
+				res := errors.New("no default address is found")
+				return res
+			}
+			orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+				defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
+			if err != nil {
+				return err
+			}
+		} else {
+			// update order infos
+			orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+				address.ID, copId, cartinfo.Totalprice, status, payment.Id)
+			if err != nil {
+				return err
+			}
+		}
+		// if address.ID == 0 {
+		// 	defaultad, err := o.userRepo.GetUserDefaultAddressId(uid)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// 	orderInfo, err = o.orderRepo.AddOrderInfo(order.Id,
+		// 		defaultad.ID, copId, cartinfo.Totalprice, status, payment.Id)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
+		err = o.orderRepo.CartAllOrder(order.Id, orderInfo, cartitem)
+		if err != nil {
+			return err
+		}
+		//
+	*/
 	// response
 	return nil
 }
@@ -180,8 +188,8 @@ func (c *OrderUseCase) OrderStatus(id, oid uint) (res.OrderStatus, error) {
 	if err != nil {
 		return body, err
 	}
-	body.OrderStatus = orderinfo.OrderStatus // order status update (3/6)
-
+	// body.OrderStatus = orderinfo.OrderStatus // order status update (3/6)
+	fmt.Println(orderinfo)
 	cart, err := c.cartRepo.ViewCart(user.ID)
 	if err != nil {
 		return body, err
@@ -314,4 +322,61 @@ func (or *OrderUseCase) FindAllOrderStatus() ([]domain.OrderStatus, error) {
 		return body, res
 	}
 	return body, nil
+}
+
+func (o *OrderUseCase) UpdatedCartAllOrder(uid, payid, addid uint) error {
+
+	// -------------- GET INFO --------------
+
+	//  user orderId
+	OrderId, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return err
+	}
+	//  cart view (for product infos)
+	CartView, err := o.cartRepo.ViewCart(uid)
+	if err != nil {
+		return err
+	}
+	if CartView == nil {
+		res := errors.New("cart is empty")
+		return res
+	}
+	//  cart info (for price & details)
+	CartInfo, err := o.cartRepo.CartInfo(uid)
+	if err != nil {
+		return err
+	}
+	// coupon info (for updation)
+	Coupon, err := o.couponRepo.ViewCouponByCode(CartInfo.CouponCode)
+	if err != nil {
+		return err
+	}
+	//  address (show full address)
+	FullAddress, err := o.userRepo.ListAllAddress(uid)
+	if err != nil {
+		return err
+	}
+	if FullAddress == nil {
+		res := errors.New("no address found")
+		return res
+	}
+	//  address (further process)
+	Address, err := o.userRepo.GetAddressByAdrsId(uid, addid)
+	if err != nil {
+		return err
+	}
+	//  payment method (payment)
+	PaymentMethod, err := o.paymentRepo.FindPaymentMethodById(payid)
+	if err != nil {
+		return err
+	}
+
+	// -------------- UPDATE INFO --------------
+
+	// order info updation
+	// o.orderRepo.AddOrderInfo(OrderId.Id, Address.ID,Coupon.Id,CartInfo.Totalprice)
+	fmt.Println(OrderId, Coupon, Address, PaymentMethod)
+	return nil
+
 }
