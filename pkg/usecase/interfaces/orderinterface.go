@@ -21,5 +21,7 @@ type OrderUseCase interface {
 	FindOrderStatusById(id uint) (domain.OrderStatus, error)
 	FindOrderStatusByStatus(status string) (domain.OrderStatus, error)
 	FindAllOrderStatus() ([]domain.OrderStatus, error)
+
+	UpdatedCartAllOrder(uid, payid, addid uint) error
 	//
 }
