@@ -79,3 +79,10 @@ type ProductQtyRes struct {
 	Size         string
 	Quantity     uint
 }
+
+type ProductStringResponce struct {
+	Brand    []ProductResponce
+	Category []ProductResponce
+	Name     []ProductResponce
+	Colour   []ProductResponce
+}
