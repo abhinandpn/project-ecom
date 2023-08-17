@@ -29,3 +29,7 @@ type ReqPagination struct {
 	Count      uint `json:"count"`
 	PageNumber uint `json:"page_number"`
 }
+
+type Name struct {
+	Name string
+}
