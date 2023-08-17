@@ -36,7 +36,8 @@ func NewServerHTTP(userHandler handlerInterface.UserHandler,
 		productHandler,
 		cartHandler,
 		orderHandler,
-		paymentHandler)
+		paymentHandler,
+		couponHandler)
 	routes.AdminRoute(Engine.Group("/admin"),
 		adminHandler,
 		productHandler,
