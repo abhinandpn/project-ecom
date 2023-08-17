@@ -12,18 +12,22 @@ type OrderInfo struct {
 	OrderId     uint
 	OrderTime   time.Time
 	AddressId   uint
-	CouponCode  string
+	CouponCode  uint
 	TotalPrice  float64
-	OrderStatus string
-	PaymentId   string
+	OrderStatus uint
+	PaymentId   uint
 	// Address     Address
 }
 type OrderItem struct {
 	Id            uint `gorm:"primaryKey;unique;not null"`
-	UserOrderId   uint
+	OrderInfo     uint
 	ProductInfoId uint
 	Quantity      uint
-	UserCartId    uint
 	// ProductInfo   ProductInfo
 	// OrderInfo     OrderInfo
+}
+
+type OrderStatus struct {
+	Id     uint `gorm:"primaryKey;unique;not null"`
+	Status string
 }
