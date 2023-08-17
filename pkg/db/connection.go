@@ -29,6 +29,7 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.UserOrder{},
 		&domain.OrderInfo{},
 		&domain.OrderItem{},
+		&domain.OrderStatus{},
 		&domain.PaymentMethod{},
 		&domain.PaymentDetail{},
 		&domain.PaymentStatus{},
@@ -38,6 +39,7 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 
 		// Product Table
 		&domain.Category{},
+		&domain.Coupon{},
 
 		// product updated {product branch}
 		&domain.Product{},
