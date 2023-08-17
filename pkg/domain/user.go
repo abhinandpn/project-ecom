@@ -23,9 +23,10 @@ type UserInfo struct {
 }
 
 type Address struct {
-	ID          uint   `json:"id"`
-	UserID      uint   `json:"user_id"`
-	Users       Users  `gorm:"foreignKey:UserID" json:"-"`
+	ID          uint  `json:"id"`
+	UserID      uint  `json:"user_id"`
+	Users       Users `gorm:"foreignKey:UserID" json:"-"`
+	Name        string
 	House       string `json:"house8"`
 	PhoneNumber string `json:"phone_number"`
 	Street      string `json:"street"`
@@ -33,13 +34,14 @@ type Address struct {
 	District    string `json:"district"`
 	Pincode     string `json:"pincode"`
 	Landmark    string `json:"landmark"`
-	// Default     *bool  `json:"is_default"`
+	Default     bool   `json:"default"`
 }
 
 type UserCart struct {
-	Id     uint `json:"id" gorm:"not null"`
-	UserId uint `json:"user_id" gorm:"not null"`
-	User   Users
+	Id       uint `json:"id" gorm:"not null"`
+	UserId   uint `json:"user_id" gorm:"not null"`
+	User     Users
+	CouponId uint
 }
 
 type CartInfo struct {
