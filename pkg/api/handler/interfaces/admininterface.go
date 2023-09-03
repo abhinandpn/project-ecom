@@ -16,5 +16,7 @@ type AdminHandler interface {
 	FindUserWithEmail(ctx *gin.Context)  // user find with email
 	FindUserWithNumber(ctx *gin.Context) // user find with number
 	FindUserWithId(ctx *gin.Context)     // user find with id
-	//
+	UserOrderDetails(ctx *gin.Context)
+	ChangeOrderStatus(ctx *gin.Context)
+
 }

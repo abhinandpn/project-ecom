@@ -13,4 +13,5 @@ type CouponHandler interface {
 	//
 	ApplyCoupon(ctx *gin.Context)
 	RemoveCoupon(ctx *gin.Context)
+	GetAppliedCoupon(ctx *gin.Context)
 }

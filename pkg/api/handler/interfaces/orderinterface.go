@@ -17,4 +17,13 @@ type OrderHandler interface {
 	FindOrderStatusById(ctx *gin.Context)
 	GetAllOrderStatus(ctx *gin.Context)
 	// ----------------------
+	UpdatedCartAllOrder(ctx *gin.Context)
+
+	// 01 - 09 - 2023 - Order status updation
+	ListOrderDetailByUid(ctx *gin.Context)
+	ListAllOrderByUid(ctx *gin.Context)
+	OrderStatusToOrdered(ctx *gin.Context)
+	OrderStatusToDelivered(ctx *gin.Context)
+	OrderStatusToCancelled(ctx *gin.Context)
+	OrderStatusToReturned(ctx *gin.Context)
 }
