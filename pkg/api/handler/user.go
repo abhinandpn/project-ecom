@@ -299,7 +299,7 @@ func (usr *UserHandler) ListAllAddress(ctx *gin.Context) {
 	UserId := helper.GetUserId(ctx)
 
 	// List func calling
-	address, err := usr.userUseCase.ListAllAddress(ctx, UserId)
+	address, err := usr.userUseCase.ListAllAddress(UserId)
 	if err != nil {
 		response := res.ErrorResponse(500, "Failed to list all address", err.Error(), address)
 		ctx.JSON(http.StatusInternalServerError, response)
@@ -491,7 +491,7 @@ func (w *UserHandler) RemoveFromWIshList(ctx *gin.Context) {
 func (w *UserHandler) ViewWishList(ctx *gin.Context) {
 
 	UserId := helper.GetUserId(ctx)
-
+	
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
@@ -276,5 +277,180 @@ func (or *OrderHandler) GetAllOrderStatus(ctx *gin.Context) {
 		return
 	}
 	respones := res.SuccessResponse(200, "successfully get order status", body)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) UpdatedCartAllOrder(ctx *gin.Context) {
+
+	Uid := helper.GetUserId(ctx)
+	PaymentId, err1 := helper.StringToUInt(ctx.Query("payid"))
+	AddressId, err2 := helper.StringToUInt(ctx.Query("addressid"))
+
+	err := errors.Join(err1, err2)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find productid",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+	}
+
+	err = o.orderUseCase.UpdatedCartAllOrder(Uid, PaymentId, AddressId)
+	if err != nil {
+		respones := res.ErrorResponse(400, "cant order cart product", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully  order status", Uid)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+// 01 - 09 - 2023 - Order status updation
+func (o *OrderHandler) ListAllOrderByUid(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	Uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	fmt.Println("==== > > > > > ", Uid)
+	orders, err := o.orderUseCase.ListAllOrderByUid(Uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't get orders", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully get orders", orders)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) OrderStatusToOrdered(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	err = o.orderUseCase.OrderStatusToOrdered(uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't update status to ordered", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update status to orderd", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) OrderStatusToDelivered(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	err = o.orderUseCase.OrderStatusToDelivered(uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't update status to delivered", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update status to delivred", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) OrderStatusToCancelled(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	err = o.orderUseCase.OrderStatusToCancelled(uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't update status to calclled", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update status to calclled", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) OrderStatusToReturned(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	err = o.orderUseCase.OrderStatusToReturned(uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't update status to returned", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update status to returned", nil)
+	ctx.JSON(http.StatusOK, respones)
+}
+
+func (o *OrderHandler) ListOrderDetailByUid(ctx *gin.Context) {
+
+	ParmId := ctx.Param("id")
+	uid, err := helper.StringToUInt(ParmId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "can't find order status id",
+			Errors:     err.Error(),
+			Data:       nil,
+		})
+		return
+
+	}
+	fmt.Println("user id( handler ) --- > ", uid)
+	body, err := o.orderUseCase.ListOrderDetailByUid(uid)
+	if err != nil {
+		respones := res.ErrorResponse(400, "can't get order details", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, respones)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully update status to returned", body)
 	ctx.JSON(http.StatusOK, respones)
 }

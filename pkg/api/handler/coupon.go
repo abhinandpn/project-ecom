@@ -200,3 +200,31 @@ func (c *CouponHandler) RemoveCoupon(ctx *gin.Context) {
 	respones := res.SuccessResponse(200, "successfully remove coupon", Coupon)
 	ctx.JSON(http.StatusOK, respones)
 }
+
+func (c *CouponHandler) GetAppliedCoupon(ctx *gin.Context) {
+
+	userId := helper.GetUserId(ctx)
+	body, err := c.CouponUseCase.GetAppliedCoupon(userId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "cat remove coupon",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, res.Response{
+			StatusCode: 400,
+			Message:    "cat get coupon",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	respones := res.SuccessResponse(200, "successfully get applied coupon", body)
+	ctx.JSON(http.StatusOK, respones)
+}

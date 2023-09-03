@@ -828,3 +828,30 @@ func (p *ProductHandler) ProductGetByQuantity(ctx *gin.Context) {
 	respones := res.SuccessResponse(200, "successfully got all products", products)
 	ctx.JSON(http.StatusOK, respones)
 }
+
+func (p *ProductHandler) GetProductByString(ctx *gin.Context) {
+
+	name := ctx.Param("name")
+	count, err1 := helper.StringToUInt(ctx.Query("count"))
+	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+
+	err1 = errors.Join(err1, err2)
+	if err1 != nil {
+		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	pagination := req.ReqPagination{
+		PageNumber: pageNumber,
+		Count:      count,
+	}
+
+	data, err := p.ProductuseCase.GetProductByString(name, req.PageNation(pagination))
+	if err != nil {
+		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	respones := res.SuccessResponse(200, "successfully got all products", data)
+	ctx.JSON(http.StatusOK, respones)
+}

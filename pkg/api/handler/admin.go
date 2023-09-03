@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
@@ -18,10 +17,12 @@ import (
 
 type AdminHandler struct {
 	AdminUseCase services.AdminUseCase
+	OrderUseCase services.OrderUseCase
 }
 
-func NewAdminHandler(AdminUseCase services.AdminUseCase) handlerInterface.AdminHandler {
-	return &AdminHandler{AdminUseCase: AdminUseCase}
+func NewAdminHandler(AdminUseCase services.AdminUseCase, orderUseCase services.OrderUseCase) handlerInterface.AdminHandler {
+	return &AdminHandler{AdminUseCase: AdminUseCase,
+		OrderUseCase: orderUseCase}
 }
 
 /*
@@ -291,11 +292,11 @@ func (adm *AdminHandler) FindUserWithNumber(ctx *gin.Context) {
 // Find User by Id
 
 func (adm *AdminHandler) FindUserWithId(ctx *gin.Context) {
-	fmt.Println("----------------------------------------")
+
 	param := ctx.Param("id")
 
 	id, err := helper.StringToUInt(param)
-	fmt.Println("id is -------------->> ", id)
+
 	if err != nil {
 		response := res.ErrorResponse(400, "faild to get user number  ", err.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -310,4 +311,47 @@ func (adm *AdminHandler) FindUserWithId(ctx *gin.Context) {
 	}
 	response := res.SuccessResponse(200, "successfully got  users", user)
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (o *AdminHandler) UserOrderDetails(ctx *gin.Context) {
+
+	param := ctx.Param("id")
+
+	id, err := helper.StringToUInt(param)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get userid", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	body, err := o.OrderUseCase.UserOrders(id)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get user order", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully got  users order", body)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (o *AdminHandler) ChangeOrderStatus(ctx *gin.Context) {
+
+	param := ctx.Param("id")
+	id, err := helper.StringToUInt(param)
+	Status := ctx.Param("status")
+
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to get userid", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = o.OrderUseCase.ChangeOrderStatus(Status, id)
+	if err != nil {
+		response := res.ErrorResponse(400, "faild to update user status", err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := res.SuccessResponse(200, "successfully got  users order", Status)
+	ctx.JSON(http.StatusOK, response)
+
 }
