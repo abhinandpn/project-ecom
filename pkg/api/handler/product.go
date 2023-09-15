@@ -831,7 +831,7 @@ func (p *ProductHandler) ProductGetByQuantity(ctx *gin.Context) {
 
 func (p *ProductHandler) GetProductByString(ctx *gin.Context) {
 
-	name := ctx.Param("name")
+	name := ctx.Query("name")
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
