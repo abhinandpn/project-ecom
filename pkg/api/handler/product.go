@@ -544,6 +544,7 @@ func (b *ProductHandler) ViewBrands(ctx *gin.Context) {
 
 func (p *ProductHandler) ProductGetByColour(ctx *gin.Context) {
 
+	colour := ctx.Query("colour")
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
 
@@ -558,14 +559,7 @@ func (p *ProductHandler) ProductGetByColour(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqColour
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByColour(body.Colour, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByColour(colour, req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -587,8 +581,10 @@ func (p *ProductHandler) ProductGetBySize(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	size := ctx.Query("size")
+	value, err3 := helper.StringToUInt(size)
 
-	err1 = errors.Join(err1, err2)
+	err1 = errors.Join(err1, err2, err3)
 	if err1 != nil {
 		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -599,14 +595,7 @@ func (p *ProductHandler) ProductGetBySize(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqSize
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetBySize(body.Size, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetBySize(int(value), req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -628,6 +617,7 @@ func (p *ProductHandler) ProductGetByCategory(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	category := ctx.Query("category")
 
 	err1 = errors.Join(err1, err2)
 	if err1 != nil {
@@ -640,14 +630,7 @@ func (p *ProductHandler) ProductGetByCategory(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqCategory
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByCategory(body.Category, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByCategory(category, req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -669,6 +652,7 @@ func (p *ProductHandler) ProductGetByBrand(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	brand := ctx.Query("brand")
 
 	err1 = errors.Join(err1, err2)
 	if err1 != nil {
@@ -681,14 +665,7 @@ func (p *ProductHandler) ProductGetByBrand(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqBrand
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByBrand(body.Brand, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByBrand(brand, req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -710,6 +687,7 @@ func (p *ProductHandler) ProductGetByName(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	name := ctx.Query("name")
 
 	err1 = errors.Join(err1, err2)
 	if err1 != nil {
@@ -722,14 +700,7 @@ func (p *ProductHandler) ProductGetByName(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqName
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByName(body.Name, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByName(name, req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -751,8 +722,12 @@ func (p *ProductHandler) ProductGetByPrice(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	start := ctx.Query("start")
+	end := ctx.Query("end")
+	Pstart, err3 := helper.StringToUInt(start)
+	Pend, err4 := helper.StringToUInt(end)
 
-	err1 = errors.Join(err1, err2)
+	err1 = errors.Join(err1, err2, err3, err4)
 	if err1 != nil {
 		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -763,14 +738,7 @@ func (p *ProductHandler) ProductGetByPrice(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqPrice
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByPrice(body.PriceStart, body.PriceEnd, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByPrice(int(Pstart), int(Pend), req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
@@ -792,8 +760,12 @@ func (p *ProductHandler) ProductGetByQuantity(ctx *gin.Context) {
 
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
+	start := ctx.Query("start")
+	end := ctx.Query("end")
+	Qstart, err3 := helper.StringToUInt(start)
+	Qend, err4 := helper.StringToUInt(end)
 
-	err1 = errors.Join(err1, err2)
+	err1 = errors.Join(err1, err2, err3, err4)
 	if err1 != nil {
 		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)
 		ctx.JSON(http.StatusBadRequest, response)
@@ -804,14 +776,7 @@ func (p *ProductHandler) ProductGetByQuantity(ctx *gin.Context) {
 		Count:      count,
 	}
 
-	var body req.SortReqQuantity
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		response := res.ErrorResponse(400, "invalid input", err.Error(), body)
-		ctx.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	products, err := p.ProductuseCase.GetByQuantity(body.QuantityStart, body.QuantityEnd, req.PageNation(pagination))
+	products, err := p.ProductuseCase.GetByQuantity(int(Qstart), int(Qend), req.PageNation(pagination))
 
 	if err != nil {
 		response := res.ErrorResponse(500, "faild to get all products", err.Error(), nil)
