@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -15,8 +17,10 @@ func NewCartRepository(db *gorm.DB) interfaces.Cartrepository {
 
 	return &cartDatabase{DB: db}
 }
+
 func (c *cartDatabase) FindCartByUId(id uint) (domain.UserCart, error) {
 
+	fmt.Println("id from repo ", id)
 	var body domain.UserCart
 	query := `select * from user_carts where user_id = $1`
 	err := c.DB.Raw(query, id).Scan(&body).Error
@@ -92,7 +96,8 @@ func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 						 pi.colour,
 						 b.brand_name, 
 						 c.category_name, 
-						 pi.price
+						 pi.price,
+						 ci.quantity
 					FROM user_carts uc
 					JOIN cart_infos ci ON uc.id = ci.cart_id
 					JOIN products p ON ci.product_info_id = p.id
@@ -147,3 +152,36 @@ func (c *cartDatabase) CartInfo(id uint) (res.CartInfo, error) {
 	}
 	return body, nil
 }
+
+func (c *cartDatabase) ViewCartProductInfoidByUid(id uint) ([]int, error) {
+
+	var body []int
+	query := `SELECT 
+    		ci.product_info_id
+			FROM user_carts uc
+			JOIN cart_infos ci ON uc.id = ci.cart_id
+			WHERE uc.user_id = $1;`
+	err := c.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (c *cartDatabase) ViewCartQuantityidByUid(id uint) ([]int, error) {
+
+	var body []int
+	query := `SELECT
+	ci.quantity
+		FROM user_carts uc
+		JOIN cart_infos ci ON uc.id = ci.cart_id
+		WHERE uc.user_id = $1;`
+	err := c.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+// updated

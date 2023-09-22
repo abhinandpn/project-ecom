@@ -18,4 +18,6 @@ type Cartrepository interface {
 	// View Cart
 	ViewCart(id uint) ([]res.CartDisplay, error)
 	CartInfo(id uint) (res.CartInfo, error)
+	ViewCartProductInfoidByUid(id uint) ([]int, error)
+	ViewCartQuantityidByUid(id uint) ([]int, error)
 }
