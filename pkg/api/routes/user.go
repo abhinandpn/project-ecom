@@ -11,7 +11,8 @@ func UserRoutes(api *gin.RouterGroup,
 	productHandler handlerInterface.ProductHandler,
 	cartHandler handlerInterface.CartHandler,
 	orderHandler handlerInterface.OrderHandler,
-	paymentHandler handlerInterface.PaymentHandler) {
+	paymentHandler handlerInterface.PaymentHandler,
+	CouponHandler handlerInterface.CouponHandler) {
 
 	// login
 	login := api.Group("/login")
@@ -35,6 +36,7 @@ func UserRoutes(api *gin.RouterGroup,
 		product.GET("/all/brand", productHandler.ProductGetByBrand)
 		product.GET("/all/name", productHandler.ProductGetByName)
 		product.GET("/all/price", productHandler.ProductGetByPrice)
+		product.GET("/get/:name", productHandler.GetProductByString)
 
 		// List all product
 		product.GET("/all", productHandler.ListProducts)
@@ -82,10 +84,11 @@ func UserRoutes(api *gin.RouterGroup,
 			//order
 			order := api.Group("/order")
 			{
-				order.POST("/cart/", orderHandler.CartAllOrder)        // cart all product order
-				order.GET("/status/:id", orderHandler.CartOrderStatus) // order status
-				order.POST("/buynow/:id", orderHandler.BuyNow)         // order by pfid
-				order.GET("/detail", orderHandler.OrderDetail)         // order details
+				order.POST("/cart", orderHandler.CartAllOrder)            // cart all product order
+				order.POST("/new/cart", orderHandler.UpdatedCartAllOrder) // updated
+				order.GET("/status/:id", orderHandler.CartOrderStatus)    // order status
+				order.POST("/buynow/:id", orderHandler.BuyNow)            // order by pfid
+				order.GET("/detail", orderHandler.OrderDetail)            // order details
 			}
 			// wishlist
 			wishlist := api.Group("/wishlist")
@@ -94,9 +97,17 @@ func UserRoutes(api *gin.RouterGroup,
 				wishlist.DELETE("/remove/:id", userHandler.RemoveFromWIshList) // remove product in to wishlist
 				wishlist.GET("/all", userHandler.ViewWishList)                 // view wishlist
 			}
+			// payment
 			payment := api.Group("payment")
 			{
 				payment.GET("/methods", paymentHandler.GetPaymentMethods) // get payment mehods
+			}
+			// coupon
+			coupon := api.Group("/coupon")
+			{
+				coupon.PATCH("/apply/:name", CouponHandler.ApplyCoupon)   // apply coupon
+				coupon.PATCH("/remove/:name", CouponHandler.RemoveCoupon) // remove coupon
+				coupon.GET("/show", CouponHandler.GetAppliedCoupon)       // get applied coupon
 			}
 		}
 	}

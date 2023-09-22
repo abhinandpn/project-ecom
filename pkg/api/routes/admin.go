@@ -55,6 +55,7 @@ func AdminRoute(api *gin.RouterGroup,
 			product.GET("/all/name", ProductHandler.ProductGetByName)
 			product.GET("/all/price", ProductHandler.ProductGetByPrice)
 			product.GET("/all/quantity", ProductHandler.ProductGetByQuantity)
+			product.GET("/get/:name", ProductHandler.GetProductByString) // sort by string
 		}
 		// Category
 		category := api.Group("/category")
@@ -74,18 +75,28 @@ func AdminRoute(api *gin.RouterGroup,
 			subct.PATCH("/:id", ProductHandler.EditSubCategory)    // edit sub catagory
 		}
 		// brand
-		brand := api.Group("/brand")
+		brand := api.Group("/br/all/cand")
 		{
 			brand.POST("/add", ProductHandler.AddBrand)     // Add brand
 			brand.DELETE("/:id", ProductHandler.DeletBrand) // Delete brand
 			brand.GET("/all", ProductHandler.ViewBrands)    // View full brands
 		}
-		// payment
-		payment := api.Group("/payment")
+		// payment method
+		payment := api.Group("/payment/method")
 		{
 			payment.POST("/add/:name", PaymentHandler.AddPaymentMethod)       // add payment method
 			payment.DELETE("/delete/:id", PaymentHandler.DeletePaymentMethod) // delete payment method
 			payment.GET("/all", PaymentHandler.GetPaymentMethods)             // get all payment methods
+
+		}
+		// payment status
+		status := api.Group("/payment/status")
+		{
+			status.POST("/add", PaymentHandler.CreatePaymentStatus)
+			status.PATCH("/edit/:id", PaymentHandler.UpdatePaymentStatus)
+			status.DELETE("/:id", PaymentHandler.DeltePaymentStatus)
+			status.GET("/:id", PaymentHandler.FindPaymentStatusById)
+			status.GET("/all", PaymentHandler.GetAllPaymentStatus)
 		}
 		// coupon
 		coupon := api.Group("/coupon")
@@ -109,6 +120,17 @@ func AdminRoute(api *gin.RouterGroup,
 			orderstatus.GET("/all", orderHandler.GetAllOrderStatus)
 			orderstatus.GET("/:id", orderHandler.FindOrderStatusById)
 			orderstatus.GET("/get/:name", orderHandler.FindOrderStatusByStatus)
+
+			// 01 - 09 - 2023 - Order status updation
+			orderstatus.GET("/user/:id", orderHandler.ListAllOrderByUid)
+			orderstatus.GET("/user/detail/:id", orderHandler.ListOrderDetailByUid)
+
+			orderstatus.PATCH("/update/ordred/:id", orderHandler.OrderStatusToOrdered)
+			orderstatus.PATCH("/update/delivered/:id", orderHandler.OrderStatusToDelivered)
+			orderstatus.PATCH("/update/canclled/:id", orderHandler.OrderStatusToCancelled)
+			orderstatus.PATCH("/update/returned/:id", orderHandler.OrderStatusToReturned)
+
 		}
+
 	}
 }
