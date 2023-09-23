@@ -8,6 +8,9 @@ type ReqProduct struct {
 	Price       uint   `json:"price" gorm:"not null" binding:"required,numeric"`
 	Color       string `json:"color" binding:"required"`
 	Size        uint   `json:"size" binding:"required" gorm:"not null"`
+	Image       string `json:"image"`
+	// Image1      string `json:"image1"`
+	// Image2      string `json:"image2"`
 	// ImageId     uint   `json:"image_id"`
 }
 type PrDelReq struct {
