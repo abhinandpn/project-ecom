@@ -13,11 +13,15 @@ type CartDisplay struct {
 
 type CartInfo struct {
 	Subtotal      float64
-	DIscountPrice float64
+	DiscountPrice float64
 	CouponCode    string
 	Totalprice    float64
 }
 
 type ProductInfoCart struct {
 	ProductInfoID int `json:"product_info_id"`
+}
+
+type CartPrice struct {
+	DiscountPrice float32
 }

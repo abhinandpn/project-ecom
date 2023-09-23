@@ -72,6 +72,3 @@ type OrderDetailByUid struct {
 	PaymentMethod string
 	PaymentStatus string
 }
-
-type abhi struct {
-}

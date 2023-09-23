@@ -10,9 +10,10 @@ type ProductResponce struct {
 	Size          uint      `json:"size"`
 	Price         uint      `json:"price"`
 	DiscountPrice uint      `json:"discount_price"`
-	Image         string    `json:"image"`
+	ProductImages string    `json:"image"`
 	CreatedAt     time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt     time.Time `json:"updated_at"`
+	Quantity      uint 
 	// CategoryID    uint      `json:"category_id"`
 }
 type CategoryRes struct {
@@ -58,26 +59,28 @@ type ResBrand struct {
 }
 
 type ResProductOrder struct {
-	Id           uint
-	ProductName  string
-	Discription  string
-	CategoryName string
-	BrandName    string
-	Size         uint
-	Price        float64
-	Colour       string
+	Id            uint
+	ProductName   string
+	Discription   string
+	CategoryName  string
+	BrandName     string
+	Size          uint
+	Price         float64
+	Colour        string
+	ProductImages string
 }
 
 type ProductQtyRes struct {
-	Id           uint
-	ProductName  string
-	Discription  string
-	Colour       string
-	CategoryName string
-	BrandName    string
-	Price        float64
-	Size         string
-	Quantity     uint
+	Id             uint
+	ProductName    string
+	Discription    string
+	Colour         string
+	CategoryName   string
+	BrandName      string
+	Price          float64
+	Size           string
+	Product_images string
+	Quantity       uint
 }
 
 type ProductStringResponce struct {
