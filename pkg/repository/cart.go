@@ -116,16 +116,19 @@ func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 
 	var body bool
-
+	fmt.Println("---->>>", id)
+	fmt.Println("-----> pf", pfid)
 	query := `select  exists(select * from cart_infos where cart_id = $1 and product_info_id = $2);`
 	err := c.DB.Raw(query, id, pfid).Scan(&body).Error
+	fmt.Println("...body", body)
 	if err != nil {
 
 		return body, err
 	}
-	if !body {
-		return body, nil
-	}
+	// if !body {
+	// 	return body, nil
+	// }
+	fmt.Println("?/")
 	return body, nil
 
 }
