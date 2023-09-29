@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	
+	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -13,11 +13,16 @@ import (
 type CartUseCase struct {
 	cartRepo interfaces.Cartrepository
 	prd      interfaces.ProductRepository
+	coupon   interfaces.Couponrepository
 }
 
-func NewCartUseCase(CartRepo interfaces.Cartrepository, p interfaces.ProductRepository) services.CartUseCase {
+func NewCartUseCase(CartRepo interfaces.Cartrepository,
+	p interfaces.ProductRepository,
+	cp interfaces.Couponrepository) services.CartUseCase {
 
-	return &CartUseCase{cartRepo: CartRepo, prd: p}
+	return &CartUseCase{cartRepo: CartRepo,
+		prd:    p,
+		coupon: cp}
 }
 func (c *CartUseCase) FindCartInfoById(id uint) (domain.CartInfo, error) {
 
@@ -91,7 +96,6 @@ func (c *CartUseCase) AddToCart(id, pfid, qty uint) error {
 
 func (c *CartUseCase) RemoveFromCart(id, pfid uint) error {
 
-	
 	// check the usr have cart
 	cart, err := c.cartRepo.FindCartByUId(id)
 	if err != nil {
@@ -102,11 +106,30 @@ func (c *CartUseCase) RemoveFromCart(id, pfid uint) error {
 	if err != nil {
 		return err
 	}
-	
+	if !exist {
+		res := errors.New("product does not exist")
+		return res
+	}
 	if exist {
 		err := c.cartRepo.RemoveCart(cart.Id, pfid)
 		if err != nil {
 			return err
+		}
+		if cart.CouponId != 0 {
+			coupon, err := c.coupon.ViewCouponById(cart.CouponId)
+			if err != nil {
+				return err
+			}
+			newCartInfo, err := c.CartInfo(id)
+			if err != nil {
+				return err
+			}
+			if newCartInfo.Totalprice <= coupon.MinimumPurchase {
+				err := c.coupon.RemoveCoupon(cart.UserId)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	// response
@@ -125,6 +148,7 @@ func (c *CartUseCase) CartDisplay(id uint) ([]res.CartDisplay, error) {
 		res := errors.New("user cart doest not exst")
 		return body, res
 	}
+	fmt.Println("cart in usecase  - >", cart)
 	body, err = c.cartRepo.ViewCart(id)
 	if err != nil {
 		return body, err
@@ -134,15 +158,38 @@ func (c *CartUseCase) CartDisplay(id uint) ([]res.CartDisplay, error) {
 
 func (c *CartUseCase) CartInfo(id uint) (res.CartInfo, error) {
 
+	fmt.Println("uid --->", id)
 	body, err := c.cartRepo.CartInfo(id)
+	fmt.Println("body from usecase (cartindo -> boy)", body)
+	if err != nil {
+		return body, err
+	}
+	// --------
+	cart, err := c.cartRepo.FindCartByUId(id)
 	if err != nil {
 		return body, err
 	}
 
-	if body.Subtotal == 0 {
-		res := errors.New("cart dosent have any product")
-		return body, res
+	coupon, err := c.coupon.ViewCouponById(cart.CouponId)
+	if err != nil {
+		return body, err
 	}
+	fmt.Println("------------>>>", coupon)
+	// body updation
+	body.CouponCode = coupon.Code
+	body.DiscountPrice = coupon.DiscountPrice
+	body.Totalprice = (body.Subtotal - body.DiscountPrice)
+	// --------
+	// if body.Subtotal == 0 {
+	// 	res := errors.New("cart dosent have any product")
+	// 	return body, res
+	// }
 	// response
+	return body, nil
+}
+
+func (c *CartUseCase) CartInfoNew(id uint) (res.CartInfo, error) {
+
+	var body res.CartInfo
 	return body, nil
 }
