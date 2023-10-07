@@ -10,11 +10,13 @@ type Cartrepository interface {
 	FindCartByUId(id uint) (domain.UserCart, error)
 	FindCartInfoById(id uint) (domain.CartInfo, error)
 	FindProductIntoCart(id, pfid uint) (bool, error)
+	
 	// CURD
 	CreateUserCart(id uint) (domain.UserCart, error)
 	CreateCartinfo(id uint) (domain.CartInfo, error)
 	AddToCart(id, pfid, qty uint) error
 	RemoveCart(id, pfid uint) error
+
 	// View Cart
 	ViewCart(id uint) ([]res.CartDisplay, error)
 	CartInfo(id uint) (res.CartInfo, error)
