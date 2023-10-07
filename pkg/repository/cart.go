@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"github.com/abhinandpn/project-ecom/pkg/util/res"
@@ -20,7 +18,6 @@ func NewCartRepository(db *gorm.DB) interfaces.Cartrepository {
 
 func (c *cartDatabase) FindCartByUId(id uint) (domain.UserCart, error) {
 
-	fmt.Println("id from repo ", id)
 	var body domain.UserCart
 	query := `select * from user_carts where user_id = $1`
 	err := c.DB.Raw(query, id).Scan(&body).Error
@@ -116,11 +113,8 @@ func (c *cartDatabase) ViewCart(id uint) ([]res.CartDisplay, error) {
 func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 
 	var body bool
-	fmt.Println("---->>>", id)
-	fmt.Println("-----> pf", pfid)
 	query := `select  exists(select * from cart_infos where cart_id = $1 and product_info_id = $2);`
 	err := c.DB.Raw(query, id, pfid).Scan(&body).Error
-	fmt.Println("...body", body)
 	if err != nil {
 
 		return body, err
@@ -128,7 +122,6 @@ func (c *cartDatabase) FindProductIntoCart(id, pfid uint) (bool, error) {
 	// if !body {
 	// 	return body, nil
 	// }
-	fmt.Println("?/")
 	return body, nil
 
 }
