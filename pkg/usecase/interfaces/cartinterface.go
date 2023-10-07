@@ -12,4 +12,5 @@ type CartUseCase interface {
 	RemoveFromCart(id, pfid uint) error
 	CartDisplay(id uint) ([]res.CartDisplay, error)
 	CartInfo(id uint) (res.CartInfo, error)
+	CartInfoNew(id uint)(res.CartInfo,error)
 }
