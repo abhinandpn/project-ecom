@@ -145,7 +145,37 @@ func (usr *userUseCase) FindUserById(ctx context.Context, Uid uint) (domain.User
 
 func (usr *userUseCase) AddAddres(ctx context.Context, Uid uint, Address req.ReqAddress) error {
 
-	err := usr.userRepo.AddAddress(ctx, Uid, Address)
+	body1, err := usr.userRepo.GetAddressByName(Address.Name, Uid)
+	if err != nil {
+		return err
+	}
+	if body1.ID != 0 {
+		body2, err := usr.userRepo.GetAddressByHouseName(Address.House, Uid)
+		if err != nil {
+			return err
+		}
+		if body2.ID != 0 {
+			body3, err := usr.userRepo.GetAddressByNumber(Address.PhoneNumber, Uid)
+			if err != nil {
+				return err
+			}
+			if body3.ID != 0 {
+				body4, err := usr.userRepo.GetAddressByPinCode(Address.Pincode, Uid)
+				if err != nil {
+					return err
+				}
+				if body4.ID != 0 {
+					res := errors.New("address alredy exist with this details")
+					return res
+				}
+			}
+		}
+	}
+
+	err = usr.userRepo.AddAddress(ctx, Uid, Address)
+	if err != nil {
+		return err
+	}
 
 	return err
 
@@ -159,13 +189,73 @@ func (usr *userUseCase) UpdateAddress(ctx context.Context, Uid uint, address req
 
 	return err
 }
-func (usr *userUseCase) ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error) {
+func (usr *userUseCase) ListAllAddress(Uid uint) ([]res.ResAddress, error) {
 
 	var body []res.ResAddress
 
-	body, err := usr.userRepo.ListAllAddress(ctx, Uid)
+	body, err := usr.userRepo.ListAllAddress(Uid)
+	if body == nil {
+		res := errors.New("address is empty")
+		return body, res
+	}
 
 	return body, err
+}
+
+func (usr *userUseCase) MakeAddressDefault(uid, id uint) error {
+
+	// if user have address
+	address, err := usr.userRepo.ListAllAddress(uid)
+	if err != nil {
+		return err
+	}
+	if address == nil {
+		res := errors.New("user does not have address")
+		return res
+	}
+	// if user have default address
+	dflt, err := usr.userRepo.FindDefaultAddress(uid)
+	if err != nil {
+		return err
+	}
+	if dflt.ID != 0 {
+
+		// if have change the default address to undefault
+		err := usr.userRepo.AddressRemoveDefaultById(dflt.ID)
+		if err != nil {
+			return err
+		}
+		// make new address id default
+		err = usr.userRepo.MakeAddressDefaultById(id)
+		if err != nil {
+			return err
+		}
+	}
+	err = usr.userRepo.MakeAddressDefaultById(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *userUseCase) GetUserDefaultAddressId(uid uint) (domain.Address, error) {
+
+	var body domain.Address
+
+	address, err := a.userRepo.ListAllAddress(uid)
+	if err != nil {
+		return body, err
+	}
+	if address == nil {
+		res := errors.New("address is empty")
+		return body, res
+	}
+	body, err = a.userRepo.GetUserDefaultAddressId(uid)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
 }
 
 // ----------------------- wishlist -------------------------------
