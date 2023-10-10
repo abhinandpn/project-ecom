@@ -9,7 +9,7 @@ type CouponHandler interface {
 	ViewCouponById(ctx *gin.Context)
 	ListCoupon(ctx *gin.Context)
 	ViewCouponByCode(ctx *gin.Context)
-
+	//
 	//
 	ApplyCoupon(ctx *gin.Context)
 	RemoveCoupon(ctx *gin.Context)
