@@ -7,6 +7,9 @@ go.work
 # Environment file
 .env
 
+githubkey
+githubkey.pub
+
 
 #
 #
