@@ -16,4 +16,5 @@ type CouponUseCase interface {
 	//
 	ApplyCoupon(code string, uid uint) error
 	RemoveCoupon(code string, uid uint) error
+	GetAppliedCoupon(uid uint) (domain.Coupon, error)
 }
