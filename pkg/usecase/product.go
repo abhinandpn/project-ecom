@@ -252,6 +252,7 @@ func (p *productUseCase) GetAllProducts(pagination req.PageNation) ([]res.Produc
 func (p *productUseCase) GetAllQtyInfoProduct(pagination req.PageNation) ([]res.ProductQtyRes, error) {
 
 	product, err := p.productRepo.FindAllProductWithQuantity(pagination)
+
 	if err != nil {
 		return product, err
 	}
@@ -318,10 +319,12 @@ func (p *productUseCase) CreateProduct(product req.ReqProduct) error {
 				return err
 			}
 			if brand.Id != 0 {
+
 				err = p.productRepo.CreateProduct(product)
 				if err != nil {
 					return err
 				}
+
 			} else {
 				res := errors.New("brand does not exist")
 				return res
@@ -532,7 +535,7 @@ func (p *productUseCase) GetByBrand(name string,
 	if err != nil {
 		return body, err
 	}
-
+	
 	body, err = p.productRepo.ListByBrand(brand.Id, pagination)
 	if err != nil {
 		return body, err
@@ -573,5 +576,50 @@ func (p *productUseCase) GetByQuantity(Start, End int,
 	if err != nil {
 		return body, err
 	}
+	return body, nil
+}
+
+func (p *productUseCase) GetProductByString(name string,
+	pagination req.PageNation) (res.ProductStringResponce, error) {
+
+	var ctx context.Context
+	var body res.ProductStringResponce
+
+	// find brand
+	brand, err := p.productRepo.FindBrandByName(name)
+	if err != nil {
+		return body, err
+	}
+	Category, err := p.productRepo.FindCategoryByname(ctx, name)
+	if err != nil {
+		return body, err
+	}
+
+	// find category
+	NameSort, err := p.productRepo.ListByName(name, pagination)
+	if err != nil {
+		return body, err
+	}
+	BrandSort, err := p.productRepo.ListByBrand(brand.Id, pagination)
+	if err != nil {
+		return body, err
+	}
+	CategorySort, err := p.productRepo.ListByCategory(Category.Id, pagination)
+	if err != nil {
+		return body, err
+	}
+	ColourSort, err := p.productRepo.ListByColour(name, pagination)
+	if err != nil {
+		return body, err
+	}
+	if BrandSort == nil && NameSort == nil && CategorySort == nil && ColourSort == nil {
+		res := errors.New("there is no product")
+		return body, res
+	}
+	body.Brand = BrandSort
+	body.Category = CategorySort
+	body.Colour = ColourSort
+	body.Name = NameSort
+
 	return body, nil
 }
