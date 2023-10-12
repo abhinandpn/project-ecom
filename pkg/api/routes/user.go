@@ -36,7 +36,7 @@ func UserRoutes(api *gin.RouterGroup,
 		product.GET("/all/brand", productHandler.ProductGetByBrand)
 		product.GET("/all/name", productHandler.ProductGetByName)
 		product.GET("/all/price", productHandler.ProductGetByPrice)
-		product.GET("/get/:name", productHandler.GetProductByString)
+		product.GET("/get", productHandler.GetProductByString)
 
 		// List all product
 		product.GET("/all", productHandler.ListProducts)

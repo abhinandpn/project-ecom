@@ -47,7 +47,7 @@ func (o *OrderDatabase) AddOrderInfo(orderId,
 	AdrsId,
 	CopId uint,
 	price float64,
-	status string,
+	status uint,
 	payId uint) (uint, error) {
 
 	var body domain.OrderInfo
@@ -68,10 +68,10 @@ func (o *OrderDatabase) AddOrderInfo(orderId,
 	return body.Id, nil
 }
 
-func (o *OrderDatabase) FindAllOrderInfoByUid(uid uint) (domain.OrderInfo, error) {
+func (o *OrderDatabase) FindOrderInfoByUid(uid uint) (domain.OrderInfo, error) {
 
 	var body domain.OrderInfo
-	query := `select * from order_infos where user_id =$1`
+	query := `select * from order_infos where order_id = $1`
 	err := o.DB.Raw(query, uid).Scan(&body).Error
 	if err != nil {
 		return body, err
@@ -82,7 +82,7 @@ func (o *OrderDatabase) FindAllOrderInfoByUid(uid uint) (domain.OrderInfo, error
 func (o *OrderDatabase) AddOrderItem(oid, pfid, qty uint) error {
 
 	var body domain.OrderItem
-	query := `insert into order_items (user_order_id,product_info_id,quantity)values ($1,$2,$3);`
+	query := `insert into order_items (order_info,product_info_id,quantity)values ($1,$2,$3);`
 	err := o.DB.Raw(query, oid, pfid, qty).Scan(&body).Error
 	if err != nil {
 		return err
@@ -93,7 +93,8 @@ func (o *OrderDatabase) AddOrderItem(oid, pfid, qty uint) error {
 func (o *OrderDatabase) CartAllOrder(orderId, OrderinfoId uint, cart []res.CartDisplay) error {
 
 	for _, item := range cart {
-		query := "INSERT INTO order_items (order_id,order_info,product_info_id, quantity) VALUES ($1, $2,$3,$4);"
+		query := `INSERT INTO order_items (order_id,order_info,
+			product_info_id, quantity) VALUES ($1, $2,$3,$4);`
 
 		err := o.DB.Exec(query, orderId, OrderinfoId, item.Id, item.Quantity).Error
 
@@ -238,3 +239,109 @@ func (pr *OrderDatabase) GetAllOrderStatus() ([]domain.OrderStatus, error) {
 	}
 	return body, nil
 }
+
+// 01 - 09 - 2023 - Order status updation
+
+func (o *OrderDatabase) ListALlOrderByUid(id uint) ([]domain.OrderInfo, error) {
+
+	var body []domain.OrderInfo
+	fmt.Println("-------- >", id)
+	query := `SELECT *
+				FROM order_infos
+				WHERE order_id = $1
+				ORDER BY order_time ASC;`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (o *OrderDatabase) UpdateOrderStatusToOrdered(id uint) error {
+
+	var body domain.OrderInfo
+	query := `update order_infos set order_status = 10 where id = $1;`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) UpdateOrderStatusToDelivered(id uint) error {
+
+	var body domain.OrderInfo
+	query := `update order_infos set order_status = 11 where id = $1;`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) UpdateOrderStatusToCancelled(id uint) error {
+
+	var body domain.OrderInfo
+	query := `UPDATE order_infos
+				SET order_status = 12
+				WHERE id = $1;`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) UpdateOrderStatusToReturned(id uint) error {
+
+	var body domain.OrderInfo
+	query := `update order_infos set order_status = 12 where id = $1;`
+	err := o.DB.Raw(query, id).Scan(&body).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderDatabase) ListOrderDetailByUid(uid uint) ([]res.OrderDetailByUid, error) {
+
+	var body []res.OrderDetailByUid
+	query := `SELECT 
+				    oi.id AS order_info_id,
+				    oi.order_id,
+				    oi.order_time,
+				    a.id AS address_id,
+				    a.house,
+				    a.phone_number,
+				    a.street,
+				    a.city,
+				    a.district,
+				    a.pincode,
+				    a.landmark,
+				    a.name AS address_name,
+				    oi.coupon_code,
+				    ci.code AS coupon_name,
+				    ci.discount_price AS coupon_discount,
+				    oi.total_price,
+				    os.status AS order_status,
+				    pd.total_price AS payment_total_price,
+				    pm.method AS payment_method,
+				    ps.payment_status AS payment_status
+				FROM user_orders uo
+				JOIN order_infos oi ON uo.id = oi.order_id
+				JOIN addresses a ON oi.address_id = a.id
+				JOIN order_statuses os ON oi.order_status = os.id
+				JOIN payment_details pd ON oi.id = pd.order_id
+				JOIN payment_methods pm ON pd.payment_method_id = pm.id
+				JOIN payment_statuses ps ON pd.payment_status_id = ps.id
+				LEFT JOIN coupons ci ON oi.coupon_code = ci.id
+				WHERE uo.user_id = $1;`
+	err := o.DB.Raw(query, uid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+

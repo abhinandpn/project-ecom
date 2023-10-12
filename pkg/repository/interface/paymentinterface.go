@@ -18,4 +18,5 @@ type PaymentRepository interface {
 	GetPaymentStatusById(id uint) (domain.PaymentStatus, error)
 	GetAllPaymentStatus() ([]domain.PaymentStatus, error)
 	// -----------------------
+	AddPaymentDetail(oid uint, price float64, pmid uint, pstid uint) (uint, error)
 }

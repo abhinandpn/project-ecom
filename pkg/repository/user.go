@@ -171,25 +171,29 @@ func (usr *userDatabase) UpdateUser(ctx context.Context, info domain.Users) (dom
 func (usr *userDatabase) AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error {
 
 	var body domain.Address
+	// var status bool
 
 	query := `insert into addresses (user_id,
+					name,
 					house,
 					phone_number,
 					street,
 					city,
 					district,
 					pincode,
-		landmark)values ($1,$2,$3,$4,$5,$6,$7,$8);`
+					landmark,
+					"default")values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);`
 	err := usr.DB.Raw(query,
 		Uid,
+		addres.Name,
 		addres.House,
 		addres.PhoneNumber,
 		addres.Street,
 		addres.City,
 		addres.District,
 		addres.Pincode,
-		// addres.IsDefault,
-		addres.Landmark).Scan(&body).Error
+		addres.Landmark,
+		addres.Default).Scan(&body).Error
 
 	if err != nil {
 		return err
@@ -226,7 +230,7 @@ func (usr *userDatabase) UpdateAddress(ctx context.Context, Uid uint, address re
 
 // -----------------ListAllAddress-----------------
 
-func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error) {
+func (usr *userDatabase) ListAllAddress(Uid uint) ([]res.ResAddress, error) {
 
 	var body []res.ResAddress
 
@@ -238,6 +242,30 @@ func (usr *userDatabase) ListAllAddress(ctx context.Context, Uid uint) ([]res.Re
 		return body, err
 	}
 	return body, nil
+}
+
+func (a *userDatabase) GetUserDefaultAddressId(uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `SELECT *
+					FROM addresses
+					WHERE user_id = $1 AND "default" = true;`
+	err := a.DB.Raw(query, uid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func (a *userDatabase) GetAddressByAdrsId(uid, adrsId uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id = $1 and id = $2;`
+	err := a.DB.Raw(query, uid, adrsId).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
 }
 
 // wishlist
@@ -372,3 +400,100 @@ func (u *userDatabase) GetAddressByUid(uid uint) (domain.Address, error) {
 	}
 	return body, nil
 }
+
+// ---------------------------------------------------------------------------------------
+
+func (u *userDatabase) GetAddressByName(name string, uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id = $1 and name = $2;`
+	err := u.DB.Raw(query, uid, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) GetAddressByHouseName(name string, uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id = $1 and house = $2;`
+	err := u.DB.Raw(query, uid, name).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) GetAddressByNumber(number string, uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id = $1 and phone_number =$2 ;`
+	err := u.DB.Raw(query, uid, number).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) GetAddressByPinCode(code string, uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where user_id = $1 and pincode = $2;`
+	err := u.DB.Raw(query, uid, code).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (u *userDatabase) MakeAddressDefaultById(id uint) error {
+
+	query := `UPDATE addresses
+				SET "default" = true
+				WHERE id = $1;`
+	err := u.DB.Exec(query, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userDatabase) AddressRemoveDefaultById(id uint) error {
+
+	query := `UPDATE addresses
+	SET "default" = false
+	WHERE id = $1;`
+	err := u.DB.Exec(query, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userDatabase) CheckDefaultAddress(uid uint) (bool, error) {
+
+	var rst bool
+	query := ` select  exists ( SELECT *
+	FROM addresses
+	WHERE "default" = true
+	  AND user_id = $1 );`
+	err := u.DB.Raw(query, uid).Scan(&rst).Error
+	if err != nil {
+		return rst, err
+	}
+	return rst, err
+}
+
+func (u *userDatabase) FindDefaultAddress(uid uint) (domain.Address, error) {
+
+	var body domain.Address
+	query := `select * from addresses where "default" = true and  user_id = $1;`
+	err := u.DB.Raw(query, uid).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+//---------------------------------------------------------------------------------------

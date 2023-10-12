@@ -370,7 +370,8 @@ func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.Produ
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_infos.size,
+				product_images.product_images,
 			  FROM
 				products
 			  INNER JOIN
@@ -379,6 +380,8 @@ func (p *productDatabase) FindAllProduct(pagination req.PageNation) ([]res.Produ
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_infos.product_id
 			  ORDER BY
 				created_at DESC
 			  LIMIT
@@ -406,6 +409,7 @@ func (p *productDatabase) FindAllProductWithQuantity(pagination req.PageNation) 
 				brands.brand_name,
 				product_infos.price,
 				product_infos.size,
+				product_images.product_images,
 				product_infos.quantity
 			  FROM
 				products
@@ -415,8 +419,10 @@ func (p *productDatabase) FindAllProductWithQuantity(pagination req.PageNation) 
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  ORDER BY
-			  product_infos.id ASC
+			    product_infos.id ASC
 			  LIMIT
 				$1 OFFSET $2;`
 	err := p.DB.Raw(query, limit, offset).Scan(&body).Error
@@ -432,7 +438,7 @@ func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
 	tx := p.DB.Begin() // transaction begin
 	var Time time.Time
 	var ProductTable domain.Product
-	// var ProductImage domain.ProductImage
+	var ProductImage domain.ProductImage
 	var ProductInfo domain.ProductInfo
 
 	// add in to product table
@@ -454,12 +460,12 @@ func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
 
 	ProductId := ProductTable.Id
 	// add in to productimages table
-	// query2 := `insert into product_images (product_id,product_images)values ($1,$2) returning id;`
-	// err = p.DB.Raw(query2, ProductId, product.ImageId).Scan(&ProductImage).Error
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
+	query2 := `insert into product_images (product_id,product_images)values ($1,$2) returning id;`
+	err = p.DB.Raw(query2, ProductId, product.Image).Scan(&ProductImage).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
 	// ImageId := ProductImage.Id
 
@@ -468,7 +474,7 @@ func (p *productDatabase) CreateProduct(product req.ReqProduct) error {
 					price,
 					colour,
 					size,
-					quatity)values ($1,$2,$3,$4,$5);`
+					quantity)values ($1,$2,$3,$4,$5)returning id;`
 	err = p.DB.Raw(query3, ProductId,
 		product.Price,
 		product.Color,
@@ -656,6 +662,7 @@ func (p *productDatabase) FindProductInfoById(id uint) (domain.ProductInfo, erro
 
 func (p *productDatabase) ProductViewByPid(id uint) (res.ResProductOrder, error) {
 
+	// need updation -------------------
 	var body res.ResProductOrder
 	query := `SELECT 
 					
@@ -757,7 +764,9 @@ func (p *productDatabase) ListByColour(colour string,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -766,6 +775,8 @@ func (p *productDatabase) ListByColour(colour string,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  WHERE
 				product_infos.colour = $1
 			  ORDER BY
@@ -795,7 +806,9 @@ func (p *productDatabase) ListBySize(size uint,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -804,6 +817,8 @@ func (p *productDatabase) ListBySize(size uint,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  WHERE
 				product_infos.size = $1
 			  ORDER BY
@@ -833,7 +848,9 @@ func (p *productDatabase) ListByCategory(id uint,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -842,6 +859,8 @@ func (p *productDatabase) ListByCategory(id uint,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  WHERE
 				products.category_id = $1
 			  ORDER BY
@@ -871,7 +890,9 @@ func (p *productDatabase) ListByBrand(id uint,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -880,6 +901,8 @@ func (p *productDatabase) ListByBrand(id uint,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  WHERE
 				products.brand_id = $1
 			  ORDER BY
@@ -910,7 +933,9 @@ func (p *productDatabase) ListByName(name string,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -919,6 +944,8 @@ func (p *productDatabase) ListByName(name string,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
 			  WHERE
 				products.product_name = $1
 			  ORDER BY
@@ -949,7 +976,9 @@ func (p *productDatabase) ListByPrice(Start, End float64,
 				brands.brand_name,
 				product_infos.price,
 				product_infos.colour,
-				product_infos.size
+				product_images.product_images,
+				product_infos.size,
+				product_infos,quantity
 			  FROM
 				products
 			  INNER JOIN
@@ -958,7 +987,9 @@ func (p *productDatabase) ListByPrice(Start, End float64,
 				brands ON products.brand_id = brands.id
 			  INNER JOIN
 				product_infos ON products.id = product_infos.product_id
-			  WHERE
+			  INNER JOIN
+				product_images ON products.id = product_images.product_id
+		      WHERE
 			  	product_infos.price BETWEEN $1 AND $2
 			  ORDER BY
 			 	 product_infos.id ASC
@@ -981,27 +1012,31 @@ func (p *productDatabase) ListByQuantity(Start, End uint,
 	offset := (pagination.PageNumber - 1) * limit
 
 	query := `SELECT
-				product_infos.id,
-				products.product_name,
-				products.discription,
-				categories.category_name,
-				brands.brand_name,
-				product_infos.price,
-				product_infos.colour,
-				product_infos.size
-			  FROM
-				products
-			  INNER JOIN
-				categories ON products.category_id = categories.id
-			  INNER JOIN
-				brands ON products.brand_id = brands.id
-			  INNER JOIN
-				product_infos ON products.id = product_infos.product_id
-			  WHERE
-			  	product_infos.quatity BETWEEN $1 AND $2
-			  ORDER BY
+    product_infos.id,
+    products.product_name,
+    products.discription,
+    categories.category_name,
+    brands.brand_name,
+    product_infos.price,
+    product_infos.colour,
+    product_images.product_images,
+    product_infos.size,
+	product_infos,quantity
+		 FROM
+		     products
+		 INNER JOIN
+		     categories ON products.category_id = categories.id
+		 INNER JOIN
+		     brands ON products.brand_id = brands.id
+		 INNER JOIN
+		     product_infos ON products.id = product_infos.product_id
+		 INNER JOIN
+		     product_images ON products.id = product_images.product_id
+		 WHERE
+		     product_infos.quantity BETWEEN $1 AND $2
+			ORDER BY
 			  	product_infos.id ASC
-			  LIMIT
+		    LIMIT
 				$3 OFFSET $4;`
 	err := p.DB.Raw(query, Start, End, limit, offset).Scan(&body).Error
 	if err != nil {
@@ -1009,4 +1044,27 @@ func (p *productDatabase) ListByQuantity(Start, End uint,
 	}
 	return body, nil
 
+}
+
+func (p *productDatabase) GetProductImage(id uint) (domain.ProductImage, error) {
+
+	var body domain.ProductImage
+	query := `select * from product_images where product_id = $1;`
+	err := p.DB.Exec(query, id).Scan(&body).Error
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+
+}
+
+func (p *productDatabase) FindProductPriceByProductInfoId(id uint) (float64, error) {
+
+	var price float64
+	query := `select price from product_infos where product_id = $1;`
+	err := p.DB.Raw(query, id).Scan(&price).Error
+	if err != nil {
+		return price, err
+	}
+	return price, nil
 }

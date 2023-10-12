@@ -799,7 +799,6 @@ func (p *ProductHandler) GetProductByString(ctx *gin.Context) {
 	name := ctx.Query("name")
 	count, err1 := helper.StringToUInt(ctx.Query("count"))
 	pageNumber, err2 := helper.StringToUInt(ctx.Query("page_number"))
-
 	err1 = errors.Join(err1, err2)
 	if err1 != nil {
 		response := res.ErrorResponse(400, "invalid inputs", err1.Error(), nil)

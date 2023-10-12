@@ -64,4 +64,7 @@ type ProductuseCase interface {
 	GetByName(name string, pagination req.PageNation) ([]res.ProductResponce, error)
 	GetByPrice(Start, End int, pagination req.PageNation) ([]res.ProductResponce, error)
 	GetByQuantity(Start, End int, pagination req.PageNation) ([]res.ProductResponce, error)
+
+	// final sort
+	GetProductByString(name string, pagination req.PageNation) (res.ProductStringResponce, error)
 }

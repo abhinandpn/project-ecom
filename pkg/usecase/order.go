@@ -342,20 +342,27 @@ func (o *OrderUseCase) UpdatedCartAllOrder(uid, payid, addid uint) error {
 		res := errors.New("cart is empty")
 		return res
 	}
-	//  cart info (for price & details)
+	// find cart
+	cart, err := o.cartRepo.FindCartByUId(uid)
+	if err != nil {
+		return err
+	}
+	coupon, err := o.couponRepo.ViewCouponById(cart.CouponId)
+	if err != nil {
+		return err
+	}
+
+	// cart section
 	CartInfo, err := o.cartRepo.CartInfo(uid)
 	if err != nil {
 		return err
 	}
-	// coupon info (for updation)
-	Coupon, err := o.couponRepo.ViewCouponByCode(CartInfo.CouponCode)
-	if err != nil {
-		return err
-	}
+
 	//  address (show full address)
 	FullAddress, err := o.userRepo.ListAllAddress(uid)
 	if err != nil {
 		return err
+
 	}
 	if FullAddress == nil {
 		res := errors.New("no address found")
@@ -371,12 +378,169 @@ func (o *OrderUseCase) UpdatedCartAllOrder(uid, payid, addid uint) error {
 	if err != nil {
 		return err
 	}
-
+	// Cart product infos
+	CartProductInfoId, err := o.cartRepo.ViewCartProductInfoidByUid(uid)
+	if err != nil {
+		return err
+	}
+	// cart product quantity
+	CartProductQuantity, err := o.cartRepo.ViewCartQuantityidByUid(uid)
+	if err != nil {
+		return err
+	}
 	// -------------- UPDATE INFO --------------
+	CouponId := cart.CouponId
+	Subtotal := CartInfo.Subtotal
+	Total := (Subtotal - coupon.DiscountPrice)
 
 	// order info updation
-	// o.orderRepo.AddOrderInfo(OrderId.Id, Address.ID,Coupon.Id,CartInfo.Totalprice)
-	fmt.Println(OrderId, Coupon, Address, PaymentMethod)
+	OrderInfoId, err := o.orderRepo.AddOrderInfo(OrderId.Id,
+		Address.ID,
+		CouponId,
+		Total,
+		10,
+		PaymentMethod.Id)
+	if err != nil {
+		return err
+	}
+
+	// order items updation
+	length := len(CartProductInfoId)
+	var i uint
+	for i = 0; i < uint(length); i++ {
+		err := o.orderRepo.AddOrderItem(OrderInfoId,
+			uint(CartProductInfoId[i]),
+			uint(CartProductQuantity[i]))
+		if err != nil {
+			return err
+		}
+	}
+
+	// Payment detail updation
+	_, err = o.paymentRepo.AddPaymentDetail(OrderInfoId,
+		Total,
+		PaymentMethod.Id,
+		1)
+	if err != nil {
+		return err
+	}
+
 	return nil
 
+}
+
+func (o *OrderUseCase) UpdatedGetFullOrderDetailByuser(uid uint) ([]res.UpdateOrderDetail, error) {
+
+	var body []res.UpdateOrderDetail
+
+	// get orderid by userid
+	OrderId, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return body, err
+	}
+	// get order info by orderid
+	orderInfo, err := o.orderRepo.FindOrderInfoByOrderId(OrderId.Id)
+	if err != nil {
+		return body, err
+	}
+	// get orderitem by order info id
+	// get payment detail order id
+	// get product info via order items
+	// o.orderRepo.
+	fmt.Println(orderInfo)
+	return body, nil
+}
+
+// 01 - 09 - 2023 - Order status updation
+
+func (o *OrderUseCase) ListAllOrderByUid(uid uint) ([]domain.OrderInfo, error) {
+
+	var body []domain.OrderInfo
+	fmt.Println("-------- >", uid)
+	order, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return body, err
+	}
+	fmt.Println("order id ----", order.Id)
+	body, err = o.orderRepo.ListALlOrderByUid(order.Id)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+
+func (o *OrderUseCase) OrderStatusToOrdered(uid uint) error {
+
+	UserOrder, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return err
+	}
+	err = o.orderRepo.UpdateOrderStatusToOrdered(UserOrder.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderUseCase) OrderStatusToDelivered(uid uint) error {
+
+	UserOrder, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return err
+	}
+	err = o.orderRepo.UpdateOrderStatusToDelivered(UserOrder.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderUseCase) OrderStatusToCancelled(uid uint) error {
+
+	UserOrder, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return err
+	}
+	err = o.orderRepo.UpdateOrderStatusToCancelled(UserOrder.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderUseCase) OrderStatusToReturned(uid uint) error {
+
+	UserOrder, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return err
+	}
+	err = o.orderRepo.UpdateOrderStatusToReturned(UserOrder.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OrderUseCase) ListOrderDetailByUid(uid uint) ([]res.OrderDetailByUid, error) {
+
+	var body []res.OrderDetailByUid
+	order, err := o.orderRepo.FindUserOrderByUId(uid)
+	if err != nil {
+		return body, err
+	}
+	if order.Id == 0 {
+		res := errors.New("order is empty 1 ")
+		return body, res
+	}
+	body, err = o.orderRepo.ListOrderDetailByUid(uid)
+	if err != nil {
+		return body, err
+	}
+
+	// if body.AddreddId == 0 {
+	// 	res := errors.New("order is empty 2")
+	// 	return body, res
+	// }
+
+	return body, nil
 }

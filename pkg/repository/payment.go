@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
 	"gorm.io/gorm"
@@ -141,4 +143,24 @@ func (py *PaymentDatabase) GetAllPaymentStatus() ([]domain.PaymentStatus, error)
 		return body, err
 	}
 	return body, nil
+}
+
+func (p *PaymentDatabase) AddPaymentDetail(oid uint,
+	price float64,
+	pmid uint,
+	pstid uint,
+) (uint, error) {
+
+	var body domain.PaymentDetail
+	time := time.Now()
+	query := `insert into payment_details (order_id,
+		total_price,
+		payment_method_id,
+		payment_status_id,
+		updated_at)values ($1,$2,$3,$4,$5) returning id;`
+	err := p.DB.Raw(query, oid, price, pmid, pstid, time).Scan(&body).Error
+	if err != nil {
+		return body.Id, err
+	}
+	return body.Id, nil
 }

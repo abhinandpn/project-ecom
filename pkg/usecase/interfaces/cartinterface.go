@@ -14,3 +14,4 @@ type CartUseCase interface {
 	CartInfo(id uint) (res.CartInfo, error)
 	CartInfoNew(id uint)(res.CartInfo,error)
 }
+																																			

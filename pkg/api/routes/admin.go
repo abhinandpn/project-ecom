@@ -55,7 +55,7 @@ func AdminRoute(api *gin.RouterGroup,
 			product.GET("/all/name", ProductHandler.ProductGetByName)
 			product.GET("/all/price", ProductHandler.ProductGetByPrice)
 			product.GET("/all/quantity", ProductHandler.ProductGetByQuantity)
-			product.GET("/get/:name", ProductHandler.GetProductByString) // sort by string
+			product.GET("/get", ProductHandler.GetProductByString) // sort by string
 		}
 		// Category
 		category := api.Group("/category")

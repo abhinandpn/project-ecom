@@ -21,7 +21,9 @@ type UserUseCase interface {
 	// Address
 	AddAddres(ctx context.Context, Uid uint, Address req.ReqAddress) error
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error
-	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)
+	ListAllAddress(Uid uint) ([]res.ResAddress, error)
+	GetUserDefaultAddressId(uid uint) (domain.Address, error)
+	MakeAddressDefault(uid, id uint) error
 
 	// wishlist
 	FindWishList(id uint) (domain.WishList, error)

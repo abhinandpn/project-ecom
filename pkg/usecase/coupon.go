@@ -128,6 +128,7 @@ func (cp *CouponUseCase) ApplyCoupon(code string, uid uint) error {
 		res := errors.New("coupon does not exist")
 		return res
 	}
+
 	// check if exist
 	cart, err := cp.cartRepo.FindCartByUId(uid)
 	if err != nil {
@@ -137,6 +138,16 @@ func (cp *CouponUseCase) ApplyCoupon(code string, uid uint) error {
 	if err != nil {
 		return err
 	}
+	cartinfo, err := cp.cartRepo.CartInfo(uid)
+	if err != nil {
+		return err
+	}
+	// check the price limit exist
+	if cartinfo.Subtotal <= coupon.MinimumPurchase {
+		res := errors.New("cart want mimimum purchase limit ammount")
+		return res
+	}
+	// checking end
 	if userCoupon.Id != 0 {
 		res := errors.New("alredy have coupon")
 		return res
@@ -184,4 +195,24 @@ func (cp *CouponUseCase) RemoveCoupon(code string, uid uint) error {
 	}
 
 	return nil
+}
+
+func (c *CouponUseCase) GetAppliedCoupon(uid uint) (domain.Coupon, error) {
+
+	var body domain.Coupon
+	cart, err := c.cartRepo.FindCartByUId(uid)
+	if err != nil {
+		return body, err
+	}
+	if cart.CouponId != 0 {
+		body, err = c.couponRepo.ViewCouponById(cart.CouponId)
+		if err != nil {
+			return body, err
+		}
+	} else {
+		res := errors.New("coupon does not exist")
+		return body, res
+	}
+
+	return body, nil
 }

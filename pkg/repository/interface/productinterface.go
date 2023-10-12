@@ -47,9 +47,13 @@ type ProductRepository interface {
 	ProductViewByPid(id uint) (res.ResProductOrder, error)                             // Find Produdct By Pinfo id
 	FindAllProductWithQuantity(pagination req.PageNation) ([]res.ProductQtyRes, error) // Find All product with quantity
 
+	// updated
+	FindProductPriceByProductInfoId(id uint) (float64, error)
+
 	// product images
 	AddProductImage(id uint, img string) error
 	FindImage(img string) (domain.ProductImage, error)
+	GetProductImage(id uint) (domain.ProductImage, error)
 
 	// opration
 	CreateProduct(product req.ReqProduct) error

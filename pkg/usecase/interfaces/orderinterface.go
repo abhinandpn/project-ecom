@@ -23,5 +23,13 @@ type OrderUseCase interface {
 	FindAllOrderStatus() ([]domain.OrderStatus, error)
 
 	UpdatedCartAllOrder(uid, payid, addid uint) error
+	UpdatedGetFullOrderDetailByuser(uid uint) ([]res.UpdateOrderDetail, error)
 	//
+	// 01 - 09 - 2023 - Order status updation
+	ListOrderDetailByUid(uid uint) ([]res.OrderDetailByUid, error)
+	ListAllOrderByUid(uid uint) ([]domain.OrderInfo, error)
+	OrderStatusToOrdered(uid uint) error
+	OrderStatusToDelivered(uid uint) error
+	OrderStatusToCancelled(uid uint) error
+	OrderStatusToReturned(uid uint) error
 }

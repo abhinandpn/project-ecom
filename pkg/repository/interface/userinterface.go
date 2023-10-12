@@ -26,8 +26,20 @@ type UserRepository interface {
 	// Address
 	AddAddress(ctx context.Context, Uid uint, addres req.ReqAddress) error     // Add Address
 	UpdateAddress(ctx context.Context, Uid uint, address req.ReqAddress) error // Update Address
-	ListAllAddress(ctx context.Context, Uid uint) ([]res.ResAddress, error)    // Delete Address
+	ListAllAddress( Uid uint) ([]res.ResAddress, error)    // get Address
 	GetAddressByUid(uid uint) (domain.Address, error)                          // get address
+	GetUserDefaultAddressId(uid uint) (domain.Address, error)                  // get default
+	GetAddressByAdrsId(uid, adrsId uint) (domain.Address, error)
+
+	// updated address
+	MakeAddressDefaultById(id uint) error
+	AddressRemoveDefaultById(id uint) error
+	CheckDefaultAddress(uid uint) (bool, error)
+	FindDefaultAddress(uid uint) (domain.Address, error)
+	GetAddressByName(name string, uid uint) (domain.Address, error)
+	GetAddressByHouseName(name string, uid uint) (domain.Address, error)
+	GetAddressByNumber(number string, uid uint) (domain.Address, error)
+	GetAddressByPinCode(code string, uid uint) (domain.Address, error)
 
 	// wishlist
 	CreateWishList(id uint) error
