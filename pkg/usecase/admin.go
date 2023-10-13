@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	domain "github.com/abhinandpn/project-ecom/pkg/domain"
 	interfaces "github.com/abhinandpn/project-ecom/pkg/repository/interface"
@@ -31,7 +30,6 @@ func NewAdminUseCase(Adminrepo interfaces.AdminRepository, UserRepo interfaces.U
 func (adm *AdminUseCase) SudoLogin(ctx context.Context, admin domain.Admin) (domain.Admin, error) {
 
 	envAdmin, err := adm.adminRepo.EnvAdminFind(ctx)
-	fmt.Println(envAdmin.Email, admin.Email)
 	if err != nil {
 		return domain.Admin{}, err
 	}

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
@@ -131,7 +130,6 @@ func (c *CartsHandler) ViewCart(ctx *gin.Context) {
 func (c *CartsHandler) CartInfo(ctx *gin.Context) {
 
 	Uid := helper.GetUserId(ctx)
-	fmt.Println("uid from handler ", Uid)
 	body, err := c.CartUseCase.CartInfo(Uid)
 
 	if err != nil {

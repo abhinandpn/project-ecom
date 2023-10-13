@@ -148,7 +148,6 @@ func (c *CartUseCase) CartDisplay(id uint) ([]res.CartDisplay, error) {
 		res := errors.New("user cart doest not exst")
 		return body, res
 	}
-	fmt.Println("cart in usecase  - >", cart)
 	body, err = c.cartRepo.ViewCart(id)
 	if err != nil {
 		return body, err

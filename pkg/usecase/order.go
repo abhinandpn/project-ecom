@@ -456,12 +456,10 @@ func (o *OrderUseCase) UpdatedGetFullOrderDetailByuser(uid uint) ([]res.UpdateOr
 func (o *OrderUseCase) ListAllOrderByUid(uid uint) ([]domain.OrderInfo, error) {
 
 	var body []domain.OrderInfo
-	fmt.Println("-------- >", uid)
 	order, err := o.orderRepo.FindUserOrderByUId(uid)
 	if err != nil {
 		return body, err
 	}
-	fmt.Println("order id ----", order.Id)
 	body, err = o.orderRepo.ListALlOrderByUid(order.Id)
 	if err != nil {
 		return body, err

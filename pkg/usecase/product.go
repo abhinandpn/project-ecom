@@ -535,7 +535,7 @@ func (p *productUseCase) GetByBrand(name string,
 	if err != nil {
 		return body, err
 	}
-	
+
 	body, err = p.productRepo.ListByBrand(brand.Id, pagination)
 	if err != nil {
 		return body, err

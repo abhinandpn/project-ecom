@@ -245,7 +245,6 @@ func (pr *OrderDatabase) GetAllOrderStatus() ([]domain.OrderStatus, error) {
 func (o *OrderDatabase) ListALlOrderByUid(id uint) ([]domain.OrderInfo, error) {
 
 	var body []domain.OrderInfo
-	fmt.Println("-------- >", id)
 	query := `SELECT *
 				FROM order_infos
 				WHERE order_id = $1
@@ -343,5 +342,3 @@ func (o *OrderDatabase) ListOrderDetailByUid(uid uint) ([]res.OrderDetailByUid, 
 	}
 	return body, nil
 }
-
-

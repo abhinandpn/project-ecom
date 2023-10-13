@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	handlerInterface "github.com/abhinandpn/project-ecom/pkg/api/handler/interfaces"
@@ -323,7 +322,6 @@ func (o *OrderHandler) ListAllOrderByUid(ctx *gin.Context) {
 		return
 
 	}
-	fmt.Println("==== > > > > > ", Uid)
 	orders, err := o.orderUseCase.ListAllOrderByUid(Uid)
 	if err != nil {
 		respones := res.ErrorResponse(400, "can't get orders", err.Error(), nil)
@@ -444,7 +442,6 @@ func (o *OrderHandler) ListOrderDetailByUid(ctx *gin.Context) {
 		return
 
 	}
-	fmt.Println("user id( handler ) --- > ", uid)
 	body, err := o.orderUseCase.ListOrderDetailByUid(uid)
 	if err != nil {
 		respones := res.ErrorResponse(400, "can't get order details", err.Error(), nil)
