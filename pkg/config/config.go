@@ -11,7 +11,9 @@ type Config struct {
 	DBUser     string `mapstructure:"DB_USER"`
 	DBPort     string `mapstructure:"DB_PORT"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
-	JWT        string `mapstructure:"JWT_CODE"`
+
+	// jwt
+	JWT string `mapstructure:"JWT_CODE"`
 
 	// TWILLIO ACCOUNT
 	AUTHTOKEN  string `mapstructure:"AUTH_TOKEN"`

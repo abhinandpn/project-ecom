@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-package di
+package die
 
 import (
 	http "github.com/abhinandpn/project-ecom/pkg/api"
