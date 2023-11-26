@@ -40,7 +40,7 @@ func NewServerHTTP(userHandler handlerInterface.UserHandler,
 		couponHandler)
 	routes.AdminRoute(Engine.Group("/admin"),
 		adminHandler,
-		productHandler,
+		productHandler, 
 		orderHandler,
 		paymentHandler,
 		couponHandler)
