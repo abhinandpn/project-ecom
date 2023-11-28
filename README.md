@@ -12,6 +12,6 @@ air
 ___
 
 ```
- Projetc updating ... progress....!! (78 % .... Completed)
+ Projetc updating ... progress....!! (75 % .... Completed)
  ```
  ___
