@@ -7,7 +7,7 @@ import (
 
 	di "github.com/abhinandpn/project-ecom/pkg/di"
 )
-
+	
 func main() {
 
 	cfg, configErr := config.LoadConfig()
